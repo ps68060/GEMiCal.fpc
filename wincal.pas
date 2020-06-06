@@ -32,8 +32,7 @@ type
                    procedure IconPaint(var PaintInfo : TPaintStruct);  VIRTUAL;
                    procedure SetupSize;                                VIRTUAL;
 
-                   procedure WriteDates(offset : Integer;
-                                        newX,
+                   procedure WriteDates(newX,
                                         newY   : LongInt);             VIRTUAL;
                  END;
 
@@ -60,8 +59,7 @@ begin
 end;
 
 
-procedure TWinCal.WriteDates(offset : Integer;
-                             newX,
+procedure TWinCal.WriteDates(newX,
                              newY   : LongInt);
 var
   leftPos,
@@ -170,7 +168,7 @@ begin
   xSpace     := 110;
   ySpace     := 100;
 
-  WriteDates(1, new_X, new_Y);
+  WriteDates(new_X, new_Y);
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
 
