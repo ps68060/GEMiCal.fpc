@@ -70,7 +70,14 @@ var
   ySpace,
   x,
   y            : Integer;
+
+  year,
+  month,
+  day,
+  dayOfWeek    : Word;
+
   daysInMon    : Integer;
+  currentMonth : Boolean;
 
   i            : Integer;
 
@@ -80,6 +87,8 @@ begin
   xSpace     := 110;
   ySpace     := 100;
 
+  currentMonth := FALSE;
+
   daysInMon := daysMon[calDate^.mm];
 
   if (calDate^.mm = 2) and (isLeapDay(calDate^.yyyy))
@@ -88,14 +97,34 @@ begin
 
   writeln(calDate^.yyyy, '    ', mon1[calDate^.mm]);
 
+  GetDate (year, month, day, dayOfWeek) ;
+
+  if     (calDate^.yyyy = year)
+     and (calDate^.mm   = month)
+  then
+    currentMonth := TRUE;
+
   for i := 1 to daysInMon
   do
   begin
-   calPos(i - 1 + offset, x, y);
-   v_gtext(vdiHandle,
-           newX + x,
-           newY + y,
-           IntToStr(i) );
+    calPos(i - 1 + calDate^.day, x, y);
+
+    if (currentMonth)
+       and (i = day)
+    then
+    begin
+      vst_effects(vdiHandle, TF_UNDERLINED);
+      v_gtext(vdiHandle,
+              newX + x,
+              newY + y,
+              IntToStr(i) );
+      vst_effects(vdiHandle, TF_NORMAL);
+    end
+    else
+      v_gtext(vdiHandle,
+              newX + x,
+              newY + y,
+              IntToStr(i) );
   end;
 end;
 
