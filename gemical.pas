@@ -5,8 +5,10 @@
 PROGRAM GemICal;
 
 uses
+  Dos,
   Gem,
   OWindows,
+  DateTime,
 
   DlgAbout,
   DlgConv,
@@ -79,6 +81,14 @@ end;
 
 
 procedure TMyApplication.INITMainWindow;
+var
+  year,
+  month,
+  day,
+  dayOfWeek : Word;
+
+  dtStr     : String;
+
 begin
   writeln ('INIT Main Window');
 
@@ -86,8 +96,17 @@ begin
   then
   begin
     MyApplication.WinCal := new(PWinCal, init(NIL, 'GEMiCal') );
-    MyApplication.WinCal^.calDate^.yyyy := 2020;
-    MyApplication.WinCal^.calDate^.mm := 6;
+
+    (* Display this month's calendar *)
+    GetDate (year, month, day, dayOfWeek) ;
+    dtStr := date2Str(year, month, 1, FALSE);
+
+    new(MyApplication.WinCal^.calDate);
+    MyApplication.WinCal^.calDate^.init;
+
+    MyApplication.WinCal^.calDate^.dtStr2Obj(dtStr);
+    MyApplication.WinCal^.calDate^.dayOfWeek;
+
   end;
 
   if MyApplication.WinCal <> NIL
