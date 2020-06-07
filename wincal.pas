@@ -123,7 +123,7 @@ begin
       v_gtext(vdiHandle,
               newX + x,
               newY + y,
-              IntToStr(i) );
+              IntToStr(i) + ' ' + day2[i mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -291,22 +291,6 @@ begin
     pxArray[3] := pxArray[3] + xSpace;
   end;
 
-(*
-  v_circle(vdiHandle, new_x+320, new_y+200, 80);
-  vsf_interior(vdiHandle, FIS_SOLID);
-
-  v_ellipse(vdiHandle, new_x+300, new_y+160, 10, 20);
-  vsf_interior(vdiHandle, FIS_PATTERN);
-  vsf_style(vdiHandle,3);
-
-  v_ellipse(vdiHandle, new_x+340, new_y+160, 10, 20);
-  vsf_style(vdiHandle,4);
-
-  v_ellipse(vdiHandle, new_x+320, new_y+200, 10, 20);
-  vsf_style(vdiHandle,2);
-
-  v_ellpie(vdiHandle, new_x+320, new_y+230, 50, 20, 1800, 3600);
-*)
 end;
 
 
