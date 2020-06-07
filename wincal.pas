@@ -9,7 +9,8 @@ interface
     OWindows,
 
     DateTime,
-    StrSubs;
+    StrSubs,
+    Logger;
 
 {$I gemical.i}
 
@@ -34,19 +35,22 @@ type
 
                    procedure WriteDates(newX,
                                         newY   : LongInt);             VIRTUAL;
+
+                   procedure DrawHeading(newX,
+                                         newY   : LongInt);
                  END;
 
 
 implementation
-
-procedure calPos(cell  : Integer;
-                 var x,
-                     y : Integer);
 var
   leftPos,
   topPos,
   xSpace,
   ySpace    : Integer;
+
+procedure calPos(cell  : Integer;
+                 var x,
+                     y : Integer);
 
 begin
   leftPos    := 30;
@@ -62,10 +66,8 @@ end;
 procedure TWinCal.WriteDates(newX,
                              newY   : LongInt);
 var
-  leftPos,
-  topPos,
-  xSpace,
-  ySpace,
+  logger    : PLogger;
+
   x,
   y            : Integer;
 
@@ -80,6 +82,11 @@ var
   i            : Integer;
 
 begin
+
+  new(logger);
+  logger^.init;
+  logger^.level := INFO;
+
   leftPos    := 30;
   topPos     := 120;
   xSpace     := 110;
@@ -93,7 +100,8 @@ begin
   then
     daysInMon := 29;
 
-  writeln(calDate^.yyyy, '    ', mon1[calDate^.mm]);
+  logger^.logInt(DEBUG, '', calDate^.yyyy );
+  logger^.log(DEBUG, mon1[calDate^.mm] );
 
   GetDate (year, month, day, dayOfWeek) ;
 
@@ -111,7 +119,7 @@ begin
        and (i = day)
     then
     begin
-      vst_effects(vdiHandle, TF_UNDERLINED);
+      vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
               newX + x,
               newY + y,
@@ -124,6 +132,77 @@ begin
               newY + y,
               IntToStr(i) );
   end;
+
+  Dispose (logger, Done);
+end;
+
+
+procedure TWinCal.DrawHeading(newX,
+                              newY   : LongInt);
+
+(* Draw the column headings *)
+var
+  lineLength,
+  cellHeight   : Integer;
+  pxArray      : Array [1..10] of Integer;
+
+  x,
+  y            : Integer;
+
+  i            : Integer;
+
+begin
+  leftPos    := 30;
+  topPos     := 120;
+  xSpace     := 110;
+  ySpace     := 100;
+
+  (* Draw horizontal line above main grid *)
+  lineLength := leftPos + 7 * xSpace;
+  cellHeight := 2*Attr.boxHeight;
+
+  pxArray[1] := leftPos;
+  pxArray[2] := topPos - cellHeight;
+
+  pxArray[3] := lineLength;
+  pxArray[4] := topPos - cellHeight;
+
+  v_pline(vdiHandle, 2, pxArray);
+
+  pxArray[2] := pxArray[2] + cellHeight +3;
+  pxArray[4] := pxArray[4] + cellHeight +3;
+
+  v_pline(vdiHandle, 2, pxArray);
+
+  (* Draw vertical lines between each column heading *)
+  lineLength := topPos + cellHeight;
+
+  pxArray[1] := leftPos;
+  pxArray[2] := topPos - cellHeight;
+
+  pxArray[3] := leftPos;
+  pxArray[4] := lineLength;
+
+  for i := 1 to 8
+  do
+  begin
+    v_pline(vdiHandle, 2, pxArray);
+
+    pxArray[1] := pxArray[1] + xSpace;
+    pxArray[3] := pxArray[3] + xSpace;
+  end;
+
+  (* Write Day labels *)
+  for i := 1 to 7
+  do
+  begin
+    calPos(i - 1, x, y);
+    v_gtext(vdiHandle,
+            newX + x,
+            newY + y - 2*Attr.boxHeight,
+            day2[i-1] );
+  end;
+
 end;
 
 
@@ -145,10 +224,6 @@ var
   New_X, New_Y : LongInt;
   pxArray      : Array [1..10] of Integer;
 
-  leftPos,
-  topPos,
-  xSpace,
-  ySpace,
   lineLength   : Integer;
 
   i            : Integer;
@@ -160,8 +235,14 @@ begin
   New_X := Scroller^.GetXOrg;
   New_Y := Scroller^.GetYOrg;
 
-  v_gtext(vdiHandle, new_x+Attr.charWidth, new_y + 2*Attr.boxHeight, date2Str(year, month, day, TRUE) );
-  v_gtext(vdiHandle, new_x+Attr.charWidth, new_y + 3*Attr.boxHeight, time2Str(hour, minute, second, TRUE) );
+  v_gtext(vdiHandle, new_x+Attr.charWidth,
+          new_y + 1*Attr.boxHeight,
+          date2Str(year, month, day, TRUE) );
+  v_gtext(vdiHandle, new_x+Attr.charWidth + Attr.charWidth * 13,
+          new_y + 1*Attr.boxHeight,
+          time2Str(hour, minute, second, TRUE) );
+
+  drawHeading(new_X, new_Y);
 
   leftPos    := 30;
   topPos     := 120;
