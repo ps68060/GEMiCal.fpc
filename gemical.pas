@@ -9,6 +9,7 @@ uses
   Gem,
   OWindows,
   DateTime,
+  Logger,
 
   DlgAbout,
   DlgConv,
@@ -59,6 +60,8 @@ var
   myFile,
   myPath        : String;
 
+  logger        : PLogger;
+
 (* ------------------------------------------------------------------------------- *)
 
 procedure TMyApplication.INITInstance;
@@ -90,7 +93,7 @@ var
   dtStr     : String;
 
 begin
-  writeln ('INIT Main Window');
+  logger^.log(DEBUG, 'INIT Main Window');
 
   if MyApplication.WinCal = NIL
   then
@@ -121,7 +124,7 @@ end;
 
 procedure TFileMenu.Work;
 begin
-  writeln ('FileMenu Work');
+  logger^.log(DEBUG, 'FileMenu Work');
 
   if MyApplication.WinCal = NIL
   then
@@ -157,7 +160,7 @@ end;
 
 procedure TCalMenu.Work;
 begin
-  writeln ('CalMenu Work');
+  logger^.log(DEBUG, 'CalMenu Work');
 
   if aDialog <> NIL
   then
@@ -183,7 +186,13 @@ end;
 (* ---------------------------- M A I N ---------------------------- *)
 
 begin
+  new(logger);
+  logger^.init;
+  logger^.level := INFO;
+
   MyApplication.INIT(dAppName);
   MyApplication.Run;
   MyApplication.Done;
+
+  Dispose (logger, Done);
 end.
