@@ -53,11 +53,6 @@ procedure calPos(cell  : Integer;
                      y : Integer);
 
 begin
-  leftPos    := 30;
-  topPos     := 120;
-  xSpace     := 110;
-  ySpace     := 100;
-
   x := leftPos + (cell mod 7)  * xSpace;
   y := topPos - yspace + yspace * (cell div 7) + 60;
 end;
@@ -86,11 +81,6 @@ begin
   new(logger);
   logger^.init;
   logger^.level := INFO;
-
-  leftPos    := 30;
-  topPos     := 120;
-  xSpace     := 110;
-  ySpace     := 100;
 
   currentMonth := FALSE;
 
@@ -152,10 +142,6 @@ var
   i            : Integer;
 
 begin
-  leftPos    := 30;
-  topPos     := 120;
-  xSpace     := 110;
-  ySpace     := 100;
 
   (* Draw horizontal line above main grid *)
   lineLength := leftPos + 7 * xSpace;
@@ -229,6 +215,12 @@ var
   i            : Integer;
 
 begin
+
+  leftPos    := 30;
+  topPos     := 120;
+  xSpace     := 110;
+  ySpace     := 100;
+
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
 
@@ -243,11 +235,6 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   drawHeading(new_X, new_Y);
-
-  leftPos    := 30;
-  topPos     := 120;
-  xSpace     := 110;
-  ySpace     := 100;
 
   WriteDates(new_X, new_Y);
 
