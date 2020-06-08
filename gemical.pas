@@ -101,8 +101,6 @@ begin
     MyApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
     (* Load iCal events *)
-    new (myApplication.winCal^.cal);
-    myApplication.winCal^.cal^.init;
     myApplication.winCal^.cal^.loadICS ('/e/develop/pascal/gemical/');  (*directory*)
 
     myApplication.winCal^.cal^.sort;
