@@ -60,6 +60,7 @@ var
   myFile,
   myPath        : String;
 
+  directory     : String;
   logger        : PLogger;
 
 (* ------------------------------------------------------------------------------- *)
@@ -93,15 +94,22 @@ var
   dtStr     : String;
 
 begin
+  logger^.level := DEBUG;
+
   logger^.log(DEBUG, 'INIT Main Window');
 
   if MyApplication.winCal = NIL
   then
   begin
-    MyApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+    myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+
+    new(myApplication.winCal^.cal);
+    myApplication.winCal^.cal^.init;
 
     (* Load iCal events *)
-    myApplication.winCal^.cal^.loadICS ('/e/develop/pascal/gemical/');  (*directory*)
+    myApplication.winCal^.cal^.loadICS(directory);
+
+    logger^.logInt(DEBUG, 'entries ', myApplication.winCal^.cal^.entries );
 
     myApplication.winCal^.cal^.sort;
 
@@ -194,6 +202,8 @@ begin
   new(logger);
   logger^.init;
   logger^.level := INFO;
+
+  directory := 'e:\develop\pascal\gemical\';
 
   MyApplication.INIT(dAppName);
   MyApplication.Run;
