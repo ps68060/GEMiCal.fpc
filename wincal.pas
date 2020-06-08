@@ -8,6 +8,7 @@ interface
     OTypes,
     OWindows,
 
+    Cal,
     DateTime,
     StrSubs,
     Logger;
@@ -23,6 +24,7 @@ type
 
   TWinCal     = OBJECT(TWindow)
                    calDate  : PDateTime;
+                   cal      : PCal;
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : Integer;                VIRTUAL;
@@ -38,6 +40,8 @@ type
 
                    procedure DrawHeading(newX,
                                          newY   : LongInt);
+
+                   procedure DisplayEvents;
                  END;
 
 
@@ -238,6 +242,8 @@ begin
 
   WriteDates(new_X, new_Y);
 
+  displayEvents;
+
   vsf_interior(vdiHandle, FIS_HOLLOW);
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
@@ -345,6 +351,61 @@ procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
 
 begin
   v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' 2xClick ');
+end;
+
+
+procedure TWinCal.DisplayEvents;
+var
+  logger    : PLogger;
+
+  dtStr     : String;
+
+  ddDiff,
+  hhDiff,
+  miDiff,
+  ssDiff    : Integer;
+
+  year,
+  month,
+  day,
+  dayOfWeek : Word;
+
+  hour,
+  minute,
+  second,
+  sec100    : Word;
+
+  future    : Boolean;
+
+  i         : Integer;
+
+begin
+
+  new(logger);
+  logger^.init;
+  logger^.level := DEBUG;
+
+  GetDate(year, month, day, dayOfWeek) ;
+  GetTime(hour, minute, second, sec100);
+
+  dtStr := date2Str(year, month, day, FALSE);
+  dtStr := dtStr + ' ' + time2Str(hour, minute, second, FALSE);
+
+  logger^.logInt(DEBUG, 'calendar ', calDate^.day);
+  logger^.logLongInt(DEBUG, 'epoch ', calDate^.epoch);
+
+  for i := 0 to cal^.entries do
+  begin
+    timeBetween(cal^.eventList[i]^.startDate^.epoch,
+                calDate^.epoch,
+                ddDiff, hhDiff, miDiff, ssDiff,
+                future);
+    logger^.logInt(DEBUG, 'ddDiff ', ddDiff);
+  end;  (* for *)
+
+(**  Dispose (calDate, Done);  **)
+  Dispose (logger, Done);
+
 end;
 
 
