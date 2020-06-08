@@ -2,12 +2,14 @@
 {$X+}
 {$M 32768}
 
-PROGRAM GemICal;
+program GemICal;
 
 uses
   Dos,
   Gem,
   OWindows,
+
+  Cal,
   DateTime,
   Logger,
 
@@ -15,9 +17,7 @@ uses
   DlgConv,
   WinCal;
 
-
 {$I gemical.i}
-
 
 type
   (* Each object has variables and methods associated with it. *)
@@ -44,9 +44,9 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
-                     FileMenu   : PFileMenu;
-                     ConvMenu   : PConvMenu;
-                     WinCal     : PWinCal;
+                     fileMenu   : PFileMenu;
+                     convMenu   : PConvMenu;
+                     winCal     : PWinCal;
                      procedure INITInstance;   VIRTUAL;
                      procedure INITMainWindow; VIRTUAL;
                    end;
@@ -74,7 +74,7 @@ begin
   new (PDeskMenu,  INIT(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
 (**  new (FileMenu,   INIT(@SELF, K_Ctrl, Ctrl_B, M_FOLDER,   M_DESK2));   **)
   new (PLoadMenu,  INIT(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
-  new (ConvMenu,   INIT(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
+  new (convMenu,   INIT(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
   new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
 
   INHERITED INITInstance;
@@ -95,26 +95,33 @@ var
 begin
   logger^.log(DEBUG, 'INIT Main Window');
 
-  if MyApplication.WinCal = NIL
+  if MyApplication.winCal = NIL
   then
   begin
-    MyApplication.WinCal := new(PWinCal, init(NIL, 'GEMiCal') );
+    MyApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+
+    (* Load iCal events *)
+    new (myApplication.winCal^.cal);
+    myApplication.winCal^.cal^.init;
+    myApplication.winCal^.cal^.loadICS ('/e/develop/pascal/gemical/');  (*directory*)
+
+    myApplication.winCal^.cal^.sort;
 
     (* Display this month's calendar *)
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2Str(year, month, 1, FALSE);
 
-    new(MyApplication.WinCal^.calDate);
-    MyApplication.WinCal^.calDate^.init;
+    new(MyApplication.winCal^.calDate);
+    myApplication.winCal^.calDate^.init;
 
-    MyApplication.WinCal^.calDate^.dtStr2Obj(dtStr);
-    MyApplication.WinCal^.calDate^.dayOfWeek;
+    myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
+    myApplication.winCal^.calDate^.dayOfWeek;
 
   end;
 
-  if MyApplication.WinCal <> NIL
+  if MyApplication.winCal <> NIL
   then
-    MyApplication.WinCal^.MakeWindow;
+    MyApplication.winCal^.MakeWindow;
 
 end;
 
