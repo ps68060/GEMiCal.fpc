@@ -23,7 +23,7 @@ type
   PWinCal      = ^TWinCal;
 
   TWinCal     = OBJECT(TWindow)
-                   calDate  : PDateTime;
+                   calDate  : PDateTime;  (* 1st of the month *)
                    cal      : PCal;
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
@@ -385,22 +385,18 @@ begin
   logger^.init;
   logger^.level := DEBUG;
 
-  GetDate(year, month, day, dayOfWeek) ;
-  GetTime(hour, minute, second, sec100);
-
-  dtStr := date2Str(year, month, day, FALSE);
-  dtStr := dtStr + ' ' + time2Str(hour, minute, second, FALSE);
-
-  logger^.logInt(DEBUG, 'calendar ', calDate^.day);
   logger^.logLongInt(DEBUG, 'epoch ', calDate^.epoch);
+  logger^.logInt(DEBUG, 'entries = ', cal^.entries );
 
   for i := 0 to cal^.entries do
   begin
-    timeBetween(cal^.eventList[i]^.startDate^.epoch,
-                calDate^.epoch,
-                ddDiff, hhDiff, miDiff, ssDiff,
-                future);
-    logger^.logInt(DEBUG, 'ddDiff ', ddDiff);
+    (*  calDate is 1st of month *)
+    if (cal^.eventList[i]^.endDate^.epoch >
+        calDate^.epoch)
+    then
+      logger^.log(DEBUG, 'ends after 1st ' );
+
+    writeln ('Summary ', cal^.eventList[i]^.summary);
   end;  (* for *)
 
 (**  Dispose (calDate, Done);  **)
