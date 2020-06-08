@@ -50,7 +50,11 @@ var
   leftPos,
   topPos,
   xSpace,
-  ySpace    : Integer;
+  ySpace       : Integer;
+
+  daysInMon    : Integer;
+  endMonthDate : PDateTime;
+
 
 procedure calPos(cell  : Integer;
                  var x,
@@ -75,8 +79,8 @@ var
   day,
   dayOfWeek    : Word;
 
-  daysInMon    : Integer;
   currentMonth : Boolean;
+  dtStr        : String;
 
   i            : Integer;
 
@@ -86,24 +90,31 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  currentMonth := FALSE;
-
+  (* Calculate date of end of month *)
   daysInMon := daysMon[calDate^.mm];
 
   if (calDate^.mm = 2) and (isLeapDay(calDate^.yyyy))
   then
     daysInMon := 29;
 
-  logger^.logInt(DEBUG, '', calDate^.yyyy );
+  dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
+  new(endMonthDate);
+  endMonthDate^.init;
+  endMonthDate^.dtStr2Obj(dtStr);
+
+  logger^.logInt(DEBUG, 'year ', calDate^.yyyy );
   logger^.log(DEBUG, mon1[calDate^.mm] );
 
+  (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
 
+  currentMonth := FALSE;
   if     (calDate^.yyyy = year)
      and (calDate^.mm   = month)
   then
     currentMonth := TRUE;
 
+  (* Display the dates, highlighting today *)
   for i := 1 to daysInMon
   do
   begin
@@ -385,16 +396,18 @@ begin
   logger^.init;
   logger^.level := DEBUG;
 
-  logger^.logLongInt(DEBUG, 'epoch ', calDate^.epoch);
+  logger^.logLongInt(DEBUG, ' 1st epoch ', calDate^.epoch);
+  logger^.logLongInt(DEBUG, 'last epoch ', endMonthDate^.epoch);
+
   logger^.logInt(DEBUG, 'entries = ', cal^.entries );
 
   for i := 0 to cal^.entries do
   begin
     (*  calDate is 1st of month *)
-    if (cal^.eventList[i]^.endDate^.epoch >
-        calDate^.epoch)
+    if      (cal^.eventList[i]^.endDate^.epoch  >  calDate^.epoch)
+        and (cal^.eventList[i]^.endDate^.epoch  <  endMonthDate^.epoch)
     then
-      logger^.log(DEBUG, 'ends after 1st ' );
+      logger^.logInt (DEBUG, 'IN Scope', i );
 
     writeln ('Summary ', cal^.eventList[i]^.summary);
   end;  (* for *)
