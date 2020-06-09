@@ -134,10 +134,10 @@ implementation
         then
           dtEnd   := COPY (currentLn, 7, length(currentLn));
 
-        if ( pos('SUMMARY:', currentLn) = 1 )
+        if ( pos('SUMMARY', currentLn) = 1 )
            and (NOT alarm)
         then
-          summary := COPY (currentLn, 9, length(currentLn));
+          summary := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
 
         if ( pos('DESCRIPTION:', currentLn) = 1 )
            and (NOT alarm)

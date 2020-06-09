@@ -1,3 +1,5 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+
 unit WinCal;
 
 interface
@@ -438,6 +440,7 @@ var
   y,
   i         : Integer;
 
+
 begin
 
   new(logger);
@@ -451,6 +454,7 @@ begin
 
   for i := 0 to cal^.entries do
   begin
+
     (*  calDate is 1st of month *)
     if      (cal^.eventList[i]^.endDate^.epoch  >  calDate^.epoch)
         and (cal^.eventList[i]^.endDate^.epoch  <  endMonthDate^.epoch)
@@ -466,10 +470,12 @@ begin
       v_gtext(vdiHandle,
               newX + x,
               newY + y + Attr.boxHeight,
-              cal^.eventList[i]^.Summary);
+              cal^.eventList[i]^.Summary );
+
+
+      writeln ('Summary ', cal^.eventList[i]^.summary);
     end;
 
-    writeln ('Summary ', cal^.eventList[i]^.summary);
   end;  (* for *)
 
 (**  Dispose (calDate, Done);  **)
