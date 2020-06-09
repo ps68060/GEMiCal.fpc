@@ -54,6 +54,11 @@ type
                                      col   : Integer;
                                      var x,
                                          y : Integer);
+
+                   procedure DrawGrid(newX,
+                                      newY : LongInt;
+                                      rows,
+                                      height  : Integer);
                  END;
 
 
@@ -103,7 +108,7 @@ procedure TWinCal.CalcPos(row,
 begin
 
   x := leftPos + (col)  * xSpace;
-  y := topPos - yspace + yspace * (row) + 60;
+  y := topPos + yspace * (row) + 60;
 
 end;
 
@@ -150,7 +155,8 @@ begin
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
-  calcCell(day, row, col);
+
+  CalcCell(day, row, col);
 
   currentMonth := FALSE;
   if     (calDate^.yyyy = year)
@@ -162,8 +168,8 @@ begin
   for i := 1 to daysInMon
   do
   begin
-    calcCell (i, row, col);
-    calcPos  (row, col, x, y);
+    CalcCell (i, row, col);
+    CalcPos  (row, col, x, y);
 
     if (currentMonth)
        and (i = day)
@@ -171,84 +177,19 @@ begin
     begin
       vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
-              newX + x,
-              newY + y,
+              newX + x + Attr.boxWidth,
+              newY + y - 2 * Attr.boxHeight - 10,
               IntToStr(i) + ' ' + day2[i mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
-              newX + x,
-              newY + y,
+              newX + x  + Attr.boxWidth,
+              newY + y - 2 * Attr.boxHeight - 10,
               IntToStr(i) );
   end;
 
   Dispose (logger, Done);
-end;
-
-
-procedure TWinCal.DrawHeading(newX,
-                              newY   : LongInt);
-
-(* Draw the column headings *)
-var
-  lineLength,
-  cellHeight   : Integer;
-  pxArray      : Array [1..10] of Integer;
-
-  x,
-  y            : Integer;
-
-  i            : Integer;
-
-begin
-
-  (* Draw horizontal line above main grid *)
-  lineLength := leftPos + 7 * xSpace;
-  cellHeight := 2*Attr.boxHeight;
-
-  pxArray[1] := leftPos;
-  pxArray[2] := topPos - cellHeight;
-
-  pxArray[3] := lineLength;
-  pxArray[4] := topPos - cellHeight;
-
-  v_pline(vdiHandle, 2, pxArray);
-
-  pxArray[2] := pxArray[2] + cellHeight +3;
-  pxArray[4] := pxArray[4] + cellHeight +3;
-
-  v_pline(vdiHandle, 2, pxArray);
-
-  (* Draw vertical lines between each column heading *)
-  lineLength := topPos + cellHeight;
-
-  pxArray[1] := leftPos;
-  pxArray[2] := topPos - cellHeight;
-
-  pxArray[3] := leftPos;
-  pxArray[4] := lineLength;
-
-  for i := 1 to 8
-  do
-  begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[1] := pxArray[1] + xSpace;
-    pxArray[3] := pxArray[3] + xSpace;
-  end;
-
-  (* Write Day labels *)
-  for i := 0 to 6
-  do
-  begin
-    calcPos(0, i, x, y);
-    v_gtext(vdiHandle,
-            newX + x,
-            newY + y - 2*Attr.boxHeight,
-            day2[i] );
-  end;
-
 end;
 
 
@@ -276,10 +217,10 @@ var
 
 begin
 
-  leftPos    := 30;
-  topPos     := 120;
+  leftPos    := 20;
+  topPos     := 80;
   xSpace     := 110;
-  ySpace     := 100;
+  ySpace     := 90;
 
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
@@ -287,14 +228,15 @@ begin
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
 
-  v_gtext(vdiHandle, new_x+Attr.charWidth,
-          new_y + 1*Attr.boxHeight,
+  v_gtext(vdiHandle, new_x + Attr.charWidth,
+          new_y + 1 * Attr.boxHeight,
           date2Str(year, month, day, TRUE) );
-  v_gtext(vdiHandle, new_x+Attr.charWidth + Attr.charWidth * 13,
-          new_y + 1*Attr.boxHeight,
+
+  v_gtext(vdiHandle, new_x + Attr.charWidth + Attr.charWidth * 13,
+          new_y + 1 * Attr.boxHeight,
           time2Str(hour, minute, second, TRUE) );
 
-  drawHeading(new_X, new_Y);
+  drawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 
   WriteDates(new_X, new_Y);
 
@@ -302,43 +244,7 @@ begin
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
 
-  (* Draw horizontal lines for weeks by changing y co-ords *)
-
-  lineLength := leftPos + 7 * xSpace;
-
-  pxArray[1] := leftPos;
-  pxArray[2] := topPos;
-
-  pxArray[3] := lineLength;
-  pxArray[4] := topPos;
-
-  for i := 1 to 7
-  do
-  begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[2] := pxArray[2] + ySpace;
-    pxArray[4] := pxArray[4] + ySpace;
-  end;
-
-  (* Draw vertical lines for days by changing x co-ords *)
-
-  lineLength := topPos + 6 * ySpace;
-
-  pxArray[1] := leftPos;
-  pxArray[2] := topPos;
-
-  pxArray[3] := leftPos;
-  pxArray[4] := lineLength;
-
-  for i := 1 to 8
-  do
-  begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[1] := pxArray[1] + xSpace;
-    pxArray[3] := pxArray[3] + xSpace;
-  end;
+  DrawGrid(new_X, new_Y, 6, ySpace);
 
 end;
 
@@ -410,6 +316,38 @@ begin
 end;
 
 
+procedure TWinCal.DrawHeading(newX,
+                              newY   : LongInt);
+
+(* Draw the column headings *)
+var
+  lineLength,
+  cellHeight   : Integer;
+  pxArray      : Array [1..10] of Integer;
+
+  x,
+  y            : Integer;
+
+  i            : Integer;
+
+begin
+
+  DrawGrid (newX, newY, 1, 30);
+
+  (* Write Day labels *)
+  for i := 0 to 6
+  do
+  begin
+    calcPos(0, i, x, y);
+    v_gtext(vdiHandle,
+            newX + x + Attr.boxWidth,
+            newY + y - 2 * Attr.boxHeight - 10,
+            day2[i] );
+  end;
+
+end;
+
+
 procedure TWinCal.DisplayEvents(newX,
                                 newY   : LongInt);
 var
@@ -440,7 +378,6 @@ var
   y,
   i         : Integer;
 
-
 begin
 
   new(logger);
@@ -468,8 +405,8 @@ begin
       logger^.logInt (DEBUG, 'col ', col);
 
       v_gtext(vdiHandle,
-              newX + x,
-              newY + y + Attr.boxHeight,
+              newX + x + Attr.boxWidth,
+              newY + y - Attr.boxHeight - 10,
               cal^.eventList[i]^.Summary );
 
 
@@ -483,5 +420,59 @@ begin
 
 end;
 
+
+procedure TWinCal.DrawGrid(newX,
+                           newY    : LongInt;
+                           rows,
+                           height  : Integer);
+var
+  lineLength : Integer;
+
+  pxArray      : Array [1..10] of Integer;
+
+  i : Integer;
+
+begin
+  (* Draw horizontal lines for weeks by changing y co-ords *)
+
+  lineLength := 7 * xSpace;
+
+  pxArray[1] := newX + leftPos;
+  pxArray[2] := newY + topPos;
+
+  pxArray[3] := newX + leftPos + lineLength;
+  pxArray[4] := newY + topPos;
+
+  for i := 1 to rows + 1
+  do
+  begin
+    v_pline(vdiHandle, 2, pxArray);
+
+    pxArray[2] := pxArray[2] + height;
+    pxArray[4] := pxArray[4] + height;
+  end;
+
+
+  (* Draw vertical lines for days by changing x co-ords *)
+
+  lineLength := topPos + rows * height;
+
+  pxArray[1] := newX + leftPos;
+  pxArray[2] := newY + topPos;
+
+  pxArray[3] := newX + leftPos;
+  pxArray[4] := newY + lineLength;
+
+  for i := 1 to 8
+  do
+  begin
+    v_pline(vdiHandle, 2, pxArray);
+
+    pxArray[1] := pxArray[1] + xSpace;
+    pxArray[3] := pxArray[3] + xSpace;
+  end;
+
+
+end;
 
 end.
