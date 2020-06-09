@@ -42,6 +42,15 @@ type
                                          newY   : LongInt);
 
                    procedure DisplayEvents;
+
+                   procedure CalcCell(day : Integer;
+                                      var row,
+                                          col : Integer);
+
+                   procedure CalcPos(row,
+                                     col   : Integer;
+                                     var x,
+                                         y : Integer);
                  END;
 
 
@@ -56,13 +65,43 @@ var
   endMonthDate : PDateTime;
 
 
-procedure calPos(cell  : Integer;
-                 var x,
-                     y : Integer);
+
+procedure TWinCal.CalcCell(day : Integer;
+                 var row,
+                     col : Integer);
+(* Purpose : Calculate the row and column of the calendar day *)
+
+var
+  logger    : PLogger;
 
 begin
-  x := leftPos + (cell mod 7)  * xSpace;
-  y := topPos - yspace + yspace * (cell div 7) + 60;
+
+  new(logger);
+  logger^.init;
+  logger^.level := INFO;
+
+  row := (day - 1 + calDate^.day) div 7;
+  col := (day - 1 + calDate^.day) mod 7;
+
+  logger^.logInt(DEBUG, 'day ', day);
+  logger^.logInt(DEBUG, 'row ', row);
+  logger^.logInt(DEBUG, 'col ', col);
+
+  Dispose (logger, Done);
+end;
+
+
+procedure TWinCal.CalcPos(row,
+                          col   : Integer;
+                          var x,
+                              y : Integer);
+(* Purpose : Calculate the x, y of the cell from row, col. *)
+
+begin
+
+  x := leftPos + (col)  * xSpace;
+  y := topPos - yspace + yspace * (row) + 60;
+
 end;
 
 
@@ -82,6 +121,7 @@ var
   currentMonth : Boolean;
   dtStr        : String;
 
+  row,col,
   i            : Integer;
 
 begin
@@ -107,6 +147,7 @@ begin
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
+  calcCell(day, row, col);
 
   currentMonth := FALSE;
   if     (calDate^.yyyy = year)
@@ -118,7 +159,8 @@ begin
   for i := 1 to daysInMon
   do
   begin
-    calPos(i - 1 + calDate^.day, x, y);
+    calcCell (i, row, col);
+    calcPos  (row, col, x, y);
 
     if (currentMonth)
        and (i = day)
@@ -197,7 +239,7 @@ begin
   for i := 1 to 7
   do
   begin
-    calPos(i - 1, x, y);
+    calcPos(0, i - 1, x, y);
     v_gtext(vdiHandle,
             newX + x,
             newY + y - 2*Attr.boxHeight,
