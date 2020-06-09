@@ -41,7 +41,8 @@ type
                    procedure DrawHeading(newX,
                                          newY   : LongInt);
 
-                   procedure DisplayEvents;
+                   procedure DisplayEvents(newX,
+                                           newY   : LongInt);
 
                    procedure CalcCell(day : Integer;
                                       var row,
@@ -236,14 +237,14 @@ begin
   end;
 
   (* Write Day labels *)
-  for i := 1 to 7
+  for i := 0 to 6
   do
   begin
-    calcPos(0, i - 1, x, y);
+    calcPos(0, i, x, y);
     v_gtext(vdiHandle,
             newX + x,
             newY + y - 2*Attr.boxHeight,
-            day2[i-1] );
+            day2[i] );
   end;
 
 end;
@@ -281,8 +282,8 @@ begin
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
 
-  New_X := Scroller^.GetXOrg;
-  New_Y := Scroller^.GetYOrg;
+  new_X := Scroller^.GetXOrg;
+  new_Y := Scroller^.GetYOrg;
 
   v_gtext(vdiHandle, new_x+Attr.charWidth,
           new_y + 1*Attr.boxHeight,
@@ -295,7 +296,7 @@ begin
 
   WriteDates(new_X, new_Y);
 
-  displayEvents;
+  displayEvents(new_X, new_Y);
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
 
@@ -407,7 +408,8 @@ begin
 end;
 
 
-procedure TWinCal.DisplayEvents;
+procedure TWinCal.DisplayEvents(newX,
+                                newY   : LongInt);
 var
   logger    : PLogger;
 
@@ -430,6 +432,10 @@ var
 
   future    : Boolean;
 
+  row,
+  col,
+  x,
+  y,
   i         : Integer;
 
 begin
@@ -449,7 +455,19 @@ begin
     if      (cal^.eventList[i]^.endDate^.epoch  >  calDate^.epoch)
         and (cal^.eventList[i]^.endDate^.epoch  <  endMonthDate^.epoch)
     then
+    begin
       logger^.logInt (DEBUG, 'IN Scope', i );
+      calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
+      calcPos(row, col, x, y);
+
+      logger^.logInt (DEBUG, 'row ', row);
+      logger^.logInt (DEBUG, 'col ', col);
+
+      v_gtext(vdiHandle,
+              newX + x,
+              newY + y + Attr.boxHeight,
+              cal^.eventList[i]^.Summary);
+    end;
 
     writeln ('Summary ', cal^.eventList[i]^.summary);
   end;  (* for *)
