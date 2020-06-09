@@ -456,8 +456,8 @@ begin
   begin
 
     (*  calDate is 1st of month *)
-    if      (cal^.eventList[i]^.endDate^.epoch  >  calDate^.epoch)
-        and (cal^.eventList[i]^.endDate^.epoch  <  endMonthDate^.epoch)
+    if      (cal^.eventList[i]^.startDate^.epoch < endMonthDate^.epoch)
+        and (cal^.eventList[i]^.endDate^.epoch   > calDate^.epoch)
     then
     begin
       logger^.logInt (DEBUG, 'IN Scope', i );
