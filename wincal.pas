@@ -382,7 +382,7 @@ begin
 
   new(logger);
   logger^.init;
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   logger^.logLongInt(DEBUG, ' 1st epoch ', calDate^.epoch);
   logger^.logLongInt(DEBUG, 'last epoch ', endMonthDate^.epoch);
@@ -397,7 +397,7 @@ begin
         and (cal^.eventList[i]^.endDate^.epoch   > calDate^.epoch)
     then
     begin
-      logger^.logInt (DEBUG, 'IN Scope', i );
+      logger^.logInt (INFO, 'IN Scope', i );
       calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
       calcPos(row, col, x, y);
 
