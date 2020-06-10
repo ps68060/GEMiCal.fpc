@@ -46,6 +46,12 @@ type
                    procedure DisplayEvents(newX,
                                            newY   : LongInt);
 
+                   procedure DisplayEvent(newX,
+                                          newY    : LongInt;
+                                          i,
+                                          row,
+                                          col     : Integer);
+
                    procedure CalcCell(day : Integer;
                                       var row,
                                           col : Integer);
@@ -63,6 +69,7 @@ type
 
 
 implementation
+
 var
   leftPos,
   topPos,
@@ -71,7 +78,6 @@ var
 
   daysInMon    : Integer;
   endMonthDate : PDateTime;
-
 
 
 procedure TWinCal.CalcCell(day : Integer;
@@ -350,32 +356,14 @@ end;
 
 procedure TWinCal.DisplayEvents(newX,
                                 newY   : LongInt);
+
+(* Purpose : Decide which Events should be displayed *)
+
 var
   logger    : PLogger;
 
-  dtStr     : String;
-
-  ddDiff,
-  hhDiff,
-  miDiff,
-  ssDiff    : Integer;
-
-  year,
-  month,
-  day,
-  dayOfWeek : Word;
-
-  hour,
-  minute,
-  second,
-  sec100    : Word;
-
-  future    : Boolean;
-
   row,
   col,
-  x,
-  y,
   i         : Integer;
 
 begin
@@ -399,23 +387,50 @@ begin
     begin
       logger^.logInt (INFO, 'IN Scope', i );
       calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
-      calcPos(row, col, x, y);
-
-      logger^.logInt (DEBUG, 'row ', row);
-      logger^.logInt (DEBUG, 'col ', col);
-
-      v_gtext(vdiHandle,
-              newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10,
-              cal^.eventList[i]^.Summary );
-
-      logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
+      DisplayEvent(newX, newY, i, row, col);
     end;
 
   end;  (* for *)
 
 (**  Dispose (calDate, Done);  **)
   Dispose (logger, Done);
+
+end;
+
+
+procedure TWinCal.DisplayEvent(newX,
+                               newY   : LongInt;
+                               i,
+                               row,
+                               col    : Integer);
+
+(* Purpose : Display a single event  *)
+
+var
+  logger    : PLogger;
+
+  x,
+  y         : Integer;
+
+begin
+
+  new(logger);
+  logger^.init;
+  logger^.level := INFO;
+
+  calcPos(row, col, x, y);
+
+  logger^.logInt (DEBUG, 'row ', row);
+  logger^.logInt (DEBUG, 'col ', col);
+
+  v_gtext(vdiHandle,
+          newX + x + Attr.boxWidth,
+          newY + y - Attr.boxHeight - 10,
+          cal^.eventList[i]^.Summary );
+
+  logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
+
+  Dispose(logger, Done);
 
 end;
 
