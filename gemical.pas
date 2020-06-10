@@ -84,7 +84,7 @@ begin
 end;
 
 
-procedure TMyApplication.INITMainWindow;
+procedure LoadCal;
 var
   year,
   month,
@@ -94,15 +94,6 @@ var
   dtStr     : String;
 
 begin
-  logger^.level := DEBUG;
-
-  logger^.log(DEBUG, 'INIT Main Window');
-
-  if MyApplication.winCal = NIL
-  then
-  begin
-    myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
-
     new(myApplication.winCal^.cal);
     myApplication.winCal^.cal^.init;
 
@@ -123,6 +114,22 @@ begin
     myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
     myApplication.winCal^.calDate^.dayOfWeek;
 
+end;
+
+
+procedure TMyApplication.INITMainWindow;
+
+begin
+  logger^.level := DEBUG;
+
+  logger^.log(DEBUG, 'INIT Main Window');
+
+  if MyApplication.winCal = NIL
+  then
+  begin
+    myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+
+    LoadCal;
   end;
 
   if MyApplication.winCal <> NIL
@@ -131,8 +138,28 @@ begin
 
 end;
 
-
 (* ------------------------------------------------------------------------------- *)
+
+procedure TLoadMenu.Work;
+begin
+  writeln ('Load Menu Work');
+  if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
+
+  then
+  begin
+    BusyMouse;
+    Dispose(myApplication.winCal^.cal, Done);
+
+    directory := myPath;
+    LoadCal;
+
+    ArrowMouse;
+
+    MyApplication.FileMenu^.Work;
+
+  end;
+
+end;
 
 
 procedure TFileMenu.Work;
@@ -146,27 +173,6 @@ begin
   if MyApplication.WinCal <> NIL
   then
     MyApplication.WinCal^.MakeWindow;
-
-end;
-
-
-procedure TLoadMenu.Work;
-begin
-  writeln ('Load Menu Work');
-  if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
-  then
-  begin
-    BusyMouse;
-    MyApplication.FileMenu^.Work;
-
-	(**			MyApplication.TBrowser^.Clear;
-				MyApplication.TBrowser^.Read(PFAD+DATEI);
-				{# so wird eine Zeile angefÅgt #}
-	(**			{MyApplication.TBrowser^.AddLine('--- EOF ---');} 
-				MyApplication.TBrowser^.SetTitle(' '+DATEI+' ');  **)
-
-    ArrowMouse;
-  end;
 
 end;
 
