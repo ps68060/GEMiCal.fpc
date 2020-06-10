@@ -3,9 +3,12 @@ GEMiCal
 
 Simple Pure-Pascal GEM to display a calendar.
 
-It is not very functional at the moment but the goal is to integrate the
-code from Calndr and be able to read an ics file and do some basic date and
-calendar functions.
+It is not very functional at the moment, it is very much an MVP.
 
-The calendar of the current month is shown.
+Current functions:
 
+1. displays current month only
+2. shows any event that either starts or ends in the current month
+3. the ICS folder can be changed but the window does not redraw itself.
+
+Contributions welcome.
