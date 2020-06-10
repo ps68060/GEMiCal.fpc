@@ -209,7 +209,9 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  directory := 'e:\develop\pascal\gemical\';
+  (* directory := 'e:\develop\pascal\gemical\';  *)
+
+  GetDir (0, directory);
 
   MyApplication.INIT(dAppName);
   MyApplication.Run;
