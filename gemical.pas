@@ -94,25 +94,25 @@ var
   dtStr     : String;
 
 begin
-    new(myApplication.winCal^.cal);
-    myApplication.winCal^.cal^.init;
+  new(myApplication.winCal^.cal);
+  myApplication.winCal^.cal^.init;
 
-    (* Load iCal events *)
-    myApplication.winCal^.cal^.loadICS(directory);
+  (* Load iCal events *)
+  myApplication.winCal^.cal^.loadICS(directory);
 
-    logger^.logInt(DEBUG, 'entries ', myApplication.winCal^.cal^.entries );
+  logger^.logInt(DEBUG, 'entries ', myApplication.winCal^.cal^.entries );
 
-    myApplication.winCal^.cal^.sort;
+  myApplication.winCal^.cal^.sort;
 
-    (* Display this month's calendar *)
-    GetDate (year, month, day, dayOfWeek) ;
-    dtStr := date2Str(year, month, 1, FALSE);
+  (* Display this month's calendar *)
+  GetDate (year, month, day, dayOfWeek) ;
+  dtStr := date2Str(year, month, 1, FALSE);
 
-    new(MyApplication.winCal^.calDate);
-    myApplication.winCal^.calDate^.init;
+  new(MyApplication.winCal^.calDate);
+  myApplication.winCal^.calDate^.init;
 
-    myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
-    myApplication.winCal^.calDate^.dayOfWeek;
+  myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
+  myApplication.winCal^.calDate^.dayOfWeek;
 
 end;
 
