@@ -409,8 +409,7 @@ begin
               newY + y - Attr.boxHeight - 10,
               cal^.eventList[i]^.Summary );
 
-
-      writeln ('Summary ', cal^.eventList[i]^.summary);
+      logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
     end;
 
   end;  (* for *)
