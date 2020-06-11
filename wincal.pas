@@ -85,7 +85,7 @@ var
 function SubStr(myStr : String)
         : String;
 begin
-  SubStr := Copy(myStr, 1, 12);
+  SubStr := Copy(myStr, 1, 16);
 end;
 
 procedure TWinCal.CalcCell(day : Integer;
@@ -362,6 +362,61 @@ begin
 end;
 
 
+procedure TWinCal.DrawGrid(newX,
+                           newY    : LongInt;
+                           rows,
+                           height  : Integer);
+var
+  lineLength : Integer;
+
+  pxArray      : Array [1..10] of Integer;
+
+  i : Integer;
+
+begin
+  (* Draw horizontal lines for weeks by changing y co-ords *)
+
+  lineLength := 7 * xSpace;
+
+  pxArray[1] := newX + leftPos;
+  pxArray[2] := newY + topPos;
+
+  pxArray[3] := newX + leftPos + lineLength;
+  pxArray[4] := newY + topPos;
+
+  for i := 1 to rows + 1
+  do
+  begin
+    v_pline(vdiHandle, 2, pxArray);
+
+    pxArray[2] := pxArray[2] + height;
+    pxArray[4] := pxArray[4] + height;
+  end;
+
+
+  (* Draw vertical lines for days by changing x co-ords *)
+
+  lineLength := topPos + rows * height;
+
+  pxArray[1] := newX + leftPos;
+  pxArray[2] := newY + topPos;
+
+  pxArray[3] := newX + leftPos;
+  pxArray[4] := newY + lineLength;
+
+  for i := 1 to 8
+  do
+  begin
+    v_pline(vdiHandle, 2, pxArray);
+
+    pxArray[1] := pxArray[1] + xSpace;
+    pxArray[3] := pxArray[3] + xSpace;
+  end;
+
+
+end;
+
+
 procedure TWinCal.DisplayEvents(newX,
                                 newY   : LongInt);
 
@@ -420,6 +475,11 @@ var
   x,
   y         : Integer;
 
+  wch,
+  hch,
+  wcell,
+  hcell     : Integer;
+
   summ      : String;
 
 begin
@@ -434,11 +494,14 @@ begin
   logger^.logInt (DEBUG, 'col ', col);
 
   summ := SubStr (cal^.eventList[i]^.summary);
+  vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
 
   v_gtext(vdiHandle,
           newX + x + Attr.boxWidth,
           newY + y - Attr.boxHeight - 10,
           summ );
+
+  vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
 
   logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
 
@@ -446,59 +509,5 @@ begin
 
 end;
 
-
-procedure TWinCal.DrawGrid(newX,
-                           newY    : LongInt;
-                           rows,
-                           height  : Integer);
-var
-  lineLength : Integer;
-
-  pxArray      : Array [1..10] of Integer;
-
-  i : Integer;
-
-begin
-  (* Draw horizontal lines for weeks by changing y co-ords *)
-
-  lineLength := 7 * xSpace;
-
-  pxArray[1] := newX + leftPos;
-  pxArray[2] := newY + topPos;
-
-  pxArray[3] := newX + leftPos + lineLength;
-  pxArray[4] := newY + topPos;
-
-  for i := 1 to rows + 1
-  do
-  begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[2] := pxArray[2] + height;
-    pxArray[4] := pxArray[4] + height;
-  end;
-
-
-  (* Draw vertical lines for days by changing x co-ords *)
-
-  lineLength := topPos + rows * height;
-
-  pxArray[1] := newX + leftPos;
-  pxArray[2] := newY + topPos;
-
-  pxArray[3] := newX + leftPos;
-  pxArray[4] := newY + lineLength;
-
-  for i := 1 to 8
-  do
-  begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[1] := pxArray[1] + xSpace;
-    pxArray[3] := pxArray[3] + xSpace;
-  end;
-
-
-end;
 
 end.
