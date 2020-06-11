@@ -7,6 +7,7 @@ interface
   uses
     Gem,
     Dos,
+
     OTypes,
     OWindows,
 
@@ -27,6 +28,7 @@ type
   TWinCal     = OBJECT(TWindow)
                    calDate  : PDateTime;  (* 1st of the month *)
                    cal      : PCal;
+
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : Integer;                VIRTUAL;
@@ -79,6 +81,12 @@ var
   daysInMon    : Integer;
   endMonthDate : PDateTime;
 
+
+function SubStr(myStr : String)
+        : String;
+begin
+  SubStr := Copy(myStr, 1, 12);
+end;
 
 procedure TWinCal.CalcCell(day : Integer;
                  var row,
@@ -288,7 +296,7 @@ function TWinCal.GetScroller
 (* set the Scroller *)
 
 begin
-  GetScroller := new(PScroller,Init(@self, 4, 4, 160, 100) );
+  GetScroller := new(PScroller, Init(@self, 4, 4, 160, 100) );
 
   (* 1,.,640,. means 1 pixel is scrolled to 640 units         *)
   (* 2,.,320,. means 2 pixels will be scrolled to 320 units   *)
@@ -412,6 +420,8 @@ var
   x,
   y         : Integer;
 
+  summ      : String;
+
 begin
 
   new(logger);
@@ -423,10 +433,12 @@ begin
   logger^.logInt (DEBUG, 'row ', row);
   logger^.logInt (DEBUG, 'col ', col);
 
+  summ := SubStr (cal^.eventList[i]^.summary);
+
   v_gtext(vdiHandle,
           newX + x + Attr.boxWidth,
           newY + y - Attr.boxHeight - 10,
-          cal^.eventList[i]^.Summary );
+          summ );
 
   logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
 
