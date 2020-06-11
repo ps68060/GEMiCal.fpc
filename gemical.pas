@@ -215,6 +215,9 @@ begin
 
   MyApplication.INIT(dAppName);
   MyApplication.Run;
+
+  Dispose(myApplication.winCal^.cal, Done);
+
   MyApplication.Done;
 
   Dispose (logger, Done);
