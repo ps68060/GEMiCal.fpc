@@ -104,6 +104,8 @@ begin
 
   myApplication.winCal^.cal^.sort;
 
+  logger^.log(DEBUG, 'Sorted');
+
   (* Display this month's calendar *)
   GetDate (year, month, day, dayOfWeek) ;
   dtStr := date2Str(year, month, 1, FALSE);
@@ -151,11 +153,12 @@ begin
     Dispose(myApplication.winCal^.cal, Done);
 
     directory := myPath;
+
+    logger^.log(DEBUG, 'Load ICS files');
     LoadCal;
 
     ArrowMouse;
-
-    MyApplication.FileMenu^.Work;
+    logger^.log(DEBUG, 'Loaded');
 
   end;
 
@@ -209,8 +212,7 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  (* directory := 'e:\develop\pascal\gemical\';  *)
-
+  (* Get current path *)
   GetDir (0, directory);
 
   MyApplication.INIT(dAppName);
