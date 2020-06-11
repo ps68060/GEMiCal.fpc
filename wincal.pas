@@ -50,9 +50,7 @@ type
 
                    procedure DisplayEvent(newX,
                                           newY    : LongInt;
-                                          i,
-                                          row,
-                                          col     : Integer);
+                                          i       : Integer);
 
                    procedure CalcCell(day : Integer;
                                       var row,
@@ -450,7 +448,7 @@ begin
     begin
       logger^.logInt (INFO, 'IN Scope', i );
       calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
-      DisplayEvent(newX, newY, i, row, col);
+      DisplayEvent(newX, newY, i);
     end;
 
   end;  (* for *)
@@ -463,15 +461,15 @@ end;
 
 procedure TWinCal.DisplayEvent(newX,
                                newY   : LongInt;
-                               i,
-                               row,
-                               col    : Integer);
+                               i      : Integer);
 
 (* Purpose : Display a single event  *)
 
 var
   logger    : PLogger;
 
+  row,
+  col,
   x,
   y         : Integer;
 
@@ -488,6 +486,11 @@ begin
   logger^.init;
   logger^.level := INFO;
 
+  calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
+
+  if (cal^.eventList[i]^.startDate^.mm = calDate^.mm)
+  then
+  begin
   calcPos(row, col, x, y);
 
   logger^.logInt (DEBUG, 'row ', row);
@@ -504,6 +507,8 @@ begin
   vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
 
   logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
+
+  end;
 
   Dispose(logger, Done);
 
