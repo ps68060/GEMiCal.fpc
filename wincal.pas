@@ -75,6 +75,10 @@ type
 
 implementation
 
+const
+  WINWIDTH  = 800;  (* W:=113, smallest width of the working area *)
+  WINHEIGHT = 680;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
+
 var
   leftPos,
   topPos,
@@ -320,8 +324,8 @@ begin
     begin
       X :=  10;  (* X,Y correspond to the coordinates of the working area *)
       Y :=  60;  (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
-      W := 800;  (* W:=113, smallest width of the working area *)
-      H := 680;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
+      W := WINWIDTH;   (* W:=113, smallest width of the working area *)
+      H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
     end;
 
   Calc(WC_BORDER,Work,Curr)
@@ -346,8 +350,10 @@ var
 
   wch,
   hch,
-  wcell,
-  hcell     : Integer;
+  wCell,
+  hCell,
+  hAlign,
+  vAlign     : Integer;
 
 begin
 
@@ -356,12 +362,15 @@ begin
   title := title + ' ' + mon1[month];
 
   vst_point(vdiHandle, 20, wch, hch, wcell, hcell);
+  vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
+
   v_gtext(vdiHandle,
-          newX + Attr.charWidth + Attr.charWidth * 46,
+          newX + WINWIDTH div 2,   (**Attr.charWidth + Attr.charWidth * 46,  **)
           newY + 2 * Attr.boxHeight,
           title);
-  vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
 
+  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
 end;
 
 
