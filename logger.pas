@@ -123,7 +123,7 @@ begin
 
   if (ord(level) >= ord(msgLevel) )
   then
-    writeln(message, myReal);
+    writeln(message, myReal:10:5);
 
 end;
 
