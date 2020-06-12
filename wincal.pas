@@ -525,41 +525,64 @@ var
   summ      : String;
   daysBetween : Real;
 
+  j,
+  sDate,
+  eDate,
+  daysInMon   : Integer;
+
 begin
 
   new(logger);
   logger^.init;
   logger^.level := INFO;
 
-  calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
-
   if (cal^.eventList[i]^.startDate^.mm = calDate^.mm)
   then
   begin
 
-    daysBetween :=  (cal^.eventList[i]^.endDate^.julianDate -
-                          cal^.eventList[i]^.startDate^.juliandate);
+    daysBetween :=  (cal^.eventList[i]^.endDate^.epoch -
+                     cal^.eventList[i]^.startDate^.epoch) / daySec;
 
     logger^.logReal(INFO, 'event lasts ', daysBetween);
 
+    sDate := cal^.eventList[i]^.startDate^.dd;
+    eDate := cal^.eventList[i]^.startDate^.dd + round(daysBetween);
+
+    daysInMon := daysMon[cal^.eventList[i]^.startDate^.mm];
+
+    if (eDate > daysInMon)
+    then
+      eDate := daysInMon;
+
+    vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
+
+    for j := sDate to eDate
+    do
+    begin
+      logger^.logInt(INFO, 'event date ',  + j);
+
+(**    calcCell(cal^.eventList[i]^.startDate^.dd, row, col);  **)
+
+    calcCell(j, row, col); 
     calcPos(row, col, x, y);
 
     logger^.logInt (DEBUG, 'row ', row);
     logger^.logInt (DEBUG, 'col ', col);
 
     summ := SubStr (cal^.eventList[i]^.summary);
-    vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
 
     v_gtext(vdiHandle,
             newX + x + Attr.boxWidth,
             newY + y - Attr.boxHeight - 10,
             summ );
-
-    vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
-
     logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
 
+    end;
+    vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
+
   end;
+
+
 
   Dispose(logger, Done);
 
