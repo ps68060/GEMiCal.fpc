@@ -42,6 +42,11 @@ type
                    procedure WriteDates(newX,
                                         newY   : LongInt);             VIRTUAL;
 
+                   procedure DrawTitle(newX,
+                                       newY   : LongInt;
+                                       year,
+                                       month  : Word);
+
                    procedure DrawHeading(newX,
                                          newY   : LongInt);
 
@@ -248,11 +253,14 @@ begin
           new_y + 1 * Attr.boxHeight,
           time2Str(hour, minute, second, TRUE) );
 
-  drawHeading(new_X, new_Y - 2 * Attr.boxHeight);
+  (* Display the year and month *)
+  DrawTitle(new_X, new_Y, year, month);
+
+  DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 
   WriteDates(new_X, new_Y);
 
-  displayEvents(new_X, new_Y);
+  DisplayEvents(new_X, new_Y);
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
 
@@ -326,6 +334,36 @@ procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
 begin
   v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' 2xClick ');
 end;
+
+
+procedure TWinCal.DrawTitle(newX,
+                            newY   : LongInt;
+                            year,
+                            month  : Word);
+
+var
+  title     : String;
+
+  wch,
+  hch,
+  wcell,
+  hcell     : Integer;
+
+begin
+
+  (* Display the year and month *)
+  str(year, title);
+  title := title + ' ' + mon1[month];
+
+  vst_point(vdiHandle, 20, wch, hch, wcell, hcell);
+  v_gtext(vdiHandle,
+          newX + Attr.charWidth + Attr.charWidth * 46,
+          newY + 2 * Attr.boxHeight,
+          title);
+  vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
+
+end;
+
 
 
 procedure TWinCal.DrawHeading(newX,
