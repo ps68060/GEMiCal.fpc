@@ -150,7 +150,7 @@ var
   currentMonth : Boolean;
   dtStr        : String;
 
-  row,col,
+  row, col,
   i            : Integer;
 
 begin
@@ -160,11 +160,7 @@ begin
   logger^.level := INFO;
 
   (* Calculate date of end of month *)
-  daysInMon := daysMon[calDate^.mm];
-
-  if (calDate^.mm = 2) and (isLeapDay(calDate^.yyyy))
-  then
-    daysInMon := 29;
+  daysInMon := daysInMonth(calDate);
 
   dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
   new(endMonthDate);
@@ -527,8 +523,7 @@ var
 
   j,
   sDate,
-  eDate,
-  daysInMon   : Integer;
+  eDate     : Integer;
 
 begin
 
@@ -548,8 +543,8 @@ begin
     sDate := cal^.eventList[i]^.startDate^.dd;
     eDate := cal^.eventList[i]^.startDate^.dd + round(daysBetween);
 
-    daysInMon := daysMon[cal^.eventList[i]^.startDate^.mm];
-
+(**    daysInMon := daysInMonth(cal^.eventList[i]^.startDate);
+**)
     if (eDate > daysInMon)
     then
       eDate := daysInMon;
