@@ -262,13 +262,12 @@ begin
 
   DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 
+  vsf_interior(vdiHandle, FIS_HOLLOW);
+  DrawGrid(new_X, new_Y, 6, ySpace);
+
   WriteDates(new_X, new_Y);
 
   DisplayEvents(new_X, new_Y);
-
-  vsf_interior(vdiHandle, FIS_HOLLOW);
-
-  DrawGrid(new_X, new_Y, 6, ySpace);
 
 end;
 
@@ -365,14 +364,13 @@ begin
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
 
   v_gtext(vdiHandle,
-          newX + WINWIDTH div 2,   (**Attr.charWidth + Attr.charWidth * 46,  **)
+          newX + WINWIDTH div 2,
           newY + 2 * Attr.boxHeight,
           title);
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
   vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
 end;
-
 
 
 procedure TWinCal.DrawHeading(newX,
@@ -493,8 +491,7 @@ begin
         and (cal^.eventList[i]^.endDate^.epoch   > calDate^.epoch)
     then
     begin
-      logger^.logInt (INFO, 'IN Scope', i );
-      calcCell(cal^.eventList[i]^.startDate^.dd, row, col);
+      logger^.logInt (DEBUG, 'IN Scope', i );
       DisplayEvent(newX, newY, i);
     end;
 
@@ -526,6 +523,7 @@ var
   hcell     : Integer;
 
   summ      : String;
+  daysBetween : Real;
 
 begin
 
@@ -538,22 +536,28 @@ begin
   if (cal^.eventList[i]^.startDate^.mm = calDate^.mm)
   then
   begin
-  calcPos(row, col, x, y);
 
-  logger^.logInt (DEBUG, 'row ', row);
-  logger^.logInt (DEBUG, 'col ', col);
+    daysBetween :=  (cal^.eventList[i]^.endDate^.julianDate -
+                          cal^.eventList[i]^.startDate^.juliandate);
 
-  summ := SubStr (cal^.eventList[i]^.summary);
-  vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
+    logger^.logReal(INFO, 'event lasts ', daysBetween);
 
-  v_gtext(vdiHandle,
-          newX + x + Attr.boxWidth,
-          newY + y - Attr.boxHeight - 10,
-          summ );
+    calcPos(row, col, x, y);
 
-  vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
+    logger^.logInt (DEBUG, 'row ', row);
+    logger^.logInt (DEBUG, 'col ', col);
 
-  logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
+    summ := SubStr (cal^.eventList[i]^.summary);
+    vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
+
+    v_gtext(vdiHandle,
+            newX + x + Attr.boxWidth,
+            newY + y - Attr.boxHeight - 10,
+            summ );
+
+    vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
+
+    logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
 
   end;
 
