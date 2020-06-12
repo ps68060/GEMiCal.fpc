@@ -36,6 +36,10 @@ type
     procedure logWord(msgLevel : a_level;
                       message  : String;
                       myWord   : Word );
+
+    procedure logReal(msgLevel : a_level;
+                      message  : String;
+                      myReal   : Real );
   end;
 
 implementation
@@ -107,6 +111,19 @@ begin
   if (ord(level) >= ord(msgLevel) )
   then
     writeln(message, myWord);
+
+end;
+
+
+
+procedure TLogger.logReal(msgLevel : a_level;
+                          message  : String;
+                          myReal   : Real );
+begin
+
+  if (ord(level) >= ord(msgLevel) )
+  then
+    writeln(message, myReal);
 
 end;
 
