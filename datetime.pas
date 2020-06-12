@@ -215,9 +215,19 @@ implementation
           : Double;
   var
     y, m, d  : double;
-    part1, part2, part3, part4 : double;
+
+    part1,
+    part2,
+    part3, 
+    part4    : double;
+
+    logger   : PLogger;
 
   begin
+    new(logger);
+    logger^.init;
+    logger^.level := INFO;
+
     (* this didn't work.
     y := yyyy;
     m := mm;
@@ -252,9 +262,8 @@ implementation
     then
       julian := julian - 0.5;
 
-    (*
-     writeln ('Julian date is', julian:20:3);
-    *)
+    logger^.logReal(DEBUG, 'Julian date is ', julian);
+    Dispose (logger, Done);
 
     julianDate := julian;
   end;
