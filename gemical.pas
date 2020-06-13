@@ -24,15 +24,10 @@ type
 
   (* Main Menu *)
 
-  PFileMenu    = ^TFileMenu;
 
   PLoadMenu    = ^TLoadMenu;
 
   PCalMenu     = ^TCalMenu;
-
-  TFileMenu  =  OBJECT(TKeyMenu)
-                  procedure Work; VIRTUAL;
-                END;
 
   TLoadMenu =  OBJECT(TKeyMenu)
                  procedure Work; VIRTUAL;
@@ -44,7 +39,6 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
-                     fileMenu   : PFileMenu;
                      convMenu   : PConvMenu;
                      winCal     : PWinCal;
                      procedure INITInstance;   VIRTUAL;
@@ -73,7 +67,6 @@ begin
   LoadMenu (TREE000);
 
   new (PDeskMenu,  INIT(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
-(**  new (FileMenu,   INIT(@SELF, K_Ctrl, Ctrl_B, M_FOLDER,   M_DESK2));   **)
   new (PLoadMenu,  INIT(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
   new (convMenu,   INIT(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
   new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
@@ -145,37 +138,25 @@ end;
 procedure TLoadMenu.Work;
 begin
   writeln ('Load Menu Work');
-  if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
 
+  if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
   then
   begin
     BusyMouse;
-    Dispose(myApplication.winCal^.cal, Done);
 
+    Dispose(myApplication.winCal^.cal, Done);
+(**    Dispose(myApplication.winCal, Done);
+**)
     directory := myPath;
 
     logger^.log(DEBUG, 'Load ICS files');
     LoadCal;
+(**    myApplication.INITMainWindow;**)
 
     ArrowMouse;
     logger^.log(DEBUG, 'Loaded');
 
   end;
-
-end;
-
-
-procedure TFileMenu.Work;
-begin
-  logger^.log(DEBUG, 'FileMenu Work');
-
-  if MyApplication.WinCal = NIL
-  then
-    MyApplication.WinCal := new(PWinCal, INIT(NIL,'GEMiCal') );
-
-  if MyApplication.WinCal <> NIL
-  then
-    MyApplication.WinCal^.MakeWindow;
 
 end;
 
@@ -187,7 +168,6 @@ begin
   if aDialog <> NIL
   then
     aDialog^.MakeWindow;
-
 
   (* Window *)
   if MyApplication.WinCal = NIL
@@ -202,6 +182,7 @@ begin
     MyApplication.WinCal^.MakeWindow;
 
 end;
+
 
 (* ----------------------------------------------------------------- *)
 
