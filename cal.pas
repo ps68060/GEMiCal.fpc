@@ -70,12 +70,16 @@ implementation
     calName : String;
 
   begin
+    new (logger);
+    logger^.init;
+    logger^.level := DEBUG;
 
     findFirst(directory + '/*.ics', attr, fileRec);
 
     while DosError = 0
     do
     begin
+      logger^.log (DEBUG, 'Loading ' + fileRec.name);
       calName := directory + '/' +  fileRec.name;
 
       DivideIcs (calName);
@@ -85,6 +89,7 @@ implementation
     end;
   
     dec (entries);
+    dispose (logger, Done);
   end;
 
 
@@ -176,16 +181,11 @@ implementation
           eventList[i]^.writeEvent;
           eventList[j]^.writeEvent;
           *)
-(*
-          new(swapper);
-          swapper^.init;
-*)
+
           swapper            := eventList[i];
           eventList[i]       := eventList[j];
           eventList[j]       := swapper;
-(*
-          dispose(swapper, Done);
-*)
+
           (*
           writeln;
           writeln('After swap');
@@ -200,7 +200,6 @@ implementation
     end;
 
   end;
-
 
 
 end.
