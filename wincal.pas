@@ -55,7 +55,7 @@ type
 
                    procedure DisplayEvent(newX,
                                           newY    : LongInt;
-                                          i       : Integer);
+                                          e       : Integer);
 
                    procedure CalcCell(day : Integer;
                                       var row,
@@ -79,6 +79,8 @@ const
   WINWIDTH  = 800;  (* W:=113, smallest width of the working area *)
   WINHEIGHT = 680;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
+  NUMCELLS  = 31;
+
 var
   leftPos,
   topPos,
@@ -88,6 +90,8 @@ var
   daysInMon    : Integer;
   endMonthDate : PDateTime;
 
+  cells        : array [1..NUMCELLS] of Integer;
+
 
 function SubStr(myStr : String)
         : String;
@@ -96,9 +100,14 @@ begin
 end;
 
 procedure TWinCal.CalcCell(day : Integer;
-                 var row,
-                     col : Integer);
-(* Purpose : Calculate the row and column of the calendar day *)
+                           var row,
+                               col : Integer);
+(* Purpose : Calculate the row and column of the calendar day
+   day = the date in the month
+   retruns:
+   row = row    0 to 6
+   col = column 0 to 5
+ *)
 
 var
   logger    : PLogger;
@@ -233,6 +242,10 @@ begin
   topPos     := 80;
   xSpace     := 110;
   ySpace     := 90;
+
+  for i := 1 to NUMCELLS
+  do
+    cells[i] := 0;
 
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
@@ -454,14 +467,14 @@ end;
 procedure TWinCal.DisplayEvents(newX,
                                 newY   : LongInt);
 
-(* Purpose : Decide which Events should be displayed *)
+(* Purpose : Decide which Events should be displayed in the month *)
 
 var
-  logger    : PLogger;
+  logger       : PLogger;
 
   row,
   col,
-  i         : Integer;
+  i            : Integer;
 
   dtStr        : String;
 
@@ -504,7 +517,7 @@ end;
 
 procedure TWinCal.DisplayEvent(newX,
                                newY   : LongInt;
-                               i      : Integer);
+                               e      : Integer);
 
 (* Purpose : Display a single event  *)
 
@@ -534,20 +547,18 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  if (cal^.eventList[i]^.startDate^.mm = calDate^.mm)
+  if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
   then
   begin
 
-    daysBetween :=  (cal^.eventList[i]^.endDate^.epoch -
-                     cal^.eventList[i]^.startDate^.epoch) / daySec;
+    daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
+                     cal^.eventList[e]^.startDate^.epoch) / daySec;
 
     logger^.logReal(INFO, 'event lasts ', daysBetween);
 
-    sDate := cal^.eventList[i]^.startDate^.dd;
-    eDate := cal^.eventList[i]^.startDate^.dd + round(daysBetween);
+    sDate := cal^.eventList[e]^.startDate^.dd;
+    eDate := cal^.eventList[e]^.startDate^.dd + round(daysBetween);
 
-(**    daysInMon := daysInMonth(cal^.eventList[i]^.startDate);
-**)
     if (eDate > daysInMon)
     then
       eDate := daysInMon;
@@ -559,23 +570,22 @@ begin
     begin
       logger^.logInt(INFO, 'event date ',  + j);
 
-(**    calcCell(cal^.eventList[i]^.startDate^.dd, row, col);  **)
+      calcCell(j, row, col); 
+      calcPos(row, col, x, y);
 
-    calcCell(j, row, col); 
-    calcPos(row, col, x, y);
+      logger^.logInt (DEBUG, 'row ', row);
+      logger^.logInt (DEBUG, 'col ', col);
 
-    logger^.logInt (DEBUG, 'row ', row);
-    logger^.logInt (DEBUG, 'col ', col);
+      summ := SubStr (cal^.eventList[e]^.summary);
 
-    summ := SubStr (cal^.eventList[i]^.summary);
-
-    v_gtext(vdiHandle,
-            newX + x + Attr.boxWidth,
-            newY + y - Attr.boxHeight - 10,
-            summ );
-    logger^.log(DEBUG, 'Summary ' + cal^.eventList[i]^.summary );
-
+      v_gtext(vdiHandle,
+              newX + x + Attr.boxWidth,
+              newY + y - Attr.boxHeight - 10 + cells[j] * Attr.boxHeight,
+              summ );
+      logger^.log(DEBUG, 'Summary ' + cal^.eventList[e]^.summary );
+      inc (cells[j] );
     end;
+
     vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
 
   end;
