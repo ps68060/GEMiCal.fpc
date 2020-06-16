@@ -159,14 +159,6 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  (* Calculate date of end of month *)
-  daysInMon := daysInMonth(calDate);
-
-  dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
-  new(endMonthDate);
-  endMonthDate^.init;
-  endMonthDate^.dtStr2Obj(dtStr);
-
   logger^.logInt(DEBUG, 'year ', calDate^.yyyy );
   logger^.log(DEBUG, mon1[calDate^.mm] );
 
@@ -180,6 +172,9 @@ begin
      and (calDate^.mm   = month)
   then
     currentMonth := TRUE;
+
+  (* Calculate date of end of month *)
+  daysInMon := daysInMonth(calDate);
 
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon
@@ -468,11 +463,19 @@ var
   col,
   i         : Integer;
 
+  dtStr        : String;
+
 begin
 
   new(logger);
   logger^.init;
   logger^.level := INFO;
+
+  dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
+
+  new(endMonthDate);
+  endMonthDate^.init;
+  endMonthDate^.dtStr2Obj(dtStr);
 
   logger^.logLongInt(DEBUG, ' 1st epoch ', calDate^.epoch);
   logger^.logLongInt(DEBUG, 'last epoch ', endMonthDate^.epoch);
@@ -493,7 +496,7 @@ begin
 
   end;  (* for *)
 
-(**  Dispose (calDate, Done);  **)
+  Dispose (endMonthDate, Done);
   Dispose (logger, Done);
 
 end;
