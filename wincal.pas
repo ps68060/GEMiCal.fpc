@@ -534,12 +534,12 @@ var
   wcell,
   hcell     : Integer;
 
-  summ      : String;
+  summ        : String;
   daysBetween : Real;
 
   j,
   sDate,
-  eDate     : Integer;
+  eDate       : Integer;
 
 begin
 
@@ -547,21 +547,24 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
-  then
-  begin
-
     daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
                      cal^.eventList[e]^.startDate^.epoch) / daySec;
 
     logger^.logReal(INFO, 'event lasts ', daysBetween);
 
-    sDate := cal^.eventList[e]^.startDate^.dd;
-    eDate := cal^.eventList[e]^.startDate^.dd + round(daysBetween);
 
-    if (eDate > daysInMon)
+    if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
     then
+      sDate := cal^.eventList[e]^.startDate^.dd
+    else
+      sDate := 1;
+
+    if (cal^.eventList[e]^.endDate^.mm = calDate^.mm)
+    then
+      eDate := cal^.eventList[e]^.endDate^.dd (** + round(daysBetween) **)
+    else
       eDate := daysInMon;
+
 
     vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
 
@@ -587,10 +590,6 @@ begin
     end;
 
     vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
-
-  end;
-
-
 
   Dispose(logger, Done);
 
