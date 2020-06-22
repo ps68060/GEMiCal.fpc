@@ -1,5 +1,3 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
-
 unit WinCal;
 
 interface
@@ -14,6 +12,7 @@ interface
     Cal,
     DateTime,
     StrSubs,
+    CellGrid,
     Logger;
 
 {$I gemical.i}
@@ -57,10 +56,6 @@ type
                                           newY    : LongInt;
                                           e       : Integer);
 
-                   procedure CalcCell(day : Integer;
-                                      var row,
-                                          col : Integer);
-
                    procedure CalcPos(row,
                                      col   : Integer;
                                      var x,
@@ -72,6 +67,9 @@ type
                                       height  : Integer);
                  END;
 
+var
+  cellGrid     : PCellGrid;
+
 
 implementation
 
@@ -79,7 +77,6 @@ const
   WINWIDTH  = 800;  (* W:=113, smallest width of the working area *)
   WINHEIGHT = 680;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
-  NUMCELLS  = 31;
 
 var
   leftPos,
@@ -90,42 +87,11 @@ var
   daysInMon    : Integer;
   endMonthDate : PDateTime;
 
-  cells        : array [1..NUMCELLS] of Integer;
-
 
 function SubStr(myStr : String)
         : String;
 begin
   SubStr := Copy(myStr, 1, 16);
-end;
-
-procedure TWinCal.CalcCell(day : Integer;
-                           var row,
-                               col : Integer);
-(* Purpose : Calculate the row and column of the calendar day
-   day = the date in the month
-   retruns:
-   row = row    0 to 6
-   col = column 0 to 5
- *)
-
-var
-  logger    : PLogger;
-
-begin
-
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
-
-  row := (day - 1 + calDate^.day) div 7;
-  col := (day - 1 + calDate^.day) mod 7;
-
-  logger^.logInt(DEBUG, 'day ', day);
-  logger^.logInt(DEBUG, 'row ', row);
-  logger^.logInt(DEBUG, 'col ', col);
-
-  Dispose (logger, Done);
 end;
 
 
@@ -174,7 +140,7 @@ begin
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
 
-  CalcCell(day, row, col);
+  CalcCell (calDate^.day, day, row, col);
 
   currentMonth := FALSE;
   if     (calDate^.yyyy = year)
@@ -189,7 +155,7 @@ begin
   for i := 1 to daysInMon
   do
   begin
-    CalcCell (i, row, col);
+    CalcCell (calDate^.day, i, row, col);
     CalcPos  (row, col, x, y);
 
     if (currentMonth)
@@ -243,9 +209,8 @@ begin
   xSpace     := 110;
   ySpace     := 90;
 
-  for i := 1 to NUMCELLS
-  do
-    cells[i] := 0;
+  new (cellGrid);
+  cellGrid^.init;
 
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
@@ -573,7 +538,7 @@ begin
     begin
       logger^.logInt(INFO, 'event date ',  + j);
 
-      calcCell(j, row, col); 
+      calcCell (calDate^.day, j, row, col); 
       calcPos(row, col, x, y);
 
       logger^.logInt (DEBUG, 'row ', row);
@@ -583,10 +548,10 @@ begin
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10 + cells[j] * Attr.boxHeight,
+              newY + y - Attr.boxHeight - 10 + cellGrid^.cells[j] * Attr.boxHeight,
               summ );
       logger^.log(DEBUG, 'Summary ' + cal^.eventList[e]^.summary );
-      inc (cells[j] );
+      inc (cellGrid^.cells[j] );
     end;
 
     vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
