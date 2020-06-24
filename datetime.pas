@@ -1,4 +1,3 @@
-{$B+,D-,G-,I-,L-,P-,Q-,R+,S-,T-,V-,X+,Z-}
 unit datetime;
 
 (* AUTHOR  : P SLEGG
