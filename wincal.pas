@@ -548,10 +548,10 @@ begin
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10 + cellGrid^.cells[j] * Attr.boxHeight,
+              newY + y - Attr.boxHeight - 10 + cellGrid^.cells[j]^.counter * Attr.boxHeight,
               summ );
       logger^.log(DEBUG, 'Summary ' + cal^.eventList[e]^.summary );
-      inc (cellGrid^.cells[j] );
+      inc (cellGrid^.cells[j]^.counter );
     end;
 
     vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
