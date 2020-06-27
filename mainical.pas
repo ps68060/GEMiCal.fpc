@@ -6,6 +6,7 @@ uses
   OWindows,
 
   DlgConv,
+  Cal,
   WinCal;
 
 {$I gemical.i}
@@ -35,6 +36,7 @@ type
 
   TMyApplication = OBJECT(TApplication)
                      convMenu   : PConvMenu;
+                     iCal       : PCal;
                      winCal     : PWinCal;
                      procedure INITInstance;   VIRTUAL;
                      procedure INITMainWindow; VIRTUAL;
@@ -51,10 +53,10 @@ uses
   Gem,
   Cal,
   DateTime,
+  CellGrid,
 
   DlgAbout,
   DlgConv,
-  WinCal,
   Logger;
 
 
@@ -68,7 +70,6 @@ var
   directory     : String;
   logger        : PLogger;
 
-(* ------------------------------------------------------------------------------- *)
 
 procedure TMyApplication.INITInstance;
 begin
@@ -85,9 +86,9 @@ begin
   (* Load and set-up the menu *)
   LoadMenu (TREE000);
 
-  new (PDeskMenu,  INIT(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
-  new (PLoadMenu,  INIT(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
-  new (convMenu,   INIT(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
+  new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
+  new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
+  new (convMenu,   Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
   new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
 
   INHERITED INITInstance;
@@ -106,17 +107,17 @@ var
   dtStr     : String;
 
 begin
-  new(myApplication.winCal^.cal);
-  myApplication.winCal^.cal^.init;
+  new(myApplication.iCal);
+  myApplication.iCal^.init;
 
   logger^.log(DEBUG, 'Load ICS files from ' + directory);
 
   (* Load iCal events *)
-  myApplication.winCal^.cal^.loadICS(directory);
+  myApplication.iCal^.loadICS(directory);
 
-  logger^.logInt(DEBUG, 'entries ', myApplication.winCal^.cal^.entries );
+  logger^.logInt(DEBUG, 'entries ', myApplication.iCal^.entries );
 
-  myApplication.winCal^.cal^.sort;
+  myApplication.iCal^.sort;
 
   logger^.log(DEBUG, 'Sorted');
 
@@ -130,13 +131,18 @@ begin
   myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
   myApplication.winCal^.calDate^.dayOfWeek;
 
+    new (cellGr);
+    cellGr^.init;
+    cellGr^.FilterEvents(myApplication.iCal,
+                         myApplication.winCal^.calDate);
+
 end;
 
 
 procedure TMyApplication.INITMainWindow;
 
 begin
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   logger^.log(DEBUG, 'INIT Main Window');
 
@@ -146,6 +152,7 @@ begin
     myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
     LoadCal;
+
   end;
 
   if MyApplication.winCal <> NIL
@@ -154,28 +161,25 @@ begin
 
 end;
 
-(* ------------------------------------------------------------------------------- *)
 
 procedure TLoadMenu.Work;
 begin
-  writeln ('Load Menu Work');
+  logger^.log(DEBUG, 'Load Menu Work');
 
   if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
   then
   begin
     BusyMouse;
 
-    Dispose(myApplication.winCal^.cal, Done);
-(**    Dispose(myApplication.winCal, Done);
-**)
+    Dispose(myApplication.iCal, Done);
+    Dispose(cellGr, Done);
+
     directory := myPath;
 
     LoadCal;
-(**    myApplication.INITMainWindow;**)
 
     ArrowMouse;
     logger^.log(DEBUG, 'Loaded');
-
   end;
 
 end;

@@ -15,16 +15,13 @@ interface
   type
     PCellGrid = ^TCellGrid;
     TCellGrid = Object(TObject)
-      summary : array [1..NUMCELLS] of 
-                  array [1..5] of String;
-      cells   : array [1..NUMCELLS] of PCalCell;
+      cell    : array [1..NUMCELLS] of PCalCell;
 
       constructor init;
       destructor  done; virtual;
 
       procedure FilterEvents(cal       : PCal;
-                             calDate   : PDateTime;
-                             daysInMon : Integer);
+                             calDate   : PDateTime);
 
       procedure FilterEvent(cal       : PCal;
                             calDate   : PDateTime;
@@ -51,8 +48,9 @@ uses
     for i := 1 to NUMCELLS
     do
     begin
-      new (cells[i]);
-      cells[i]^.init;
+      new (cell[i]);
+      cell[i]^.init;
+      cell[i]^.counter := 0;
     end;
 
   end;
@@ -65,7 +63,7 @@ uses
     for i := 1 to NUMCELLS
     do
     begin
-      dispose(cells[i], Done);
+      dispose(cell[i], Done);
     end;
   end;
 
@@ -78,18 +76,17 @@ uses
 
 
   procedure TCellGrid.FilterEvents(cal       : PCal;
-                                   calDate   : PDateTime;
-                                   daysInMon : Integer);
+                                   calDate   : PDateTime);
 
-  (* Purpose : Decide which Events should be displayed in the month *)
-
+  (* Purpose : Decide which Events should be displayed in the month
+               cal     = iCal calendar
+               calDate = date of 1st of month *)
   var
     logger       : PLogger;
 
     endMonthDate : PDateTime;
+    daysInMon    : Integer;
 
-    row,
-    col,
     i            : Integer;
 
     dtStr        : String;
@@ -99,6 +96,11 @@ uses
     new(logger);
     logger^.init;
     logger^.level := INFO;
+
+    logger^.log (DEBUG, 'FilterEvents');
+
+    (* Calculate date of end of month *)
+    daysInMon := daysInMonth(calDate);
 
     dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
 
@@ -118,6 +120,7 @@ uses
       then
       begin
         logger^.logInt (DEBUG, 'IN Scope', i );
+
         FilterEvent(cal, calDate, daysInMon, i);
       end;
 
@@ -125,7 +128,6 @@ uses
 
     Dispose (endMonthDate, Done);
     Dispose (logger, Done);
-
   end;
 
 
@@ -137,10 +139,7 @@ uses
   (* Purpose : Display a single event  *)
 
   var
-    logger    : PLogger;
-
-    row,
-    col         : Integer;
+    logger      : PLogger;
 
     summ        : String;
     daysBetween : Real;
@@ -155,11 +154,12 @@ uses
     logger^.init;
     logger^.level := INFO;
 
+    logger^.logInt(DEBUG, 'end date = ' , cal^.eventList[e]^.endDate^.dd);
+
     daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
                      cal^.eventList[e]^.startDate^.epoch) / daySec;
 
-    logger^.logReal(INFO, 'event lasts ', daysBetween);
-
+    logger^.logReal(DEBUG, 'event lasts ', daysBetween);
 
     if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
     then
@@ -176,24 +176,19 @@ uses
     for j := sDate to eDate
     do
     begin
-      logger^.logInt(INFO, 'event date ',  + j);
+      logger^.logInt(DEBUG, 'event date ',  + j);
+      logger^.logInt(DEBUG, 'slot ', cell[j]^.counter);
 
-      calcCell (calDate^.day, j, row, col); 
-      (* calcPos was here *)
-
-      logger^.logInt (DEBUG, 'row ', row);
-      logger^.logInt (DEBUG, 'col ', col);
-
+      (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
-(*
-      v_gtext(vdiHandle,
-              newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10 + cellGrid^.cells[j]^.count * Attr.boxHeight,
-              summ );
-*)
-      logger^.log(DEBUG, 'Summary ' + cal^.eventList[e]^.summary );
-      inc (cells[j]^.counter );
+      cell[j]^.summary[cell[j]^.counter] := summ;
+
+      logger^.log(DEBUG, 'Summary ' +
+                  cell[j]^.summary[cell[j]^.counter] );
+      inc (cell[j]^.counter );
     end;
+
+    dec (cell[eDate]^.counter );
 
     Dispose(logger, Done);
 

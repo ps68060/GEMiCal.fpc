@@ -9,7 +9,6 @@ interface
     OTypes,
     OWindows,
 
-    Cal,
     DateTime,
     StrSubs,
     CellGrid,
@@ -26,7 +25,6 @@ type
 
   TWinCal     = OBJECT(TWindow)
                    calDate  : PDateTime;  (* 1st of the month *)
-                   cal      : PCal;
 
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
@@ -50,11 +48,7 @@ type
                                          newY   : LongInt);
 
                    procedure DisplayEvents(newX,
-                                           newY   : LongInt);
-
-                   procedure DisplayEvent(newX,
-                                          newY    : LongInt;
-                                          e       : Integer);
+                                           newY    : LongInt);
 
                    procedure CalcPos(row,
                                      col   : Integer;
@@ -68,7 +62,7 @@ type
                  END;
 
 var
-  cellGrid     : PCellGrid;
+  cellGr     : PCellGrid;
 
 
 implementation
@@ -208,9 +202,6 @@ begin
   topPos     := 80;
   xSpace     := 110;
   ySpace     := 90;
-
-  new (cellGrid);
-  cellGrid^.init;
 
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
@@ -432,59 +423,7 @@ end;
 procedure TWinCal.DisplayEvents(newX,
                                 newY   : LongInt);
 
-(* Purpose : Decide which Events should be displayed in the month *)
-
-var
-  logger       : PLogger;
-
-  row,
-  col,
-  i            : Integer;
-
-  dtStr        : String;
-
-begin
-
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
-
-  dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
-
-  new(endMonthDate);
-  endMonthDate^.init;
-  endMonthDate^.dtStr2Obj(dtStr);
-
-  logger^.logLongInt(DEBUG, ' 1st epoch ', calDate^.epoch);
-  logger^.logLongInt(DEBUG, 'last epoch ', endMonthDate^.epoch);
-
-  logger^.logInt(DEBUG, 'entries = ', cal^.entries );
-
-  for i := 0 to cal^.entries do
-  begin
-
-    (*  calDate is 1st of month *)
-    if      (cal^.eventList[i]^.startDate^.epoch < endMonthDate^.epoch)
-        and (cal^.eventList[i]^.endDate^.epoch   > calDate^.epoch)
-    then
-    begin
-      logger^.logInt (DEBUG, 'IN Scope', i );
-      DisplayEvent(newX, newY, i);
-    end;
-
-  end;  (* for *)
-
-  Dispose (endMonthDate, Done);
-  Dispose (logger, Done);
-
-end;
-
-
-procedure TWinCal.DisplayEvent(newX,
-                               newY   : LongInt;
-                               e      : Integer);
-
-(* Purpose : Display a single event  *)
+(* Purpose : Display Events for a month  *)
 
 var
   logger    : PLogger;
@@ -503,8 +442,7 @@ var
   daysBetween : Real;
 
   j,
-  sDate,
-  eDate       : Integer;
+  i           : Integer;
 
 begin
 
@@ -512,49 +450,35 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-    daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
-                     cal^.eventList[e]^.startDate^.epoch) / daySec;
+  logger^.log (DEBUG, 'DisplayEvents');
 
-    logger^.logReal(INFO, 'event lasts ', daysBetween);
+  vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
 
+  for j := 1 to 31
+  do
+  begin
+    calcCell (calDate^.day, j, row, col); 
+    calcPos(row, col, x, y);
 
-    if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
-    then
-      sDate := cal^.eventList[e]^.startDate^.dd
-    else
-      sDate := 1;
-
-    if (cal^.eventList[e]^.endDate^.mm = calDate^.mm)
-    then
-      eDate := cal^.eventList[e]^.endDate^.dd (** + round(daysBetween) **)
-    else
-      eDate := daysInMon;
+    logger^.logInt (DEBUG, 'row ', row);
+    logger^.logInt (DEBUG, 'col ', col);
 
 
-    vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
-
-    for j := sDate to eDate
+    for i := 0 to cellGr^.cell[j]^.counter
     do
     begin
-      logger^.logInt(INFO, 'event date ',  + j);
-
-      calcCell (calDate^.day, j, row, col); 
-      calcPos(row, col, x, y);
-
-      logger^.logInt (DEBUG, 'row ', row);
-      logger^.logInt (DEBUG, 'col ', col);
-
-      summ := SubStr (cal^.eventList[e]^.summary);
+      summ := SubStr (cellGr^.cell[j]^.summary[i] );
+      logger^.log(DEBUG, 'Summary  ' + summ );
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10 + cellGrid^.cells[j]^.counter * Attr.boxHeight,
+              newY + y - Attr.boxHeight - 10 + i * Attr.boxHeight,
               summ );
-      logger^.log(DEBUG, 'Summary ' + cal^.eventList[e]^.summary );
-      inc (cellGrid^.cells[j]^.counter );
     end;
 
-    vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
+  end;
+
+  vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
 
   Dispose(logger, Done);
 
