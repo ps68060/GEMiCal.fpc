@@ -8,7 +8,7 @@ interface
   type
     PCalCell  = ^TCalCell;
     TCalCell  = Object(TObject)
-      summary : array [1..5] of String;
+      summary : array [0..9] of String;
       counter : Integer;
 
       constructor init;
@@ -23,11 +23,12 @@ implementation
     i : Integer;
 
   begin
-    for i := 1 to 5
+    counter    := 0;
+
+    for i := 0 to 9
     do
     begin
       summary[i] := '';
-      counter    := 0;
     end;
 
   end;
