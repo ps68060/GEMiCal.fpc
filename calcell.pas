@@ -9,6 +9,7 @@ interface
     PCalCell  = ^TCalCell;
     TCalCell  = Object(TObject)
       summary : array [0..9] of String;
+      eventNum: Integer;
       counter : Integer;
 
       constructor init;

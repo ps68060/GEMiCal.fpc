@@ -136,7 +136,7 @@ uses
                                   daysInMon : Integer;
                                   e         : Integer);
 
-  (* Purpose : Display a single event  *)
+  (* Purpose : Store a single event in the cellGrid *)
 
   var
     logger      : PLogger;
@@ -185,6 +185,9 @@ uses
 
       logger^.log(DEBUG, 'Summary ' +
                   cell[j]^.summary[cell[j]^.counter] );
+
+      cell[j]^.eventNum := e;
+
       inc (cell[j]^.counter );
     end;
 
