@@ -1,5 +1,3 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
-
 unit Event;
 
 (* AUTHOR  : P Slegg
@@ -10,6 +8,7 @@ unit Event;
 interface
   uses
     Objects,
+    Token,
     DateTime,
     Logger;
 
@@ -21,7 +20,9 @@ type
     summary     : String;
     description : String;
     dtStart     : String;
+    dtStartTz   : String;
     dtEnd       : String;
+    dtEndTz     : String;
     location    : String;
 
     startDate   : PDateTime;
@@ -94,6 +95,8 @@ implementation
     alarm        : Boolean;
     endEvent     : Boolean;
 
+    tokens       : PToken;
+
   begin
     new(logger);
     logger^.init;
@@ -120,19 +123,30 @@ implementation
         endEvent := TRUE;
 
       end
+
       else
       begin
+        new (tokens);
+        tokens^.init;
+        tokens^.tokenise(currentLn);
+
         if ( pos('CREATED:', currentLn) = 1 )
         then
           created := COPY (currentLn, 9, length(currentLn));
 
         if ( pos('DTSTART', currentLn) = 1 )
         then
-          dtStart := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
+        begin
+          dtStart   := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
+          dtStartTz := tokens^.part[1];
+        end;
 
         if ( pos('DTEND', currentLn) = 1 )
         then
+        begin
           dtEnd   := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
+          dtEndTz := tokens^.part[1];
+        end;
 
         if ( pos('SUMMARY', currentLn) = 1 )
            and (NOT alarm)
@@ -160,6 +174,8 @@ implementation
         if (pos('END:VALARM', currentLn) = 1 )
         then
           alarm := FALSE;
+
+        dispose (tokens, Done);
 
       end;  (* if *)
 
