@@ -131,10 +131,10 @@ begin
   myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
   myApplication.winCal^.calDate^.dayOfWeek;
 
-    new (cellGr);
-    cellGr^.init;
-    cellGr^.FilterEvents(myApplication.iCal,
-                         myApplication.winCal^.calDate);
+  new (cellGr);
+  cellGr^.init;
+  cellGr^.FilterEvents(myApplication.iCal,
+                       myApplication.winCal^.calDate);
 
 end;
 
