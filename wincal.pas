@@ -160,7 +160,7 @@ begin
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
               newY + y - 2 * Attr.boxHeight - 10,
-              IntToStr(i) + ' ' + day2[i mod 7]);
+              IntToStr(i) + ' ' + day2[(calDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
