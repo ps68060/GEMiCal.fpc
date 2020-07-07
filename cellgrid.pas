@@ -50,7 +50,6 @@ uses
     begin
       new (cell[i]);
       cell[i]^.init;
-      cell[i]^.counter := 0;
     end;
 
   end;
@@ -169,7 +168,7 @@ uses
 
     if (cal^.eventList[e]^.endDate^.mm = calDate^.mm)
     then
-      eDate := cal^.eventList[e]^.endDate^.dd (** + round(daysBetween) **)
+      eDate := cal^.eventList[e]^.endDate^.dd
     else
       eDate := daysInMon;
 
@@ -190,8 +189,6 @@ uses
 
       inc (cell[j]^.counter );
     end;
-
-    dec (cell[eDate]^.counter );
 
     Dispose(logger, Done);
 
