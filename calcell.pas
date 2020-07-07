@@ -25,6 +25,7 @@ implementation
 
   begin
     counter    := 0;
+    eventNum   := 0;
 
     for i := 0 to 9
     do
