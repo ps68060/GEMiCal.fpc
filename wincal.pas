@@ -229,6 +229,8 @@ begin
 
   DisplayEvents(new_X, new_Y);
 
+  (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
+
 end;
 
 
@@ -464,11 +466,12 @@ begin
     logger^.logInt (DEBUG, 'col ', col);
 
 
-    for i := 0 to cellGr^.cell[j]^.counter
+    for i := 0 to cellGr^.cell[j]^.counter - 1
     do
     begin
       summ := SubStr (cellGr^.cell[j]^.summary[i] );
       logger^.log(DEBUG, 'Summary  ' + summ );
+      logger^.logInt(DEBUG, 'counter ', i);
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
