@@ -440,7 +440,9 @@ var
   wcell,
   hcell     : Integer;
 
-  summ        : String;
+  summ,
+  timePlace   : String;
+
   daysBetween : Real;
 
   j,
@@ -469,9 +471,16 @@ begin
     for i := 0 to cellGr^.cell[j]^.counter - 1
     do
     begin
-      summ := SubStr (cellGr^.cell[j]^.summary[i] );
+      summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary );
+ (*     timePlace := SubStr (Concat(cellGr^.cell[j]^.cellEvents[i]^.timeStart,
+                                  cellGr^.cell[j]^.cellEvents[i]^.location) );  *)
       logger^.log(DEBUG, 'Summary  ' + summ );
       logger^.logInt(DEBUG, 'counter ', i);
+
+      v_gtext(vdiHandle,
+              newX + x + Attr.boxWidth,
+              newY + y - Attr.boxHeight - 10 + i * Attr.boxHeight,
+              summ );
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
