@@ -98,7 +98,7 @@ procedure TWinCal.CalcPos(row,
 begin
 
   x := leftPos + (col)  * xSpace;
-  y := topPos + yspace * (row) + 60;
+  y := topPos  + (row)  * ySpace;
 
 end;
 
@@ -121,6 +121,11 @@ var
 
   row, col,
   i            : Integer;
+
+  wch,
+  hch,
+  wCell,
+  hCell        : Integer;
 
 begin
 
@@ -145,6 +150,10 @@ begin
   (* Calculate date of end of month *)
   daysInMon := daysInMonth(calDate);
 
+
+  (* Set the font to getthe dimensions *)
+  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon
   do
@@ -159,14 +168,14 @@ begin
       vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y - 2 * Attr.boxHeight - 10,
+              newY + y + hCell,
               IntToStr(i) + ' ' + day2[(calDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
               newX + x  + Attr.boxWidth,
-              newY + y - 2 * Attr.boxHeight - 10,
+              newY + y + hCell,
               IntToStr(i) );
   end;
 
@@ -341,17 +350,24 @@ procedure TWinCal.DrawHeading(newX,
 (* Draw the column headings *)
 var
   lineLength,
-  cellHeight   : Integer;
-  pxArray      : Array [1..10] of Integer;
+  cellHeight  : Integer;
+  pxArray     : Array [1..10] of Integer;
 
   x,
-  y            : Integer;
+  y           : Integer;
 
-  i            : Integer;
+  i           : Integer;
+
+  wch,
+  hch,
+  wcell,
+  hcell       : Integer;
 
 begin
 
   DrawGrid (newX, newY, 1, 30);
+
+  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
   (* Write Day labels *)
   for i := 0 to 6
@@ -360,7 +376,7 @@ begin
     calcPos(0, i, x, y);
     v_gtext(vdiHandle,
             newX + x + Attr.boxWidth,
-            newY + y - 2 * Attr.boxHeight - 10,
+            newY + y + hCell,
             day2[i] );
   end;
 
@@ -428,17 +444,18 @@ procedure TWinCal.DisplayEvents(newX,
 (* Purpose : Display Events for a month  *)
 
 var
-  logger    : PLogger;
+  logger      : PLogger;
 
   row,
   col,
   x,
-  y         : Integer;
+  y           : Integer;
 
   wch,
   hch,
-  wcell,
-  hcell     : Integer;
+  wCell,
+  hCell,
+  offset      : Integer;
 
   summ,
   timePlace   : String;
@@ -456,7 +473,10 @@ begin
 
   logger^.log (DEBUG, 'DisplayEvents');
 
-  vst_point(vdiHandle, 7, wch, hch, wcell, hcell);
+  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  offset := hCell * 2;
+
+  vst_point(vdiHandle, 7, wch, hch, wCell, hCell);
 
   for j := 1 to 31
   do
@@ -472,20 +492,20 @@ begin
     do
     begin
       summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary );
- (*     timePlace := SubStr (Concat(cellGr^.cell[j]^.cellEvents[i]^.timeStart,
-                                  cellGr^.cell[j]^.cellEvents[i]^.location) );  *)
+      timePlace := SubStr (Concat(cellGr^.cell[j]^.cellEvents[i]^.timeStart,
+                                  cellGr^.cell[j]^.cellEvents[i]^.location) );
       logger^.log(DEBUG, 'Summary  ' + summ );
       logger^.logInt(DEBUG, 'counter ', i);
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10 + i * Attr.boxHeight,
+              newY + y + offset + (i * 2) * hCell,
               summ );
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y - Attr.boxHeight - 10 + i * Attr.boxHeight,
-              summ );
+              newY + y + offset + (i * 2 + 1) * hCell,
+              timePlace );
     end;
 
   end;
