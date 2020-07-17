@@ -66,6 +66,8 @@ type
 
     procedure writeDT;
 
+    function humanDateTime
+            : String;
   end;
 
   function date2Str(year, month, day : Word;
@@ -323,6 +325,20 @@ implementation
              lpad(IntToStr(ss),  2, '0'), ' ',
              tz
            );
+  end;
+
+
+  function TDateTime.humanDateTime
+          : String;
+  var
+    thisDate,
+    thisTime    : String;
+
+  begin
+    thisDate := date2Str(yyyy, mm, dd, true);
+    thistime := time2Str(hh24, mi, ss, true);
+
+    humanDateTime := concat(thisDate, thisTime);
   end;
 
 

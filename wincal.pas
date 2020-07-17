@@ -82,10 +82,12 @@ var
   endMonthDate : PDateTime;
 
 
-function SubStr(myStr : String)
+function SubStr(myStr : String;
+                index,
+                count : Integer)
         : String;
 begin
-  SubStr := Copy(myStr, 1, 16);
+  SubStr := Copy(myStr, index, count);
 end;
 
 
@@ -377,7 +379,7 @@ begin
     v_gtext(vdiHandle,
             newX + x + Attr.boxWidth,
             newY + y + hCell,
-            day2[i] );
+            day1[i] );
   end;
 
 end;
@@ -458,6 +460,7 @@ var
   offset      : Integer;
 
   summ,
+  time,
   timePlace   : String;
 
   daysBetween : Real;
@@ -491,9 +494,12 @@ begin
     for i := 0 to cellGr^.cell[j]^.counter - 1
     do
     begin
-      summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary );
-      timePlace := SubStr (Concat(cellGr^.cell[j]^.cellEvents[i]^.timeStart,
-                                  cellGr^.cell[j]^.cellEvents[i]^.location) );
+      summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary, 1, 16 );
+      time      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.timeStart^.humanDateTime, 11, 5 );
+
+      timePlace := SubStr (Concat(time,
+                                  cellGr^.cell[j]^.cellEvents[i]^.location), 1, 16 );
+
       logger^.log(DEBUG, 'Summary  ' + summ );
       logger^.logInt(DEBUG, 'counter ', i);
 

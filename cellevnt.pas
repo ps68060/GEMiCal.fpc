@@ -3,7 +3,8 @@ unit CellEvnt;
 interface
 
   uses
-    Objects;
+    Objects,
+    DateTime;
 
 
   type
@@ -11,8 +12,8 @@ interface
     TCellEvent = Object(TObject)
       summary   : String;
       location  : String;
-      timeStart : String;
-      timeEnd   : String;
+      timeStart : PDateTime;
+      timeEnd   : PDateTime;
 
       constructor init;
       destructor  done; virtual;
@@ -26,14 +27,20 @@ implementation
   begin
     summary   := '';
     location  := '';
-    timeStart := '00:00';
-    timeEnd   := '23:59';    
+
+    new (timeStart);
+    timeStart^.init;
+
+    new (timeEnd);
+    timeEnd^.init;    
+
   end;
 
 
   destructor TCellEvent.done;
   begin
-
+    dispose (timeStart, Done);
+    dispose (timeEnd,   Done);
   end;
 
 end.

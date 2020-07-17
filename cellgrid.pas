@@ -180,7 +180,9 @@ uses
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
-      cell[j]^.cellEvents[cell[j]^.counter]^.summary := summ;
+      cell[j]^.cellEvents[cell[j]^.counter]^.summary   := summ;
+
+      cell[j]^.cellEvents[cell[j]^.counter]^.timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
 
       logger^.log(DEBUG, 'Summary ' +
                   cell[j]^.cellEvents[cell[j]^.counter]^.summary );
