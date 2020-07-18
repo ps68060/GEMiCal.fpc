@@ -62,7 +62,8 @@ type
                  END;
 
 var
-  cellGr     : PCellGrid;
+  cellGr      : PCellGrid;
+  displayDate : PDateTime;
 
 
 implementation
@@ -229,7 +230,7 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   (* Display the year and month *)
-  DrawTitle(new_X, new_Y, year, month);
+  DrawTitle(new_X, new_Y, displayDate^.yyyy, displayDate^.mm);
 
   DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 

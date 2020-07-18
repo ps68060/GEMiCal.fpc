@@ -112,8 +112,8 @@ begin
   new (convMenu,   Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
   new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
 
-  new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_V, M_MONTHPREV, M_DESK3));
-  new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_X, M_MONTHNEXT, M_DESK3));
+  new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
+  new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
@@ -143,6 +143,7 @@ begin
 
     GetDate (year, month, day, dayOfWeek) ;
     myApplication.winCal^.calDate := GetToday(year, month);
+    displayDate := GetToday(year, month);
 
     FilterCal(myApplication.winCal^.calDate);
 
@@ -180,7 +181,8 @@ begin
 
     GetDate (year, month, day, dayOfWeek) ;
     myApplication.winCal^.calDate := GetToday(year, month);
-      
+    displayDate := GetToday(year, month); 
+     
     FilterCal(myApplication.winCal^.calDate);
 
     ArrowMouse;
@@ -297,6 +299,7 @@ begin
   myApplication.winCal^.calDate^.init;
 
   myApplication.winCal^.calDate := GetToday(year, month);  
+  displayDate := GetToday(year, month);
 
 end;
 
@@ -327,6 +330,7 @@ begin
   myApplication.winCal^.calDate^.init;
 
   myApplication.winCal^.calDate := GetToday(year, month);  
+  displayDate := GetToday(year, month);
 
 end;
 
