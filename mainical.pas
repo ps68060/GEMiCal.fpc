@@ -7,6 +7,7 @@ uses
 
   DlgConv,
   Cal,
+  DateTime,
   WinCal;
 
 {$I gemical.i}
@@ -34,6 +35,16 @@ type
                   procedure Work; VIRTUAL;
                 end;
 
+  PNavPrevMon = ^TNavPrevMon;
+  TNavPrevMon = OBJECT(TKeyMenu)
+                  procedure Work; VIRTUAL;
+                end;
+
+  PNavNextMon = ^TNavNextMon;
+  TNavNextMon = OBJECT(TKeyMenu)
+                  procedure Work; VIRTUAL;
+                end;
+
   TMyApplication = OBJECT(TApplication)
                      convMenu   : PConvMenu;
                      iCal       : PCal;
@@ -42,8 +53,17 @@ type
                      procedure INITMainWindow; VIRTUAL;
                    end;
 
+  procedure LoadCal;
+
+  procedure FilterCal(displayDate : PDateTime);
+
+  function GetToday(year,
+                    month : Word)
+          : PDateTime;
+
 var
   myApplication : TMyApplication;
+
 
 implementation
 
@@ -76,7 +96,7 @@ begin
 
   new(logger);
   logger^.init;
-  logger^.level := INFO;
+  logger^.level := DEBUG;
 
   (* Get current path *)
   GetDir (0, directory);
@@ -87,9 +107,13 @@ begin
   LoadMenu (TREE000);
 
   new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
+
   new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
   new (convMenu,   Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
   new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
+
+  new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_V, M_MONTHPREV, M_DESK3));
+  new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_X, M_MONTHNEXT, M_DESK3));
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
@@ -97,52 +121,16 @@ begin
 end;
 
 
-procedure LoadCal;
+procedure TMyApplication.INITMainWindow;
+
 var
   year,
   month,
   day,
   dayOfWeek : Word;
 
-  dtStr     : String;
-
 begin
-  new(myApplication.iCal);
-  myApplication.iCal^.init;
-
-  logger^.log(DEBUG, 'Load ICS files from ' + directory);
-
-  (* Load iCal events *)
-  myApplication.iCal^.loadICS(directory);
-
-  logger^.logInt(DEBUG, 'entries ', myApplication.iCal^.entries );
-
-  myApplication.iCal^.sort;
-
-  logger^.log(DEBUG, 'Sorted');
-
-  (* Display this month's calendar *)
-  GetDate (year, month, day, dayOfWeek) ;
-  dtStr := date2Str(year, month, 1, FALSE);
-
-  new(myApplication.winCal^.calDate);
-  myApplication.winCal^.calDate^.init;
-
-  myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
-  myApplication.winCal^.calDate^.dayOfWeek;
-
-  new (cellGr);
-  cellGr^.init;
-  cellGr^.FilterEvents(myApplication.iCal,
-                       myApplication.winCal^.calDate);
-
-end;
-
-
-procedure TMyApplication.INITMainWindow;
-
-begin
-  logger^.level := INFO;
+  logger^.level := DEBUG;
 
   logger^.log(DEBUG, 'INIT Main Window');
 
@@ -152,6 +140,11 @@ begin
     myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
     LoadCal;
+
+    GetDate (year, month, day, dayOfWeek) ;
+    myApplication.winCal^.calDate := GetToday(year, month);
+
+    FilterCal(myApplication.winCal^.calDate);
 
   end;
 
@@ -163,6 +156,13 @@ end;
 
 
 procedure TLoadMenu.Work;
+
+var
+  year,
+  month,
+  day,
+  dayOfWeek : Word;
+
 begin
   logger^.log(DEBUG, 'Load Menu Work');
 
@@ -177,6 +177,11 @@ begin
     directory := myPath;
 
     LoadCal;
+
+    GetDate (year, month, day, dayOfWeek) ;
+    myApplication.winCal^.calDate := GetToday(year, month);
+      
+    FilterCal(myApplication.winCal^.calDate);
 
     ArrowMouse;
     logger^.log(DEBUG, 'Loaded');
@@ -198,12 +203,130 @@ begin
   then
   begin
     MyApplication.WinCal := NEW(PWinCal, Init(NIL, dAppName));
-   	MyApplication.WinCal^.SetSubTitle('Calendar Month');
+    MyApplication.WinCal^.SetSubTitle('Calendar Month');
   end;
 
   if MyApplication.WinCal <> NIL
   then
     MyApplication.WinCal^.MakeWindow;
+
+end;
+
+
+procedure LoadCal;
+
+begin
+
+  new(myApplication.iCal);
+  myApplication.iCal^.init;
+
+  logger^.log(DEBUG, 'Load ICS files from ' + directory);
+
+  (* Load iCal events *)
+  myApplication.iCal^.loadICS(directory);
+
+  logger^.logInt(DEBUG, 'loaded ', myApplication.iCal^.entries );
+
+  myApplication.iCal^.sort;
+
+  logger^.log(DEBUG, 'Sorted');
+
+end;
+
+
+procedure FilterCal(displayDate : PDateTime);
+
+begin
+
+  new (cellGr);
+  cellGr^.init;
+  cellGr^.FilterEvents(myApplication.iCal,
+                       displayDate);
+
+  logger^.log(DEBUG, 'Cal displayed');
+end;
+
+
+function GetToday (year,
+                   month : Word)
+        : PDateTime;
+var
+  thisDateTime : PDateTime;
+
+  dtStr        : String;
+
+begin
+
+  dtStr := date2Str(year, month, 1, FALSE);
+
+  new(thisDateTime);
+  thisDateTime^.init;
+
+  thisDateTime^.dtStr2Obj(dtStr);
+  thisDateTime^.dayOfWeek;
+
+  GetToday := thisDateTime;
+
+  logger^.log(DEBUG, 'GetToday');
+end;
+
+
+procedure TNavPrevMon.Work;
+var
+  month,
+  year        : Word;
+
+begin
+  logger^.log(DEBUG, 'Prev Month Menu Work');
+
+  month := myApplication.winCal^.calDate^.mm;
+  year  := myApplication.winCal^.calDate^.yyyy;
+
+  dec (month);
+
+  if (month < 1)
+  then
+  begin
+    month := 12;
+    dec (year);
+  end;
+
+  dispose (myApplication.winCal^.calDate, done);
+
+  new (myApplication.winCal^.calDate);
+  myApplication.winCal^.calDate^.init;
+
+  myApplication.winCal^.calDate := GetToday(year, month);  
+
+end;
+
+
+procedure TNavNextMon.Work;
+var
+  month,
+  year        : Word;
+
+begin
+  logger^.log(DEBUG, 'Next Month Menu Work');
+
+  month := myApplication.winCal^.calDate^.mm;
+  year  := myApplication.winCal^.calDate^.yyyy;
+
+  inc (month);
+
+  if (month > 12)
+  then
+  begin
+    month := 1;
+    inc (year);
+  end;
+
+  dispose (myApplication.winCal^.calDate, done);
+
+  new (myApplication.winCal^.calDate);
+  myApplication.winCal^.calDate^.init;
+
+  myApplication.winCal^.calDate := GetToday(year, month);  
 
 end;
 
