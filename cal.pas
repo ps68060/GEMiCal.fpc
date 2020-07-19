@@ -199,6 +199,9 @@ implementation
       end;
     end;
 
+    logger^.log(DEBUG, 'Sorted');
+    dispose (logger, done);
+
   end;
 
 

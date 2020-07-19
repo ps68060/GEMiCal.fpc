@@ -154,6 +154,8 @@ begin
 
     LoadCal;
 
+    myApplication.iCal^.sort;
+
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
@@ -203,7 +205,6 @@ begin
     LoadCal;
 
     myApplication.iCal^.sort;
-    logger^.log(DEBUG, 'Sorted');
 
     GetDate (year, month, day, dayOfWeek) ;
 
