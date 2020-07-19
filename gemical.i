@@ -17,6 +17,8 @@ CONST
     M_END                            =  20; (* STRING in tree Tree000 *)
     M_MONTHPREV                      =  22; (* STRING in tree Tree000 *)
     M_MONTHNEXT                      =  23; (* STRING in tree Tree000 *)
+    M_YEARPREV                       =  24; (* STRING in tree Tree000 *)
+    M_YEARNEXT                       =  25; (* STRING in tree Tree000 *)
 
     Tree002                          =   1; (* form/dialog *)
     B_PREV_MONTH                     =   4; (* BUTTON in tree Tree002 *)

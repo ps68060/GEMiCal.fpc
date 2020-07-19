@@ -44,6 +44,17 @@ type
                   procedure Work; VIRTUAL;
                 end;
 
+
+  PNavPrevYear = ^TNavPrevYear;
+  TNavPrevYear = OBJECT(TKeyMenu)
+                  procedure Work; VIRTUAL;
+                end;
+
+  PNavNextYear = ^TNavNextYear;
+  TNavNextYear = OBJECT(TKeyMenu)
+                  procedure Work; VIRTUAL;
+                end;
+
   TMyApplication = OBJECT(TApplication)
                      convMenu   : PConvMenu;
                      iCal       : PCal;
@@ -103,12 +114,17 @@ begin
 
   new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
 
+  (* File Menu *)
   new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
   new (convMenu,   Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
   new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
 
+  (* Navigation menu *)
   new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
   new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
+
+  new (PNavPrevYear,  Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
+  new (PNavNextYear,  Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
@@ -230,10 +246,10 @@ var
   month,
   year        : Word;
 
-  dtStr     : String;
+  dtStr       : String;
 
 begin
-  logger^.log(DEBUG, 'Prev Month Menu Work');
+  logger^.log(DEBUG, 'Prev Month Work');
 
   month := displayDate^.mm;
   year  := displayDate^.yyyy;
@@ -259,10 +275,10 @@ var
   month,
   year        : Word;
 
-  dtStr     : String;
+  dtStr       : String;
 
 begin
-  logger^.log(DEBUG, 'Next Month Menu Work');
+  logger^.log(DEBUG, 'Next Month Work');
 
   month := displayDate^.mm;
   year  := displayDate^.yyyy;
@@ -277,6 +293,46 @@ begin
   end;
 
   dtStr := date2str(year, month, 1, FALSE);
+
+  FilterCal(dtStr);
+
+end;
+
+
+procedure TNavPrevYear.Work;
+var
+  year        : Word;
+
+  dtStr       : String;
+
+begin
+  logger^.log(DEBUG, 'Prev Year Work');
+
+  year  := displayDate^.yyyy;
+
+  dec (year);
+
+  dtStr := date2str(year, displayDate^.mm, 1, FALSE);
+
+  FilterCal(dtStr);
+
+end;
+
+
+procedure TNavNextYear.Work;
+var
+  year        : Word;
+
+  dtStr       : String;
+
+begin
+  logger^.log(DEBUG, 'Next Year Work');
+
+  year  := displayDate^.yyyy;
+
+  inc (year);
+
+  dtStr := date2str(year, displayDate^.mm, 1, FALSE);
 
   FilterCal(dtStr);
 
