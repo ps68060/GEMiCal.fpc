@@ -175,11 +175,19 @@ begin
     BusyMouse;
 
     Dispose(myApplication.iCal, Done);
-    Dispose(cellGr, Done);
+    if (cellGr <> NIL)
+    then
+      Dispose(cellGr, Done);
+
+    new (cellGr);
+    cellGr^.init;
 
     directory := myPath;
 
     LoadCal;
+
+    myApplication.iCal^.sort;
+    logger^.log(DEBUG, 'Sorted');
 
     GetDate (year, month, day, dayOfWeek) ;
 
@@ -289,22 +297,17 @@ begin
 
   logger^.logInt(DEBUG, 'loaded ', myApplication.iCal^.entries );
 
-  myApplication.iCal^.sort;
-
-  logger^.log(DEBUG, 'Sorted');
-
 end;
 
 
 procedure FilterCal(dtStr : String);
 
 begin
+  logger^.log(DEBUG, 'FilterCal ' );
 
   if (calDate <> NIL)
   then
     dispose (calDate, done);
-
-  logger^.log(DEBUG, 'FilterCal ' );
 
   new (calDate);
   calDate^.init;
