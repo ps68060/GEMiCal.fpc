@@ -62,9 +62,9 @@ type
 
 var
   calDate     : PDateTime;  (* 1st of the month *)
+  displayDate : PDateTime;
 
   cellGr      : PCellGrid;
-  displayDate : PDateTime;
 
 
 implementation

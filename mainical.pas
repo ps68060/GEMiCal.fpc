@@ -7,7 +7,6 @@ uses
 
   DlgConv,
   Cal,
-  DateTime,
   WinCal;
 
 {$I gemical.i}
@@ -55,7 +54,7 @@ type
 
   procedure LoadCal;
 
-  procedure FilterCal(filterDate : PDateTime);
+  procedure FilterCal(dtStr : String);
 
 var
   myApplication : TMyApplication;
@@ -92,7 +91,7 @@ begin
 
   new(logger);
   logger^.init;
-  logger^.level := INFO;
+  logger^.level := DEBUG;
 
   (* Get current path *)
   GetDir (0, directory);
@@ -128,7 +127,7 @@ var
   dtStr     : String;
 
 begin
-  logger^.level := INFO;
+  logger^.level := DEBUG;
 
   logger^.log(DEBUG, 'INIT Main Window');
 
@@ -142,15 +141,11 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    new (calDate);
-    calDate^.init;
-    calDate^.dtStr2Obj(dtStr);
-
     new (displayDate);
     displayDate^.init;
     displayDate^.dtStr2Obj(dtStr);
 
-    FilterCal(calDate);
+    FilterCal(dtStr);
 
   end;
 
@@ -187,12 +182,10 @@ begin
     LoadCal;
 
     GetDate (year, month, day, dayOfWeek) ;
+
     dtStr := date2str(year, month, 1, FALSE);
 
-    calDate^.init;
-    calDate^.dtStr2Obj(dtStr);
-     
-    FilterCal(displayDate);
+    FilterCal(dtStr);
 
     ArrowMouse;
     logger^.log(DEBUG, 'Loaded');
@@ -246,16 +239,9 @@ begin
     dec (year);
   end;
 
-  dispose (calDate, done);
-
   dtStr := date2str(year, month, 1, FALSE);
 
-  new (calDate);
-  calDate^.init;
-
-  calDate^.dtStr2Obj(dtStr);
-
-  FilterCal(calDate);
+  FilterCal(dtStr);
 
 end;
 
@@ -282,16 +268,9 @@ begin
     inc (year);
   end;
 
-  dispose (calDate, done);
-
   dtStr := date2str(year, month, 1, FALSE);
 
-  new (calDate);
-  calDate^.init;
-
-  calDate^.dtStr2Obj(dtStr);  
-
-  FilterCal(calDate);
+  FilterCal(dtStr);
 
 end;
 
@@ -317,9 +296,21 @@ begin
 end;
 
 
-procedure FilterCal(filterDate : PDateTime);
+procedure FilterCal(dtStr : String);
 
 begin
+
+  if (calDate <> NIL)
+  then
+    dispose (calDate, done);
+
+  logger^.log(DEBUG, 'FilterCal ' );
+
+  new (calDate);
+  calDate^.init;
+  calDate^.dtStr2Obj(dtStr);
+
+  logger^.log(DEBUG, 'Filter ' + dtStr );
 
   if (cellGr <> NIL)
   then
@@ -328,7 +319,7 @@ begin
   new (cellGr);
   cellGr^.init;
   cellGr^.FilterEvents(myApplication.iCal,
-                       filterDate);
+                       calDate);
   logger^.log(DEBUG, 'Cal displayed');
 end;
 
