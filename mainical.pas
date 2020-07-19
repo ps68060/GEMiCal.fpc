@@ -55,11 +55,7 @@ type
 
   procedure LoadCal;
 
-  procedure FilterCal(displayDate : PDateTime);
-
-  function GetToday(year,
-                    month : Word)
-          : PDateTime;
+  procedure FilterCal(filterDate : PDateTime);
 
 var
   myApplication : TMyApplication;
@@ -96,7 +92,7 @@ begin
 
   new(logger);
   logger^.init;
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   (* Get current path *)
   GetDir (0, directory);
@@ -129,8 +125,10 @@ var
   day,
   dayOfWeek : Word;
 
+  dtStr     : String;
+
 begin
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   logger^.log(DEBUG, 'INIT Main Window');
 
@@ -142,10 +140,17 @@ begin
     LoadCal;
 
     GetDate (year, month, day, dayOfWeek) ;
-    myApplication.winCal^.calDate := GetToday(year, month);
-    displayDate := GetToday(year, month);
+    dtStr := date2str(year, month, 1, FALSE);
 
-    FilterCal(myApplication.winCal^.calDate);
+    new (calDate);
+    calDate^.init;
+    calDate^.dtStr2Obj(dtStr);
+
+    new (displayDate);
+    displayDate^.init;
+    displayDate^.dtStr2Obj(dtStr);
+
+    FilterCal(calDate);
 
   end;
 
@@ -164,6 +169,8 @@ var
   day,
   dayOfWeek : Word;
 
+  dtStr     : String;
+
 begin
   logger^.log(DEBUG, 'Load Menu Work');
 
@@ -180,10 +187,12 @@ begin
     LoadCal;
 
     GetDate (year, month, day, dayOfWeek) ;
-    myApplication.winCal^.calDate := GetToday(year, month);
-    displayDate := GetToday(year, month); 
+    dtStr := date2str(year, month, 1, FALSE);
+
+    calDate^.init;
+    calDate^.dtStr2Obj(dtStr);
      
-    FilterCal(myApplication.winCal^.calDate);
+    FilterCal(displayDate);
 
     ArrowMouse;
     logger^.log(DEBUG, 'Loaded');
@@ -215,6 +224,74 @@ begin
 end;
 
 
+procedure TNavPrevMon.Work;
+var
+  month,
+  year        : Word;
+
+  dtStr     : String;
+
+begin
+  logger^.log(DEBUG, 'Prev Month Menu Work');
+
+  month := calDate^.mm;
+  year  := calDate^.yyyy;
+
+  dec (month);
+
+  if (month < 1)
+  then
+  begin
+    month := 12;
+    dec (year);
+  end;
+
+  dispose (calDate, done);
+
+  dtStr := date2str(year, month, 1, FALSE);
+
+  new (calDate);
+  calDate^.init;
+
+  calDate^.dtStr2Obj(dtStr);  
+
+end;
+
+
+procedure TNavNextMon.Work;
+var
+  month,
+  year        : Word;
+
+  dtStr     : String;
+
+begin
+
+  month := calDate^.mm;
+  year  := calDate^.yyyy;
+
+  inc (month);
+
+  if (month > 12)
+  then
+  begin
+    month := 1;
+    inc (year);
+  end;
+
+  dispose (calDate, done);
+
+  dtStr := date2str(year, month, 1, FALSE);
+
+  new (calDate);
+  calDate^.init;
+
+  calDate^.dtStr2Obj(dtStr);  
+
+  logger^.log(DEBUG, 'Next Month Menu Work');
+end;
+
+
 procedure LoadCal;
 
 begin
@@ -236,102 +313,17 @@ begin
 end;
 
 
-procedure FilterCal(displayDate : PDateTime);
+procedure FilterCal(filterDate : PDateTime);
 
 begin
+writeln('year  ', filterDate^.yyyy);
+writeln('month ', filterDate^.mm);
 
   new (cellGr);
   cellGr^.init;
   cellGr^.FilterEvents(myApplication.iCal,
-                       displayDate);
-
+                       filterDate);
   logger^.log(DEBUG, 'Cal displayed');
-end;
-
-
-function GetToday (year,
-                   month : Word)
-        : PDateTime;
-var
-  thisDateTime : PDateTime;
-
-  dtStr        : String;
-
-begin
-
-  dtStr := date2Str(year, month, 1, FALSE);
-
-  new(thisDateTime);
-  thisDateTime^.init;
-
-  thisDateTime^.dtStr2Obj(dtStr);
-  thisDateTime^.dayOfWeek;
-
-  GetToday := thisDateTime;
-
-  logger^.log(DEBUG, 'GetToday');
-end;
-
-
-procedure TNavPrevMon.Work;
-var
-  month,
-  year        : Word;
-
-begin
-  logger^.log(DEBUG, 'Prev Month Menu Work');
-
-  month := myApplication.winCal^.calDate^.mm;
-  year  := myApplication.winCal^.calDate^.yyyy;
-
-  dec (month);
-
-  if (month < 1)
-  then
-  begin
-    month := 12;
-    dec (year);
-  end;
-
-  dispose (myApplication.winCal^.calDate, done);
-
-  new (myApplication.winCal^.calDate);
-  myApplication.winCal^.calDate^.init;
-
-  myApplication.winCal^.calDate := GetToday(year, month);  
-  displayDate := GetToday(year, month);
-
-end;
-
-
-procedure TNavNextMon.Work;
-var
-  month,
-  year        : Word;
-
-begin
-  logger^.log(DEBUG, 'Next Month Menu Work');
-
-  month := myApplication.winCal^.calDate^.mm;
-  year  := myApplication.winCal^.calDate^.yyyy;
-
-  inc (month);
-
-  if (month > 12)
-  then
-  begin
-    month := 1;
-    inc (year);
-  end;
-
-  dispose (myApplication.winCal^.calDate, done);
-
-  new (myApplication.winCal^.calDate);
-  myApplication.winCal^.calDate^.init;
-
-  myApplication.winCal^.calDate := GetToday(year, month);  
-  displayDate := GetToday(year, month);
-
 end;
 
 end.

@@ -24,7 +24,6 @@ type
   PWinCal      = ^TWinCal;
 
   TWinCal     = OBJECT(TWindow)
-                   calDate  : PDateTime;  (* 1st of the month *)
 
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
@@ -62,6 +61,8 @@ type
                  END;
 
 var
+  calDate     : PDateTime;  (* 1st of the month *)
+
   cellGr      : PCellGrid;
   displayDate : PDateTime;
 
@@ -120,7 +121,6 @@ var
   dayOfWeek    : Word;
 
   currentMonth : Boolean;
-  dtStr        : String;
 
   row, col,
   i            : Integer;
