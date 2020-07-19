@@ -91,7 +91,7 @@ begin
 
   new(logger);
   logger^.init;
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   (* Get current path *)
   GetDir (0, directory);
@@ -127,7 +127,7 @@ var
   dtStr     : String;
 
 begin
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   logger^.log(DEBUG, 'INIT Main Window');
 
