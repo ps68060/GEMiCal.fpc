@@ -235,8 +235,8 @@ var
 begin
   logger^.log(DEBUG, 'Prev Month Menu Work');
 
-  month := calDate^.mm;
-  year  := calDate^.yyyy;
+  month := displayDate^.mm;
+  year  := displayDate^.yyyy;
 
   dec (month);
 
@@ -264,8 +264,8 @@ var
 begin
   logger^.log(DEBUG, 'Next Month Menu Work');
 
-  month := calDate^.mm;
-  year  := calDate^.yyyy;
+  month := displayDate^.mm;
+  year  := displayDate^.yyyy;
 
   inc (month);
 
@@ -305,13 +305,13 @@ procedure FilterCal(dtStr : String);
 begin
   logger^.log(DEBUG, 'FilterCal ' );
 
-  if (calDate <> NIL)
+  if (displayDate <> NIL)
   then
-    dispose (calDate, done);
+    dispose (displayDate, done);
 
-  new (calDate);
-  calDate^.init;
-  calDate^.dtStr2Obj(dtStr);
+  new (displayDate);
+  displayDate^.init;
+  displayDate^.dtStr2Obj(dtStr);
 
   logger^.log(DEBUG, 'Filter ' + dtStr );
 
@@ -322,7 +322,7 @@ begin
   new (cellGr);
   cellGr^.init;
   cellGr^.FilterEvents(myApplication.iCal,
-                       calDate);
+                       displayDate);
   logger^.log(DEBUG, 'Cal displayed');
 end;
 

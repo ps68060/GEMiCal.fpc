@@ -61,8 +61,7 @@ type
                  END;
 
 var
-  calDate     : PDateTime;  (* 1st of the month *)
-  displayDate : PDateTime;
+  displayDate     : PDateTime;  (* 1st of the month *)
 
   cellGr      : PCellGrid;
 
@@ -136,22 +135,22 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  logger^.logInt(DEBUG, 'year ', calDate^.yyyy );
-  logger^.log(DEBUG, mon1[calDate^.mm] );
+  logger^.logInt(DEBUG, 'year ', displayDate^.yyyy );
+  logger^.log(DEBUG, mon1[displayDate^.mm] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
 
-  CalcCell (calDate^.day, day, row, col);
+  CalcCell (displayDate^.day, day, row, col);
 
   currentMonth := FALSE;
-  if     (calDate^.yyyy = year)
-     and (calDate^.mm   = month)
+  if     (displayDate^.yyyy = year)
+     and (displayDate^.mm   = month)
   then
     currentMonth := TRUE;
 
   (* Calculate date of end of month *)
-  daysInMon := daysInMonth(calDate);
+  daysInMon := daysInMonth(displayDate);
 
 
   (* Set the font to getthe dimensions *)
@@ -161,7 +160,7 @@ begin
   for i := 1 to daysInMon
   do
   begin
-    CalcCell (calDate^.day, i, row, col);
+    CalcCell (displayDate^.day, i, row, col);
     CalcPos  (row, col, x, y);
 
     if (currentMonth)
@@ -172,7 +171,7 @@ begin
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
               newY + y + hCell,
-              IntToStr(i) + ' ' + day2[(calDate^.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -485,7 +484,7 @@ begin
   for j := 1 to 31
   do
   begin
-    calcCell (calDate^.day, j, row, col); 
+    calcCell (displayDate^.day, j, row, col); 
     calcPos(row, col, x, y);
 
     logger^.logInt (DEBUG, 'row ', row);
