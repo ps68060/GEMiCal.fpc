@@ -119,8 +119,15 @@ implementation
   var
    code : Integer;
    date1, date2 : Double;
+   logger       : PLogger;
 
   begin
+    new(logger);
+    logger^.init;
+    logger^.level := DEBUG;
+
+    logger^.log(DEBUG, 'converting date-time  ' + dtString);
+
     val ( COPY (dtString, 1, 4), yyyy, code );
     if (code <> 0)
     then
@@ -151,7 +158,9 @@ implementation
     then
       writeln ('Integer conversion error of ss at ', code, ' in ', dtString);
 
-    tz := COPY (dtString, 16, length(dtString) );
+    if (length(dtString) >= 16 )
+    then
+      tz := COPY (dtString, 16, length(dtString) );
 
     (*writeln (yyyy, mm, dd, ' ', hh24, mi, ss); *)
 
@@ -164,6 +173,7 @@ implementation
     dayOfWeek;
 
   end;
+
 
 
   procedure TDateTime.calcEpoch;
