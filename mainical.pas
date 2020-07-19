@@ -253,7 +253,9 @@ begin
   new (calDate);
   calDate^.init;
 
-  calDate^.dtStr2Obj(dtStr);  
+  calDate^.dtStr2Obj(dtStr);
+
+  FilterCal(calDate);
 
 end;
 
@@ -266,6 +268,7 @@ var
   dtStr     : String;
 
 begin
+  logger^.log(DEBUG, 'Next Month Menu Work');
 
   month := calDate^.mm;
   year  := calDate^.yyyy;
@@ -288,7 +291,8 @@ begin
 
   calDate^.dtStr2Obj(dtStr);  
 
-  logger^.log(DEBUG, 'Next Month Menu Work');
+  FilterCal(calDate);
+
 end;
 
 
@@ -316,8 +320,10 @@ end;
 procedure FilterCal(filterDate : PDateTime);
 
 begin
-writeln('year  ', filterDate^.yyyy);
-writeln('month ', filterDate^.mm);
+
+  if (cellGr <> NIL)
+  then
+    dispose (cellGr, done);
 
   new (cellGr);
   cellGr^.init;

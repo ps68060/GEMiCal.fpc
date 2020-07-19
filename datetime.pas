@@ -124,7 +124,7 @@ implementation
   begin
     new(logger);
     logger^.init;
-    logger^.level := DEBUG;
+    logger^.level := INFO;
 
     logger^.log(DEBUG, 'converting date-time  ' + dtString);
 
