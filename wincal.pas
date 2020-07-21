@@ -260,7 +260,7 @@ function TWinCal.GetIconTitle
 (* Name of iconified Windows *)
 
 begin
-  GetIconTitle := 'MiniWind';
+  GetIconTitle := 'GEMiCal';
 end;
 
 
@@ -308,7 +308,7 @@ procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
 (* write a Text in the iconified Window *)
 
 begin
-  v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' 2xClick ');
+  v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' GEMiCal ');
 end;
 
 
