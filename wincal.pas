@@ -510,6 +510,7 @@ begin
       time      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.timeStart^.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
+                                  ';',
                                   cellGr^.cell[j]^.cellEvents[i]^.location), 1, 16 );
 
       logger^.log(DEBUG, 'Summary  ' + summ );

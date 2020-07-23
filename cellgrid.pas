@@ -70,7 +70,7 @@ uses
   function SubStr(myStr : String)
           : String;
   begin
-    SubStr := Copy(myStr, 1, 16);
+    SubStr := Copy(myStr, 1, 30);
   end;
 
 
@@ -140,7 +140,9 @@ uses
   var
     logger      : PLogger;
 
-    summ        : String;
+    summ,
+    locat       : String;
+
     daysBetween : Real;
 
     j,
@@ -181,6 +183,9 @@ uses
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
       cell[j]^.cellEvents[cell[j]^.counter]^.summary   := summ;
+
+      locat := SubStr (cal^.eventList[e]^.location);
+      cell[j]^.cellEvents[cell[j]^.counter]^.location  := locat;
 
       cell[j]^.cellEvents[cell[j]^.counter]^.timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
 
