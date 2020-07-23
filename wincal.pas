@@ -307,8 +307,20 @@ end;
 procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
 (* write a Text in the iconified Window *)
 
+var
+  year,
+  month,
+  day,
+  dayOfWeek : Word;
+
+  dayStr    : String;
+
 begin
-  v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' GEMiCal ');
+  GetDate (year, month, day, dayOfWeek) ;
+  str (day, dayStr);
+
+  v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' ' + dayStr);
+
 end;
 
 
