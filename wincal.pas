@@ -469,7 +469,8 @@ var
   hch,
   wCell,
   hCell,
-  offset      : Integer;
+  offset,
+  lineSpace   : Integer;
 
   summ,
   time,
@@ -489,9 +490,10 @@ begin
   logger^.log (DEBUG, 'DisplayEvents');
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
-  offset := hCell * 2;
+  offset    := hCell + hcell div 2;
 
   vst_point(vdiHandle, 7, wch, hch, wCell, hCell);
+  lineSpace := (2 * hCell) div 3;
 
   for j := 1 to 31
   do
@@ -518,12 +520,12 @@ begin
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y + offset + (i * 2) * hCell,
+              newY + y + offset + i*lineSpace + (i * 2) * hCell,
               summ );
 
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y + offset + (i * 2 + 1) * hCell,
+              newY + y + offset + i*lineSpace + (i * 2 + 1) * hCell,
               timePlace );
     end;
 
