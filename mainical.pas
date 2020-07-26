@@ -268,6 +268,8 @@ begin
 
   FilterCal(dtStr);
 
+  MyApplication.WinCal^.ForceRedraw;
+
 end;
 
 
@@ -297,6 +299,8 @@ begin
 
   FilterCal(dtStr);
 
+  MyApplication.WinCal^.ForceRedraw;
+
 end;
 
 
@@ -317,6 +321,8 @@ begin
 
   FilterCal(dtStr);
 
+  MyApplication.WinCal^.ForceRedraw;
+
 end;
 
 
@@ -336,6 +342,8 @@ begin
   dtStr := date2str(year, displayDate^.mm, 1, FALSE);
 
   FilterCal(dtStr);
+
+  MyApplication.WinCal^.ForceRedraw;
 
 end;
 

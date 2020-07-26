@@ -294,8 +294,8 @@ begin
   INHERITED SetupSize;
   with Work do
     begin
-      X :=  10;  (* X,Y correspond to the coordinates of the working area *)
-      Y :=  60;  (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
+      X :=  10;        (* X,Y correspond to the coordinates of the working area *)
+      Y :=  60;        (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
       W := WINWIDTH;   (* W:=113, smallest width of the working area *)
       H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
     end;
