@@ -212,6 +212,8 @@ begin
 
     FilterCal(dtStr);
 
+    MyApplication.WinCal^.ForceRedraw;
+
     ArrowMouse;
     logger^.log(DEBUG, 'Loaded');
   end;
