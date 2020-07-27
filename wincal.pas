@@ -193,26 +193,35 @@ var
   year,
   month,
   day,
-  dayOfWeek : Word;
+  dayOfWeek   : Word;
 
   hour,
   minute,
   second,
-  sec100    : Word;
+  sec100      : Word;
 
-  New_X, New_Y : LongInt;
-  pxArray      : Array [1..10] of Integer;
+  New_X,
+  New_Y : LongInt;
 
-  lineLength   : Integer;
+  pxArray     : Array [1..10] of Integer;
 
-  i            : Integer;
+  wch,
+  hch,
+  wcell,
+  hcell       : Integer;
+
+  lineLength  : Integer;
+
+  i           : Integer;
 
 begin
+
+  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
   leftPos    := 20;
   topPos     := 80;
   xSpace     := 110;
-  ySpace     := 90;
+  ySpace     := 6 * hCell;
 
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
@@ -221,11 +230,11 @@ begin
   new_Y := Scroller^.GetYOrg;
 
   v_gtext(vdiHandle, new_x + Attr.charWidth,
-          new_y + 1 * Attr.boxHeight,
+          new_y + Attr.boxHeight,
           date2Str(year, month, day, TRUE) );
 
   v_gtext(vdiHandle, new_x + Attr.charWidth + Attr.charWidth * 13,
-          new_y + 1 * Attr.boxHeight,
+          new_y + Attr.boxHeight,
           time2Str(hour, minute, second, TRUE) );
 
   (* Display the year and month *)
@@ -379,9 +388,9 @@ var
 
 begin
 
-  DrawGrid (newX, newY, 1, 30);
-
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+
+  DrawGrid (newX, newY, 1, hCell * 2);
 
   (* Write Day labels *)
   for i := 0 to 6
