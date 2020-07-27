@@ -220,8 +220,8 @@ begin
 
   leftPos    := 20;
   topPos     := 80;
-  xSpace     := 110;
-  ySpace     := 6 * hCell;
+  xSpace     := 14 * wCell; (*110;*)
+  ySpace     :=  6 * hCell;
 
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
