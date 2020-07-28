@@ -218,7 +218,7 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
-  leftPos    := 20;
+  leftPos    := 10;
   topPos     := 80;
   xSpace     := 14 * wCell; (*110;*)
   ySpace     :=  6 * hCell;
