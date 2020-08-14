@@ -50,6 +50,21 @@ type
 
 implementation
 
+  const
+    endEventTk   = 'END:VEVENT';
+    createdTk    = 'CREATED:';
+    dtStartTk    = 'DTSTART';
+    dtEndTk      = 'DTEND';
+    SummaryTk    = 'SUMMARY';
+    descrTk      = 'DESCRIPTION:';
+    locationTk   = 'LOCATION:';
+
+    beginAlarmTk  = 'BEGIN:VALARM';
+    endAlarmTk    = 'END:VALARM';
+    triggerTk     = 'TRIGGER:';
+    alarmDescTk   = 'DESCRIPTION:';
+    alarmActionTk = 'ACTION:';
+
   constructor TEvent.init;
   begin
     created     := '';
@@ -87,7 +102,6 @@ implementation
   var
     logger       : PLogger;
 
-    checkEnd,
     convStr      : String;
 
     currentLn    : String;
@@ -103,7 +117,6 @@ implementation
 
     logger^.level := INFO;
 
-    checkEnd     := 'END:VEVENT';
     endEvent     := FALSE;
     alarm        := FALSE;
 
@@ -116,7 +129,7 @@ implementation
       logger^.log (DEBUG, currentLn);
 
       (* Look for End Event *)
-      if ( pos(checkEnd, currentLn) = 1 )
+      if ( pos(endEventTk, currentLn) = 1 )
       then
       begin
 
@@ -130,48 +143,48 @@ implementation
         tokens^.init;
         tokens^.tokenise(currentLn);
 
-        if ( pos('CREATED:', currentLn) = 1 )
+        if ( pos(createdTk, currentLn) = 1 )
         then
           created := COPY (currentLn, 9, length(currentLn));
 
-        if ( pos('DTSTART', currentLn) = 1 )
+        if ( pos(dtStartTk, currentLn) = 1 )
         then
         begin
           dtStart   := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
           dtStartTz := tokens^.part[1];
         end;
 
-        if ( pos('DTEND', currentLn) = 1 )
+        if ( pos(dtEndTk, currentLn) = 1 )
         then
         begin
           dtEnd   := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
           dtEndTz := tokens^.part[1];
         end;
 
-        if ( pos('SUMMARY', currentLn) = 1 )
+        if ( pos(SummaryTk, currentLn) = 1 )
            and (NOT alarm)
         then
           summary := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
 
-        if ( pos('DESCRIPTION:', currentLn) = 1 )
+        if ( pos(descrTk, currentLn) = 1 )
            and (NOT alarm)
         then
           description := COPY (currentLn, 13, length(currentLn));
 
-        if ( pos('LOCATION:', currentLn) = 1 )
+        if ( pos(locationTk, currentLn) = 1 )
            and (NOT alarm)
         then
           location := COPY (currentLn, 10, length(currentLn));
 
 
         if (NOT alarm)
-            and (pos('BEGIN:VALARM', currentLn) = 1 )
+            and (pos(beginAlarmTk, currentLn) = 1 )
         then
         begin
           alarm := GetAlarm(calFile);
         end;
 
-        if (pos('END:VALARM', currentLn) = 1 )
+        if (pos(endAlarmTk, currentLn) = 1 )
         then
           alarm := FALSE;
 
@@ -207,11 +220,9 @@ implementation
   var
     currentLn    : String;
 
-    checkEnd     : String;
     endAlarm     : Boolean;
 
   begin
-    checkEnd := 'END:VALARM';
     endAlarm := FALSE;
 
     while (NOT eof (calFile) 
@@ -222,7 +233,7 @@ implementation
       readln ( calFile, currentLn );
 
       (* Look for End Alarm *)
-      if ( pos(checkEnd, currentLn) = 1 )
+      if ( pos(endAlarmTk, currentLn) = 1 )
       then
       begin
 
@@ -232,15 +243,15 @@ implementation
       else
       begin
 
-        if (pos('TRIGGER:', currentLn) = 1 )
+        if (pos(triggerTk, currentLn) = 1 )
         then
           alarmTrigger := COPY (currentLn, 9, length(currentLn));
 
-        if (pos('ACTION:', currentLn) = 1 )
+        if (pos(alarmActionTk, currentLn) = 1 )
         then
           alarmAction  := COPY (currentLn, 8, length(currentLn));
 
-        if (pos('DESCRIPTION:', currentLn) = 1 )
+        if (pos(alarmDescTk, currentLn) = 1 )
         then
           alarmDescription := COPY (currentLn, 13, length(currentLn));
 
