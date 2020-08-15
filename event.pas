@@ -16,6 +16,7 @@ interface
 type
   PEvent = ^TEvent;
   TEvent = object(TObject)
+    filename    : String;
     created     : String;
     summary     : String;
     description : String;
@@ -67,6 +68,7 @@ implementation
 
   constructor TEvent.init;
   begin
+    filename    := '';
     created     := '';
     summary     := '';
     description := '';

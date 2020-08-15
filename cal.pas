@@ -137,6 +137,7 @@ implementation
         eventList[entries]^.init;
       
         eventList[entries]^.getEvent(calFile);
+        eventList[entries]^.filename := calName;
 
         inc (entries);
       end;
