@@ -115,7 +115,8 @@ uses
 
       (*  calDate is 1st of month *)
       if      (cal^.eventList[i]^.startDate^.epoch < endMonthDate^.epoch)
-          and (cal^.eventList[i]^.endDate^.epoch   > calDate^.epoch)
+          and (    (cal^.eventList[i]^.endDate^.epoch   > calDate^.epoch)
+                or (cal^.eventList[i]^.endDate^.epoch = 0) )
       then
       begin
         logger^.logInt (DEBUG, 'IN Scope', i );
@@ -175,15 +176,24 @@ uses
 
     if (cal^.eventList[e]^.endDate^.mm = calDate^.mm)
     then
+
+      (* All Day events *)
       if     (cal^.eventList[e]^.endDate^.hh24 = 0)
          and (cal^.eventList[e]^.endDate^.mi   = 0)
          and (cal^.eventList[e]^.endDate^.ss   = 0)
       then
-        eDate := cal^.eventList[e]^.endDate^.dd - 1
+        eDate := sDate
       else
         eDate := cal^.eventList[e]^.endDate^.dd
+
     else
       eDate := daysInMon;
+
+    if     (cal^.eventList[e]^.endDate^.yyyy = 1970)
+       and (cal^.eventList[e]^.endDate^.mm   = 1)
+       and (cal^.eventList[e]^.endDate^.dd   = 1)
+    then
+      eDate := sDate;
 
 
     (* Iterate days and put info into cells. *)
