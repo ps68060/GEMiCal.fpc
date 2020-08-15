@@ -147,37 +147,36 @@ implementation
 
         if ( pos(createdTk, currentLn) = 1 )
         then
-          created := COPY (currentLn, 9, length(currentLn));
+          created := tokens^.part[2];
 
         if ( pos(dtStartTk, currentLn) = 1 )
         then
         begin
-          dtStart   := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
+          dtStart   := tokens^.part[2];
           dtStartTz := tokens^.part[1];
         end;
 
         if ( pos(dtEndTk, currentLn) = 1 )
         then
         begin
-          dtEnd   := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
+          dtEnd   := tokens^.part[2];
           dtEndTz := tokens^.part[1];
         end;
 
         if ( pos(SummaryTk, currentLn) = 1 )
            and (NOT alarm)
         then
-          summary := COPY (currentLn, pos(':', currentLn)+1, length(currentLn));
+          summary := tokens^.part[2];
 
         if ( pos(descrTk, currentLn) = 1 )
            and (NOT alarm)
         then
-          description := COPY (currentLn, 13, length(currentLn));
+          description := tokens^.part[2];
 
         if ( pos(locationTk, currentLn) = 1 )
            and (NOT alarm)
         then
-          location := COPY (currentLn, 10, length(currentLn));
-
+          location := tokens^.part[2];
 
         if (NOT alarm)
             and (pos(beginAlarmTk, currentLn) = 1 )
