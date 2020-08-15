@@ -162,17 +162,31 @@ uses
 
     logger^.logReal(DEBUG, 'event lasts ', daysBetween);
 
+
+    (* Does the event Start in the displayed month ? *)
+
     if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
     then
       sDate := cal^.eventList[e]^.startDate^.dd
     else
       sDate := 1;
 
+    (* Does the event End in the displayed month ? *)
+
     if (cal^.eventList[e]^.endDate^.mm = calDate^.mm)
     then
-      eDate := cal^.eventList[e]^.endDate^.dd
+      if     (cal^.eventList[e]^.endDate^.hh24 = 0)
+         and (cal^.eventList[e]^.endDate^.mi   = 0)
+         and (cal^.eventList[e]^.endDate^.ss   = 0)
+      then
+        eDate := cal^.eventList[e]^.endDate^.dd - 1
+      else
+        eDate := cal^.eventList[e]^.endDate^.dd
     else
       eDate := daysInMon;
+
+
+    (* Iterate days and put info into cells. *)
 
     for j := sDate to eDate
     do
