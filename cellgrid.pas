@@ -146,6 +146,8 @@ uses
 
     daysBetween : Real;
 
+    allDay      : Boolean;
+
     j,
     sDate,
     eDate       : Integer;
@@ -172,28 +174,21 @@ uses
     else
       sDate := 1;
 
-    (* Does the event End in the displayed month ? *)
 
-    if (cal^.eventList[e]^.endDate^.mm = calDate^.mm)
+    allDay := cal^.eventList[e]^.endDate^.isAllDay;
+
+    (* Does the event End after the displayed month ? *)
+    if (cal^.eventList[e]^.endDate^.mm > calDate^.mm)
     then
+      eDate := daysInMon
 
+    else
       (* All Day events *)
-      if     (cal^.eventList[e]^.endDate^.hh24 = 0)
-         and (cal^.eventList[e]^.endDate^.mi   = 0)
-         and (cal^.eventList[e]^.endDate^.ss   = 0)
+      if     (allDay)
       then
         eDate := sDate
       else
-        eDate := cal^.eventList[e]^.endDate^.dd
-
-    else
-      eDate := daysInMon;
-
-    if     (cal^.eventList[e]^.endDate^.yyyy = 1970)
-       and (cal^.eventList[e]^.endDate^.mm   = 1)
-       and (cal^.eventList[e]^.endDate^.dd   = 1)
-    then
-      eDate := sDate;
+        eDate := cal^.eventList[e]^.endDate^.dd;
 
 
     (* Iterate days and put info into cells. *)

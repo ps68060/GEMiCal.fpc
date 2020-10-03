@@ -68,6 +68,10 @@ type
 
     function humanDateTime
             : String;
+
+    function isAllDay
+            : Boolean;
+
   end;
 
   function date2Str(year, month, day : Word;
@@ -90,6 +94,7 @@ type
 
   function daysInMonth(myDate : PDateTime)
           :Integer;
+
 
 implementation
 
@@ -172,6 +177,7 @@ implementation
 
     dayOfWeek;
 
+    Dispose (logger, Done);
   end;
 
 
@@ -499,6 +505,39 @@ implementation
     if (myDate^.mm = 2) and (isLeapDay(myDate^.yyyy))
     then
       daysInMonth := 29;
+  end;
+
+
+  function TDateTime.isAllDay
+          : Boolean;
+  (* Purpose : Is this an all day event ? *)
+
+  var
+    logger       : PLogger;
+
+  begin
+    new(logger);
+    logger^.init;
+    logger^.level := INFO;
+
+    if     (hh24 = 0)
+       and (mi   = 0)
+       and (ss   = 0)
+    then
+      isAllDay := true
+    else
+      isAllDay := false;
+
+    if     (yyyy = 1970)
+       and (mm   = 1)
+       and (dd   = 1)
+    then
+    begin
+      isAllDay := true;
+    end;
+
+    Dispose (logger, Done);
+
   end;
 
 end.
