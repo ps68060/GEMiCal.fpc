@@ -68,6 +68,9 @@ var
 
 implementation
 
+uses
+  RiseSet;
+
 const
   WINWIDTH  = 800;  (* W:=113, smallest width of the working area *)
   WINHEIGHT = 680;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
@@ -81,15 +84,6 @@ var
 
   daysInMon    : Integer;
   endMonthDate : PDateTime;
-
-
-function SubStr(myStr : String;
-                index,
-                count : Integer)
-        : String;
-begin
-  SubStr := Copy(myStr, index, count);
-end;
 
 
 procedure TWinCal.CalcPos(row,
@@ -190,6 +184,8 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
 (* Purpose : called on every change *)
 
 var
+  logger    : PLogger;
+
   year,
   month,
   day,
@@ -214,7 +210,17 @@ var
 
   i           : Integer;
 
+  dtStr,
+  sunrise,
+  sunset        : String;
+
+  todayDate     : PDateTime;
+
 begin
+
+  new(logger);
+  logger^.init;
+  logger^.level := INFO;
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
@@ -226,9 +232,21 @@ begin
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
 
+  dtStr := date2str(year, month, day, FALSE);
+
+  new (todayDate);
+  todayDate^.init;
+  todayDate^.dtStr2Obj(dtStr);
+
+  sunRiseSet(53.0, 0.0, 0.0, todayDate,  sunrise, sunset);
+  dispose(todayDate);
+  logger^.log(DEBUG, 'sunrise ' + sunrise);
+  logger^.log(DEBUG, 'sunset '  + sunset);
+
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
 
+  (* Display date and time at top left *)
   v_gtext(vdiHandle, new_x + Attr.charWidth,
           new_y + Attr.boxHeight,
           date2Str(year, month, day, TRUE) );
@@ -237,10 +255,19 @@ begin
           new_y + Attr.boxHeight,
           time2Str(hour, minute, second, TRUE) );
 
-  (* Display the year and month *)
+  (* Display the year and month in larger text *)
   DrawTitle(new_X, new_Y, displayDate^.yyyy, displayDate^.mm);
 
   DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
+
+  (* Display Sunrise and sunset times at top right *)
+  v_gtext(vdiHandle, new_x + Attr.charWidth * 80,
+          new_y + Attr.boxHeight,
+          'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
+
+  v_gtext(vdiHandle, new_x + Attr.charWidth * 102,
+          new_y + Attr.boxHeight,
+          SubStr(sunset, 1, 5) );
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
   DrawGrid(new_X, new_Y, 6, ySpace);
@@ -250,6 +277,8 @@ begin
   DisplayEvents(new_X, new_Y);
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
+
+  Dispose (logger, Done);
 
 end;
 
