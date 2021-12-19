@@ -12,11 +12,11 @@ interface
   function UPPERCASE (s : STRING) : STRING;
 
   function INTEGER_TO_CHAR (     Value      : INTEGER;
-                             VAR Conversion : CHAR )
+                             var Conversion : CHAR )
           : Boolean;
 
   function CHAR_TO_INTEGER (     Character  : CHAR;
-                             VAR Conversion : INTEGER )
+                             var Conversion : INTEGER )
           : Boolean;
 
   function IntToStr(myInt : Integer)
@@ -36,57 +36,58 @@ interface
                   count : Integer)
           : String;
 
-  function GET_TOKEN (VAR Text : STRING) : STRING;
+  function GET_TOKEN (var Text : STRING) : STRING;
 
 
 implementation
 
 function UPPERCASE (s : STRING) : STRING;
-VAR
+var
   i : INTEGER;
-BEGIN
-  FOR i := 1 to LENGTH(s) DO
+begin
+  for i := 1 to LENGTH(s) do
     s[i] := UPCASE (s[i]);
   UPPERCASE := s;
-END;  (* Uppercase *)
+end;  (* Uppercase *)
 
 
 
 
 function INTEGER_TO_CHAR (     Value      : INTEGER;
-                           VAR Conversion : CHAR )
+                           var Conversion : CHAR )
         : Boolean;
 
 (* PURPOSE : Converts a single integer into a character representation *)
 
-BEGIN
-  IF ( Value >= 0 ) AND ( Value <= 9 )
-  THEN
-  BEGIN
+begin
+
+  if ( Value >= 0 ) AND ( Value <= 9 )
+  then
+  begin
     Conversion := CHR ( Value + ORD('0') );
     INTEGER_TO_CHAR := TRUE;
-  END
+  end
   ELSE
     INTEGER_TO_CHAR := FALSE
 
-END;  (* function integer_to_char *)
+end;  (* function integer_to_char *)
 
 
 function CHAR_TO_INTEGER (     Character  : CHAR;
-                           VAR Conversion : INTEGER )
+                           var Conversion : INTEGER )
         : Boolean;
 
 (* PURPOSE : Converts a single character into an integer representation *)
 
-BEGIN
+begin
   Conversion := ORD ( Character ) - ORD('0');
-  IF ( Conversion >= 0 )
-  THEN
+  if ( Conversion >= 0 )
+  then
     CHAR_TO_INTEGER := TRUE
-  ELSE
+  else
     CHAR_TO_INTEGER := FALSE
 
-END;  (* function char_to_integer *)
+end;  (* function char_to_integer *)
 
 
 function IntToStr(myInt : Integer)
@@ -103,10 +104,10 @@ end;
 function INDEX (Key, Text : STRING) : INTEGER;
 { Purpose : Find the index position of string Key in the string Text }
 
-VAR
+var
   TextLen, KeyLen, TextCursor, KeyCursor : INTEGER;
   
-BEGIN
+begin
   TextLen := LENGTH (Text);
   KeyLen  := LENGTH (Key);
 
@@ -114,38 +115,38 @@ BEGIN
   INDEX      := 0;
 
   WHILE TextCursor < TextLen DO
-  BEGIN
+  begin
 
-    IF Key[1] = Text[TextCursor]
-    THEN
-    BEGIN
+    if Key[1] = Text[TextCursor]
+    then
+    begin
       INDEX := TextCursor;
 
       FOR KeyCursor := 1 TO KeyLen DO
-      BEGIN
-        IF Key[KeyCursor] <> Text[TextCursor + KeyCursor - 1]
-        THEN
+      begin
+        if Key[KeyCursor] <> Text[TextCursor + KeyCursor - 1]
+        then
           INDEX := 0;
-      END; (* for *)
-    END; (* if *)
+      end; (* for *)
+    end; (* if *)
 
     TextCursor := SUCC (TextCursor);
-  END; (* while *)
+  end; (* while *)
 
-END;
+end;
 
 
 function LTrim (Text : STRING)
         : string;
-VAR
-  i : INTEGER;
-BEGIN
+var
+  i : Integer;
+begin
   i := 1;
-  WHILE (Text[i] <= ' ') AND (i < LENGTH(Text)) DO
+  while (Text[i] <= ' ') and (i < LENGTH(Text)) do
     INC (i);
 
   LTRIM := COPY (Text, i, LENGTH(Text) - i + 1);  (* Remove leading spaces *)
-END;  (* LTrim *)
+end;  (* LTrim *)
 
 
 function LPad (txt  : String;
@@ -176,28 +177,28 @@ begin
 end;
 
 
-function Get_Token (VAR Text : string)
+function Get_Token (var Text : string)
         : string;
 (*
   Purpose: Get the first token
            Return the token
            Text = the remainder of the string 
  *)
-VAR
+var
   Token    : string;
   SpacePos : integer;
 
-BEGIN
+begin
   Text := LTrim(Text);
   SpacePos := POS (' ', Text);
 
-  If (SpacePos = 0)
-  THEN
+  if (SpacePos = 0)
+  then
     SpacePos := LENGTH(Text) + 1;
 
   Get_Token := COPY (Text, 1, SpacePos-1);
   Text := COPY (Text, SpacePos+1, LENGTH(Text) - SpacePos);  (* chop from first space to end *)
 
-END;
+end;
 
 end.
