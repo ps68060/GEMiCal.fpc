@@ -143,7 +143,7 @@ implementation
       begin
         new (tokens);
         tokens^.init;
-        tokens^.tokenise(currentLn);
+        tokens^.tokeniseIcal(currentLn);
 
         if ( pos(createdTk, currentLn) = 1 )
         then

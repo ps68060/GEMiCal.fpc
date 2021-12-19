@@ -1,14 +1,13 @@
 unit Token;
 
 (* AUTHOR  : P Slegg
-   DATE    : 16th May 2020 Version 0
-   PURPOSE : TToken object for iCal Event lines.
+   DATE    : 19th Dec 2021 Version 1
+   PURPOSE : TToken object for lines of either iCal Event or INF key=value.
 *)
 
 interface
   uses
-    Objects,
-    Logger;
+    Objects;
 
 
 type
@@ -20,11 +19,16 @@ type
     constructor init;
     destructor  done; virtual;
 
-    procedure Tokenise (line : String);
+    procedure TokeniseIcal (line : String);
+
+    procedure TokeniseInf  (line : String);
   end;
 
 
 implementation
+
+uses
+  Logger;
 
   constructor TToken.init;
   var
@@ -67,8 +71,8 @@ implementation
   end;
 
 
-  procedure TToken.Tokenise (line : String);
-  var
+  procedure TToken.TokeniseIcal (line : String);
+    var
     logger       : PLogger;
     posn         : Integer;
 
@@ -90,6 +94,27 @@ implementation
     logger^.log (DEBUG, 'value = ' + part[2]);
 
     Dispose(logger, Done);
- end;
+  end;
+
+
+  procedure TToken.TokeniseInf (line : String);
+  var
+    logger       : PLogger;
+    posn         : Integer;
+
+  begin
+    new(logger);
+    logger^.init;
+
+    logger^.level := INFO;
+
+    (* Token before equals *)
+    splitAt ('=', line, part[0], part[2]);
+
+    logger^.log(DEBUG, 'key    = ' + part[0]);
+    logger^.log(DEBUG, 'value  = ' + part[1]);
+ 
+    Dispose(logger, Done);
+  end;
 
 end.
