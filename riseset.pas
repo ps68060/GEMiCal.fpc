@@ -104,7 +104,7 @@ var
 begin
   new(logger);
   logger^.init;
-  logger^.level := DEBUG;
+  logger^.level := INFO;
 
   E := 0;
 
@@ -207,8 +207,8 @@ begin
   ss_mm   := trunc((sset * 24 - ss_hh) * 60);
   sunset  := time2str(ss_hh, ss_mm, 0, true);  
 
-  logger^.log(INFO, 'Sunrise : ' + sunrise);
-  logger^.log(INFO, 'Sunset  : ' + sunset);
+  logger^.log(DEBUG, 'Sunrise : ' + sunrise);
+  logger^.log(DEBUG, 'Sunset  : ' + sunset);
 
   Dispose (logger, Done);
 
