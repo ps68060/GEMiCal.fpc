@@ -78,6 +78,7 @@ uses
   Dos,
   Gem,
   Cal,
+  Config,
   DateTime,
   CellGrid,
 
@@ -95,6 +96,7 @@ var
 
   directory     : String;
   logger        : PLogger;
+  config        : PConfig;
 
 
 procedure TMyApplication.INITInstance;
@@ -108,6 +110,10 @@ begin
   GetDir (0, directory);
 
   LoadResource ('GEMICAL.RSC','');
+
+  new(config);
+  config^.init;
+  config^.readConfig;
 
   (* Load and set-up the menu *)
   LoadMenu (TREE000);
