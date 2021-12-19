@@ -20,6 +20,7 @@ type
     procedure log(msgLevel : a_level;
                   message  : String);
 
+    procedure info(message  : String);
 
     procedure logBool(msgLevel : a_level;
                       message  : String;
@@ -61,6 +62,17 @@ begin
 (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
 
   if (ord(level) >= ord(msgLevel) )
+  then
+    writeln(message);
+
+end;
+
+
+procedure TLogger.info(message  : String);
+begin
+
+(**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+  if (ord(level) >= 2 )
   then
     writeln(message);
 
