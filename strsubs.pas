@@ -9,34 +9,39 @@ unit StrSubs;
 
 interface
 
-  FUNCTION UPPERCASE (s : STRING) : STRING;
+  function UPPERCASE (s : STRING) : STRING;
 
-  FUNCTION INTEGER_TO_CHAR (     Value      : INTEGER;
+  function INTEGER_TO_CHAR (     Value      : INTEGER;
                              VAR Conversion : CHAR )
           : Boolean;
 
-  FUNCTION CHAR_TO_INTEGER (     Character  : CHAR;
+  function CHAR_TO_INTEGER (     Character  : CHAR;
                              VAR Conversion : INTEGER )
           : Boolean;
 
-  FUNCTION IntToStr(myInt : Integer)
+  function IntToStr(myInt : Integer)
           : String;
 
-  FUNCTION INDEX (Key, Text : STRING) : INTEGER;
+  function INDEX (Key, Text : STRING) : INTEGER;
 
-  FUNCTION LTRIM (Text : STRING) : STRING;
+  function LTRIM (Text : STRING) : STRING;
 
-  Function LPad  (txt  : String;
+  function LPad  (txt  : String;
                   len  : Integer;
                   pad  : Char)
           : String;
 
-  FUNCTION GET_TOKEN (VAR Text : STRING) : STRING;
+  function SubStr(myStr : String;
+                  index,
+                  count : Integer)
+          : String;
+
+  function GET_TOKEN (VAR Text : STRING) : STRING;
 
 
 implementation
 
-FUNCTION UPPERCASE (s : STRING) : STRING;
+function UPPERCASE (s : STRING) : STRING;
 VAR
   i : INTEGER;
 BEGIN
@@ -46,35 +51,9 @@ BEGIN
 END;  (* Uppercase *)
 
 
-(**
-FUNCTION UPPERCASE ( InChar : CHAR; VAR OutChar : CHAR ) : BOOLEAN;
-VAR
-  InCharOrd : INTEGER;
-
-BEGIN
-  InCharOrd := ORD (InChar);
-  OutChar   := InChar;
-
-  UPPERCASE := FALSE;
-  IF ( (InCharOrd > ORD ('z')) OR
-       (InCharOrd < ORD ('A')) )
-  THEN
-  BEGIN
-    UPPERCASE := FALSE;
-  END
-  ELSE
-  BEGIN
-    IF ( InCharOrd > ORD ('Z') )
-    THEN
-    BEGIN
-      OutChar := CHR ( InCharOrd - 32 );
-      UPPERCASE := TRUE;
-    END; (* if *)
-(**  END; (* if *)
-(**END;**)
 
 
-FUNCTION INTEGER_TO_CHAR (     Value      : INTEGER;
+function INTEGER_TO_CHAR (     Value      : INTEGER;
                            VAR Conversion : CHAR )
         : Boolean;
 
@@ -93,7 +72,7 @@ BEGIN
 END;  (* function integer_to_char *)
 
 
-FUNCTION CHAR_TO_INTEGER (     Character  : CHAR;
+function CHAR_TO_INTEGER (     Character  : CHAR;
                            VAR Conversion : INTEGER )
         : Boolean;
 
@@ -110,7 +89,7 @@ BEGIN
 END;  (* function char_to_integer *)
 
 
-FUNCTION IntToStr(myInt : Integer)
+function IntToStr(myInt : Integer)
         : String;
 var
   convStr : String;
@@ -121,7 +100,7 @@ begin
 end;
 
 
-FUNCTION INDEX (Key, Text : STRING) : INTEGER;
+function INDEX (Key, Text : STRING) : INTEGER;
 { Purpose : Find the index position of string Key in the string Text }
 
 VAR
@@ -156,7 +135,7 @@ BEGIN
 END;
 
 
-FUNCTION LTrim (Text : STRING)
+function LTrim (Text : STRING)
         : string;
 VAR
   i : INTEGER;
@@ -169,7 +148,7 @@ BEGIN
 END;  (* LTrim *)
 
 
-Function LPad (txt  : String;
+function LPad (txt  : String;
                len  : Integer;
                pad  : Char)
         : String;
@@ -188,7 +167,16 @@ begin
 end;
 
 
-FUNCTION Get_Token (VAR Text : string)
+function SubStr(myStr : String;
+                index,
+                count : Integer)
+        : String;
+begin
+  SubStr := Copy(myStr, index, count);
+end;
+
+
+function Get_Token (VAR Text : string)
         : string;
 (*
   Purpose: Get the first token
