@@ -254,6 +254,7 @@ begin
   dispose(todayDate);
   logger^.log(DEBUG, 'sunrise ' + sunrise);
   logger^.log(DEBUG, 'sunset '  + sunset);
+  dispose(config);
 
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
