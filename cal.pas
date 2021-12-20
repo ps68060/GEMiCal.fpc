@@ -9,10 +9,8 @@ unit Cal;
 
 interface
   uses
-    Dos,
     Objects,
-    Event,
-    Logger;
+    Event;
 
 const
   maxEvents = 999;
@@ -34,6 +32,10 @@ type
   end;
 
 implementation
+
+  uses
+    Dos,
+    Logger;
 
   var
     logger : PLogger;

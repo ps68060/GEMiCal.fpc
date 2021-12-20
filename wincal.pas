@@ -3,16 +3,11 @@ unit WinCal;
 interface
 
   uses
-    Gem,
-    Dos,
-
     OTypes,
     OWindows,
 
-    DateTime,
-    StrSubs,
     CellGrid,
-    Logger;
+    DateTime;
 
 {$I gemical.i}
 
@@ -63,13 +58,19 @@ type
 var
   displayDate     : PDateTime;  (* 1st of the month *)
 
-  cellGr      : PCellGrid;
+  cellGr          : PCellGrid;
 
 
 implementation
 
-uses
-  RiseSet;
+  uses
+    Gem,
+    Dos,
+
+    Logger,
+    StrSubs,
+    Config,
+    RiseSet;
 
 const
   WINWIDTH  = 800;  (* W:=113, smallest width of the working area *)
@@ -210,6 +211,12 @@ var
 
   i           : Integer;
 
+  lat,
+  lng,
+  UTCoffset   : Real;
+
+  config        : PConfig;
+
   dtStr,
   sunrise,
   sunset        : String;
@@ -238,7 +245,12 @@ begin
   todayDate^.init;
   todayDate^.dtStr2Obj(dtStr);
 
-  sunRiseSet(53.0, 0.0, 0.0, todayDate,  sunrise, sunset);
+  new(config);
+  config^.init;
+  config^.readConfig;
+
+  sunRiseSet(config^.lat, config^.lng, config^.UTCoffset
+            ,todayDate,  sunrise, sunset);
   dispose(todayDate);
   logger^.log(DEBUG, 'sunrise ' + sunrise);
   logger^.log(DEBUG, 'sunset '  + sunset);
@@ -261,11 +273,12 @@ begin
   DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 
   (* Display Sunrise and sunset times at top right *)
-  v_gtext(vdiHandle, new_x + Attr.charWidth * 80,
+  v_gtext(vdiHandle, new_x + Attr.charWidth * 84,
           new_y + Attr.boxHeight,
-          'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
+          'Sunrise/set: '
+          + SubStr(sunrise, 1, 5) );
 
-  v_gtext(vdiHandle, new_x + Attr.charWidth * 102,
+  v_gtext(vdiHandle, new_x + Attr.charWidth * 106,
           new_y + Attr.boxHeight,
           SubStr(sunset, 1, 5) );
 

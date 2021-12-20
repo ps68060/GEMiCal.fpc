@@ -8,9 +8,7 @@ unit Event;
 interface
   uses
     Objects,
-    Token,
-    DateTime,
-    Logger;
+    DateTime;
 
 
 type
@@ -50,6 +48,10 @@ type
 
 
 implementation
+
+  uses
+    Token,
+    Logger;
 
   const
     endEventTk   = 'END:VEVENT';
