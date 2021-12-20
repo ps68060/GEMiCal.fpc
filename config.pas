@@ -30,13 +30,14 @@ uses
   const
     latTk        = 'lat';
     lngTk        = 'long';
-    UTCoffsetTk  = 'UTCoffst';
+    UTCoffsetTk  = 'UTCoffset';
 
   constructor TConfig.init;
   begin
     name := 'default';
     lat  := 51.4779;
     lng  := 0.0;
+    UTCoffset := 0.0;
   end;
 
 
@@ -69,7 +70,6 @@ uses
     do
     begin
       readln (cnfFile, currentLn );
-      logger^.log(INFO, currentLn);
 
       new(keyValue);
       keyValue^.init;
@@ -107,8 +107,9 @@ uses
 
     logger^.logReal(DEBUG,'lat = ', lat);
     logger^.logReal(DEBUG,'lng = ', lng);
-    logger^.logReal(DEBUG,'offset = ', UTCoffset);
+    logger^.logReal(DEBUG,'UTC ', UTCoffset);
 
+    close(cnfFile);
     Dispose (logger, Done);
 
   end;
