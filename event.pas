@@ -91,8 +91,8 @@ implementation
 
   destructor TEvent.done;
   begin
-    Dispose(startDate, Done);
-    Dispose(endDate, Done);
+    dispose(startDate, Done);
+    dispose(endDate, Done);
   end;
 
 
@@ -211,7 +211,7 @@ implementation
       endDate^.dtStr2Obj(dtEnd);
     end;
 
-    Dispose(logger, Done);
+    dispose(logger);
 
     GetEvent := TRUE;
 
@@ -346,8 +346,8 @@ implementation
       writeln ('Current event');
     end;
 
-    Dispose (pStart, Done);
-    Dispose (pEnd,   Done);
+    dispose (pStart, Done);
+    dispose (pEnd,   Done);
 
   end;
 
