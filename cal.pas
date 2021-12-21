@@ -56,7 +56,7 @@ implementation
     for i := 0 to entries
     do
     begin
-      Dispose(eventList[i], Done);
+      dispose(eventList[i], Done);
     end;
   end;
 
@@ -91,7 +91,7 @@ implementation
     end;
   
     dec (entries);
-    dispose (logger, Done);
+    dispose (logger);
   end;
 
 
@@ -151,7 +151,7 @@ implementation
     writeln ('INFO: ', entries +1, ' Entries read.');
     writeln;
 
-    Dispose (logger, Done);
+    dispose (logger);
   end;
 
 
@@ -203,7 +203,7 @@ implementation
     end;
 
     logger^.log(DEBUG, 'Sorted');
-    dispose (logger, done);
+    dispose (logger);
 
   end;
 
