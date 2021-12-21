@@ -126,8 +126,8 @@ uses
 
     end;  (* for *)
 
-    Dispose (endMonthDate, Done);
-    Dispose (logger, Done);
+    dispose (endMonthDate, Done);
+    dispose (logger);
   end;
 
 
@@ -216,7 +216,7 @@ uses
       inc (cell[j]^.counter );
     end;
 
-    Dispose(logger, Done);
+    dispose(logger);
 
   end;
 
@@ -250,7 +250,7 @@ uses
     logger^.logInt(DEBUG, 'row ', row);
     logger^.logInt(DEBUG, 'col ', col);
 
-    Dispose (logger, Done);
+    dispose (logger);
   end;
 
 end.
