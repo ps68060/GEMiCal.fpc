@@ -210,7 +210,7 @@ begin
   logger^.log(DEBUG, 'Sunrise : ' + sunrise);
   logger^.log(DEBUG, 'Sunset  : ' + sunset);
 
-  Dispose (logger, Done);
+  dispose (logger);
 
 end;
 
