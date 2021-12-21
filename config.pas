@@ -140,7 +140,7 @@ uses
 
       end;
 
-      Dispose (keyValue, Done);
+      dispose (keyValue, Done);
     end;  (* while *)
 
     logger^.log(DEBUG, 'location = ' + name);
@@ -149,7 +149,7 @@ uses
     logger^.logReal(DEBUG,'UTC ',   UTCoffset);
 
     close(cnfFile);
-    Dispose (logger, Done);
+    dispose (logger);
 
   end;
 
