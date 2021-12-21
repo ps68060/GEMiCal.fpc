@@ -292,7 +292,7 @@ begin
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
-  Dispose (logger, Done);
+  dispose (logger);
 
 end;
 
