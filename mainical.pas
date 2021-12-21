@@ -171,6 +171,8 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
+  dispose(logger);
+
 end;
 
 
@@ -218,6 +220,8 @@ begin
     logger^.log(DEBUG, 'Loaded');
   end;
 
+  dispose(logger);
+
 end;
 
 
@@ -240,6 +244,8 @@ begin
   if MyApplication.WinCal <> NIL
   then
     MyApplication.WinCal^.MakeWindow;
+
+  dispose(logger);
 
 end;
 
@@ -272,6 +278,8 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  dispose(logger);
+
 end;
 
 
@@ -303,6 +311,8 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  dispose(logger);
+
 end;
 
 
@@ -325,6 +335,8 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  dispose(logger);
+
 end;
 
 
@@ -346,6 +358,8 @@ begin
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
+
+  dispose(logger);
 
 end;
 
@@ -391,6 +405,7 @@ begin
   cellGr^.FilterEvents(myApplication.iCal,
                        displayDate);
   logger^.log(DEBUG, 'Cal displayed');
+
 end;
 
 end.
