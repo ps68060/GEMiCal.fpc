@@ -93,7 +93,7 @@ uses
  
     logger^.log (DEBUG, 'value = ' + part[2]);
 
-    Dispose(logger, Done);
+    dispose(logger);
   end;
 
 
@@ -114,7 +114,7 @@ uses
     logger^.log(DEBUG, 'key    = ' + part[0]);
     logger^.log(DEBUG, 'value  = ' + part[1]);
  
-    Dispose(logger, Done);
+    dispose(logger);
   end;
 
 end.
