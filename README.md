@@ -12,5 +12,7 @@ Current functions:
    current month.
 3. loads all the .ics files in a folder.
 4. the ICS folder can be changed.
+5. gemical.cnf holds the lat-long and UTC offset so that the sunrise
+   and sunset times can be calculated.
 
 Contributions welcome.
