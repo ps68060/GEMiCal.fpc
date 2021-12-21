@@ -6,6 +6,7 @@ interface
     OTypes,
     OWindows,
 
+    Config,
     CellGrid,
     DateTime;
 
@@ -56,6 +57,8 @@ type
                  END;
 
 var
+  config          : PConfig;
+
   displayDate     : PDateTime;  (* 1st of the month *)
 
   cellGr          : PCellGrid;
@@ -69,7 +72,6 @@ implementation
 
     Logger,
     StrSubs,
-    Config,
     RiseSet;
 
 const
@@ -215,8 +217,6 @@ var
   lng,
   UTCoffset   : Real;
 
-  config        : PConfig;
-
   dtStr,
   sunrise,
   sunset        : String;
@@ -245,16 +245,11 @@ begin
   todayDate^.init;
   todayDate^.dtStr2Obj(dtStr);
 
-  new(config);
-  config^.init;
-  config^.readConfig;
-
   sunRiseSet(config^.lat, config^.lng, config^.UTCoffset
             ,todayDate,  sunrise, sunset);
   dispose(todayDate);
   logger^.log(DEBUG, 'sunrise ' + sunrise);
   logger^.log(DEBUG, 'sunset '  + sunset);
-  dispose(config);
 
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
