@@ -213,10 +213,6 @@ var
 
   i           : Integer;
 
-  lat,
-  lng,
-  UTCoffset   : Real;
-
   dtStr,
   sunrise,
   sunset        : String;
@@ -228,6 +224,9 @@ begin
   new(logger);
   logger^.init;
   logger^.level := INFO;
+
+  new (config);
+  config^.init;
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
