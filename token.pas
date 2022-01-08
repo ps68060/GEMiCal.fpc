@@ -109,7 +109,7 @@ uses
     logger^.level := INFO;
 
     (* Token before equals *)
-    splitAt ('=', line, part[0], part[2]);
+    splitAt ('=', line, part[0], part[1]);
 
     logger^.log(DEBUG, 'key    = ' + part[0]);
     logger^.log(DEBUG, 'value  = ' + part[1]);
