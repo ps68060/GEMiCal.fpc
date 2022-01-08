@@ -59,6 +59,8 @@ type
                      convMenu   : PConvMenu;
                      iCal       : PCal;
                      winCal     : PWinCal;
+
+                     destructor done; virtual;
                      procedure INITInstance;   VIRTUAL;
                      procedure INITMainWindow; VIRTUAL;
                    end;
@@ -95,6 +97,12 @@ var
 
   directory     : String;
   logger        : PLogger;
+
+
+  destructor TMyApplication.done;
+  begin
+
+  end;
 
 
 procedure TMyApplication.INITInstance;
@@ -150,15 +158,12 @@ begin
   if MyApplication.winCal = NIL
   then
   begin
-    myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
-    new(config);
-    config^.init;
-    config^.readConfig;
+    myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
     LoadCal;
 
-    myApplication.iCal^.sort;
+    MyApplication.iCal^.sort;
 
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
@@ -175,7 +180,6 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  dispose(config);
   dispose(logger);
 
 end;
