@@ -39,6 +39,8 @@ uses
     lat       := 51.4779;
     lng       := 0.0;
     UTCoffset := 0.0;
+
+    readConfig;
   end;
 
 
@@ -66,7 +68,7 @@ uses
     logger^.level := DEBUG;
 
     (* Open the config file for reading *)
-    assign (cnfFile, 'gemical.cnf');
+    assign (cnfFile, 'GEMICAL.CNF');
     reset  (cnfFile);
 
     while (NOT eof (cnfFile))
@@ -82,18 +84,18 @@ uses
       (* Get the name *)
       if ( pos(nameTk, currentLn) = 1 )
       then
-        name := keyValue^.part[2];
+        name := keyValue^.part[1];
 
 
       (* Get the latitude, if it is invalid, keep default *)
       if ( pos(latTk, currentLn) = 1 )
       then
       begin
-        val(keyValue^.part[2], valReal, code);
+        val(keyValue^.part[1], valReal, code);
 
         if (code <> 0)
         then
-          writeln ('Real conversion error of lat');
+          writeln ('Real conversion error of lat: ', keyValue^.part[1]);
 
         if (abs(valReal) > 90.0)
         then
@@ -108,11 +110,11 @@ uses
       if ( pos(lngTk, currentLn) = 1 )
       then
       begin
-        val(keyValue^.part[2], valReal, code);
+        val(keyValue^.part[1], valReal, code);
 
         if (code <> 0)
         then
-          writeln ('Real conversion error of lng');
+          writeln ('Real conversion error of lng: ', keyValue^.part[1]);
 
         if (abs(valReal) > 180.0)
         then
@@ -126,11 +128,11 @@ uses
       if ( pos(UTCoffsetTk, currentLn) = 1 )
       then
       begin
-        val(keyValue^.part[2], valReal, code);
+        val(keyValue^.part[1], valReal, code);
 
         if (code <> 0)
         then
-          writeln ('Real conversion error of UTCoffset');
+          writeln ('Real conversion error of UTCoffset: ', keyValue^.part[1]);
 
         if (abs(valReal) > 12.0)
         then
@@ -140,13 +142,13 @@ uses
 
       end;
 
-      dispose (keyValue, Done);
+      dispose (keyValue);
     end;  (* while *)
 
     logger^.log(DEBUG, 'location = ' + name);
     logger^.logReal(DEBUG,'lat = ', lat);
     logger^.logReal(DEBUG,'lng = ', lng);
-    logger^.logReal(DEBUG,'UTC ',   UTCoffset);
+    logger^.logReal(DEBUG,'UTC = ', UTCoffset);
 
     close(cnfFile);
     dispose (logger);
