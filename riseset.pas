@@ -106,6 +106,10 @@ begin
   logger^.init;
   logger^.level := INFO;
 
+  logger^.logReal(DEBUG, 'lat = ', lat);
+  logger^.logReal(DEBUG, 'lng = ', lng);
+  logger^.logReal(DEBUG, 'UTC = ', UTCoff);
+
   E := 0;
 
   F := date^.julianDate - UTCoff / 24;      (* Julian day *)
@@ -158,6 +162,8 @@ begin
                   - 0.5  * U * U * sin(4 * deg2rad(I)) 
                   - 1.25 * K * K * sin(2 * deg2rad(J)));  (* Eq of time (min) *)
 
+  logger^.logReal(DEBUG, 'v = ', V);
+
   AB := trunc(E * 1440.0 + V + 4.0 * lng - 60.0 * UTCoff) mod 1440;    (* True Solar time (min) *)
 
   if ((AB/4) < 0)
@@ -167,7 +173,15 @@ begin
     AC := AB/4 - 180;  (* Hour Angle *)
 
   AD := acosd(sind(lat) * sind(T) + cosd(lat) * cosd(T) * cosd(AC));        (* Solar Zenith angle *)
-  W  := rad2deg(acos(cosd(90.833) / (cosd(lat) * cosd(T)) - tand(lat) * tand(T)) );  (* HA Sunrise *)
+
+  W  := rad2deg(acos(cosd(90.833)
+                     / (cosd(lat) * cosd(T)
+                       )
+                     - tand(lat)
+                     * tand(T)
+                     )
+               );  (* HA Sunrise *)
+
   X  := (720 - 4 * lng - V + UTCoff * 60.0) / 1440;                         (* Solar noon (LST) *)
 
   logger^.logReal(DEBUG, 'w = ', W);
@@ -199,7 +213,6 @@ begin
   sset  := X + W * 4 / 1440;
 
   sr_hh   := trunc(srise * 24);
-  logger^.logReal(DEBUG, 'sr_hh = ', sr_hh);
   sr_mm   := trunc((srise * 24 - sr_hh) * 60);
   sunrise := time2str(sr_hh, sr_mm, 0, true);
 
