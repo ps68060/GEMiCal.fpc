@@ -209,11 +209,16 @@ implementation
     then
     begin
       endDate^.dtStr2Obj(dtEnd);
+    end
+    else
+    begin
+      endDate^.dtStr2Obj(dtStart);
     end;
 
     dispose(logger);
 
     GetEvent := TRUE;
+    (*writeEvent;*)
 
   end;
 
