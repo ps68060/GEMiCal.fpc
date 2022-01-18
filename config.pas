@@ -65,7 +65,7 @@ uses
   begin
     new(logger);
     logger^.init;
-    logger^.level := DEBUG;
+    logger^.level := INFO;
 
     (* Open the config file for reading *)
     assign (cnfFile, 'GEMICAL.CNF');
