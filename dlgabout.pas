@@ -10,7 +10,7 @@ interface
 {$I gemical.i}
 
 const
-  dDate    = '23.05.2020';
+  dDate    = '16.01.2022';
   dVersion = '0.0';                          (**  not used yet **)
 
 type
