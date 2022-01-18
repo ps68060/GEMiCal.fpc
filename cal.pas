@@ -74,7 +74,7 @@ implementation
   begin
     new (logger);
     logger^.init;
-    logger^.level := DEBUG;
+    logger^.level := INFO;
 
     findFirst(directory + '/*.ics', attr, fileRec);
 
@@ -123,7 +123,7 @@ implementation
     assign (calFile, calName);
     reset  (calFile);
 
-    logger^.log (INFO, 'Reading from ' + calName);
+    logger^.log (DEBUG, 'Reading from ' + calName);
 
     while ( NOT eof(calFile) ) 
     do
@@ -148,7 +148,7 @@ implementation
 
     dec (entries);
 
-    writeln ('INFO: ', entries +1, ' Entries read.');
+    logger^.logInt (DEBUG, 'Entries Read = ', entries +1);
     writeln;
 
     dispose (logger);
