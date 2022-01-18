@@ -61,6 +61,7 @@ implementation
     SummaryTk    = 'SUMMARY';
     descrTk      = 'DESCRIPTION:';
     locationTk   = 'LOCATION:';
+    recurRuleTk  = 'RRULE:';
 
     beginAlarmTk  = 'BEGIN:VALARM';
     endAlarmTk    = 'END:VALARM';
