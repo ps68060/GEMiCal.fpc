@@ -7,9 +7,7 @@ unit datetime;
 
 interface
   uses
-    Objects,
-    StrSubs,
-    Logger;
+    Objects;
 
 const
   daySec  = 86400;
@@ -97,6 +95,10 @@ type
 
 
 implementation
+
+uses
+    Logger,
+    StrSubs;
 
   constructor TDateTime.init;
   begin
