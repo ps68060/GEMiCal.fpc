@@ -265,8 +265,8 @@ var
 begin
   logger^.log(DEBUG, 'Prev Month Work');
 
-  month := displayDate^.mm;
-  year  := displayDate^.yyyy;
+  month := displayDate^.getMMFromIso;
+  year  := displayDate^.getYYYYFromIso;
 
   dec (month);
 
@@ -296,8 +296,8 @@ var
 begin
   logger^.log(DEBUG, 'Next Month Work');
 
-  month := displayDate^.mm;
-  year  := displayDate^.yyyy;
+  month := displayDate^.getMMFromIso;
+  year  := displayDate^.getYYYYFromIso;
 
   inc (month);
 
@@ -326,11 +326,11 @@ var
 begin
   logger^.log(DEBUG, 'Prev Year Work');
 
-  year  := displayDate^.yyyy;
+  year  := displayDate^.getYYYYFromIso;
 
   dec (year);
 
-  dtStr := date2str(year, displayDate^.mm, 1, FALSE);
+  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
 
   FilterCal(dtStr);
 
@@ -348,11 +348,11 @@ var
 begin
   logger^.log(DEBUG, 'Next Year Work');
 
-  year  := displayDate^.yyyy;
+  year  := displayDate^.getYYYYFromIso;
 
   inc (year);
 
-  dtStr := date2str(year, displayDate^.mm, 1, FALSE);
+  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
 
   FilterCal(dtStr);
 

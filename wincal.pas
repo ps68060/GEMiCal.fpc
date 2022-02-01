@@ -132,8 +132,8 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  logger^.logInt(DEBUG, 'year ', displayDate^.yyyy );
-  logger^.log(DEBUG, mon1[displayDate^.mm] );
+  logger^.logInt(DEBUG, 'year ', displayDate^.getYYYYFromIso );
+  logger^.log(DEBUG, mon1[displayDate^.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
@@ -141,8 +141,8 @@ begin
   CalcCell (displayDate^.day, day, row, col);
 
   currentMonth := FALSE;
-  if     (displayDate^.yyyy = year)
-     and (displayDate^.mm   = month)
+  if     (displayDate^.getYYYYFromIso = year)
+     and (displayDate^.getMMFromIso   = month)
   then
     currentMonth := TRUE;
 
@@ -263,7 +263,7 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   (* Display the year and month in larger text *)
-  DrawTitle(new_X, new_Y, displayDate^.yyyy, displayDate^.mm);
+  DrawTitle(new_X, new_Y, displayDate^.getYYYYFromIso, displayDate^.getMMFromIso);
 
   DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 

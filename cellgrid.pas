@@ -101,7 +101,7 @@ uses
     (* Calculate date of end of month *)
     daysInMon := daysInMonth(calDate);
 
-    dtStr := date2Str(calDate^.yyyy, calDate^.mm, daysInMon, FALSE);
+    dtStr := date2Str(calDate^.getYYYYFromIso, calDate^.getMMFromIso, daysInMon, FALSE);
 
     new(endMonthDate);
     endMonthDate^.init;
@@ -158,7 +158,7 @@ uses
     logger^.init;
     logger^.level := INFO;
 
-    logger^.logInt(DEBUG, 'end date = ' , cal^.eventList[e]^.endDate^.dd);
+    logger^.logInt(DEBUG, 'end date = ' , cal^.eventList[e]^.endDate^.getDDFromIso);
 
     daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
                      cal^.eventList[e]^.startDate^.epoch) / daySec;
@@ -168,9 +168,9 @@ uses
 
     (* Does the event Start in the displayed month ? *)
 
-    if (cal^.eventList[e]^.startDate^.mm = calDate^.mm)
+    if (cal^.eventList[e]^.startDate^.getMMFromIso = calDate^.getMMFromIso)
     then
-      sDate := cal^.eventList[e]^.startDate^.dd
+      sDate := cal^.eventList[e]^.startDate^.getDDFromIso
     else
       sDate := 1;
 
@@ -178,7 +178,7 @@ uses
     allDay := cal^.eventList[e]^.endDate^.isAllDay;
 
     (* Does the event End after the displayed month ? *)
-    if (cal^.eventList[e]^.endDate^.mm > calDate^.mm)
+    if (cal^.eventList[e]^.endDate^.getMMFromIso > calDate^.getMMFromIso)
     then
       eDate := daysInMon
 
@@ -188,7 +188,7 @@ uses
       then
         eDate := sDate
       else
-        eDate := cal^.eventList[e]^.endDate^.dd;
+        eDate := cal^.eventList[e]^.endDate^.getDDFromIso;
 
 
     (* Iterate days and put info into cells. *)

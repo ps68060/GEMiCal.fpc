@@ -1,5 +1,6 @@
 unit datetime;
 
+
 (* AUTHOR  : P SLEGG
    DATE    : 17th May 2020 Version 1
    PURPOSE : TDateTime object for the parsed an converted ICS Event.
@@ -34,15 +35,13 @@ const
 type
   PDateTime = ^TDateTime;
   TDateTime = object(TObject)
-    yyyy : Integer;
-    mm   : Integer;
-    dd   : Integer;
-
     hh24 : Integer;
     mi   : Integer;
     ss   : Integer;
     tz   : String;
 
+    isoDate : String;
+    isoTime : String;
     epoch  : LongInt;
     julian : Double;
 
@@ -52,6 +51,15 @@ type
     destructor  done; virtual;
 
     procedure dtStr2Obj(dtString : String);
+
+    function getYYYYFromIso
+            : Integer;
+
+    function getMMFromIso
+            : Integer;
+
+    function getDDFromIso
+            : Integer;
 
     procedure calcEpoch;
 
@@ -71,6 +79,7 @@ type
             : Boolean;
 
   end;
+
 
   function date2Str(year, month, day : Word;
                     human : Boolean)
@@ -102,13 +111,12 @@ uses
 
   constructor TDateTime.init;
   begin
-    yyyy := 1970;
-    mm   := 1;
-    dd   := 1;
+    isoDate := '19700101';
 
     hh24 := 0;
     mi   := 0;
     ss   := 0;
+    isoTime := '000000';
     tz   := '';
 
     epoch  := 0;
@@ -118,7 +126,7 @@ uses
 
   destructor TDateTime.done;
   begin
-    
+
   end;
 
 
@@ -135,20 +143,7 @@ uses
 
     logger^.log(DEBUG, 'converting date-time  ' + dtString);
 
-    val ( COPY (dtString, 1, 4), yyyy, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of year at ', code, ' in ', dtString);
-
-    val ( COPY (dtString, 5, 2), mm, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of month at ', code, ' in ', dtString);
-
-    val ( COPY (dtString, 7, 2), dd, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of date at ', code, ' in ', dtString);
+    isoDate := SubStr(dtString, 1, 8);
 
     val ( COPY (dtString, 10, 2), hh24, code );
     if (code <> 0)
@@ -184,6 +179,60 @@ uses
 
 
 
+  function TDateTime.getYYYYFromIso
+          : Integer;
+  var
+    code  : Integer;
+    year4 : Integer;
+
+  begin
+    year4 := 1970;
+    val ( COPY (isoDate, 1, 4), year4, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
+
+    getYYYYFromIso := year4;
+
+  end;
+
+
+  function TDateTime.getMMFromIso
+          : Integer;
+  var
+    code   : Integer;
+    month2 : Integer;
+
+  begin
+    month2 := 1;
+    val ( COPY (isoDate, 5, 2), month2, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of month at ', code, ' in ', isoDate);
+
+    getMMFromIso := month2;
+
+  end;
+
+
+  function TDateTime.getDDFromIso
+          : Integer;
+  var
+    code   : Integer;
+    day2   : Integer;
+
+  begin
+    day2 := 1;
+    val ( COPY (isoDate, 7, 2), day2, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate);
+
+    getDDFromIso := day2;
+
+  end;
+
+
   procedure TDateTime.calcEpoch;
   const
     epochJD = 2440587.50;  (*  1970/01/01 00:00:00 *)
@@ -203,33 +252,6 @@ uses
 
     epoch := epoch + ss;
 
-    (**
-    calc := yyyy;
-    epoch := (calc - 1970)    * 31556926;
-    epoch := epoch;
-    writeln (yyyy, ' : ', epoch);
-
-    calc := mm;
-    epoch := epoch + (calc - 1) * 2629743;
-    writeln (calc-1:2, ' : ', epoch);
-
-    calc := dd;
-    epoch := epoch + (calc - 1) * 86400;
-    writeln (calc-1:2, ' : ', epoch);
-
-    calc := hh24;
-    epoch := epoch + (calc    ) * hourSec;
-    writeln (calc:2, ' : ', epoch);
-
-    calc := mi;
-    epoch := epoch + (calc    ) * 60;
-    writeln (calc:2, ' : ', epoch);
-
-    calc := ss;
-    epoch := epoch + (calc    ); 
-    writeln (calc:2, ' : ', epoch);
-    **)
-
   end;
 
 
@@ -238,9 +260,13 @@ uses
   var
     y, m, d  : double;
 
+    lyyyy,
+    lmm,
+    ldd      : integer;
+
     part1,
     part2,
-    part3, 
+    part3,
     part4    : double;
 
     logger   : PLogger;
@@ -249,26 +275,15 @@ uses
     new(logger);
     logger^.init;
     logger^.level := INFO;
+    
+    lyyyy := getYYYYFromIso;
+    lmm   := getMMFromIso;
+    ldd   := getDDFromIso;
 
-    (* this didn't work.
-    y := yyyy;
-    m := mm;
-    d := dd;
-
-    julian := 1721028.5367 + d + 367*y -7*(y+(m+9)/12) /4-3*((y+(m-9)/7)/100+1)/4 + 275*m/9;
-    writeln(julian:20:10);
-    *)
-
-    (*
-    JDN  = (1461 * (Y + 4800 + (M - 14)/12))/4 +(367 * (M - 2 - 12 * ((M - 14)/12)))/12 - (3 * ((Y + 4900 + (M - 14)/12)/100))/4 + D - 32075 
-
-    julian := (1461 * (vy + 4800 + (vm - 14) / 12)) / 4 + (367 * (vm - 2 - 12 * ((vm - 14) / 12))) / 12 - (3 * ((vy + 4900 + (vm - 14) / 12) / 100)) / 4 + vd - 32075;
-    *)
-
-    part1 := (1461 * (yyyy + 4800 + trunc((mm - 14) / 12) )) div 4;
-    part2 := (367 * (mm - 2 - 12 * ((mm - 14) div 12))) div 12 ;
-    part3 := (3 * ((yyyy + 4900 + (mm - 14) div 12) div 100)) div 4 ;
-    part4 := dd - 32075 ;
+    part1 := (1461 * (lyyyy + 4800 + trunc((lmm - 14) / 12) )) div 4;
+    part2 := (367 * (lmm - 2 - 12 * ((lmm - 14) div 12))) div 12 ;
+    part3 := (3 * ((lyyyy + 4900 + (lmm - 14) div 12) div 100)) div 4 ;
+    part4 := ldd - 32075 ;
 
     (*
     writeln('part1 : ', part1:20:10);
@@ -294,8 +309,10 @@ uses
   procedure TDateTime.dayOfWeek;
   var
     t : array [0..11] of Integer;
-    y : Integer;
-    d : Real;
+    lyyyy,
+    lmm,
+    ldd    : Integer;
+    d      : Real;
 
   begin
     t[0] := 0;
@@ -314,13 +331,15 @@ uses
     t[10] := 2;
     t[11] := 4;
 
-    y := yyyy;
+    lyyyy := getYYYYFromIso;
+    lmm   := getMMFromIso; 
+    ldd   := getDDFromIso;
 
-    if (mm < 3)
+    if (lmm < 3)
     then
-      y := y - 1;
+      lyyyy := lyyyy - 1;
 
-    d :=  ( y + y div 4 - y div 100 + y div 400 + trunc(t[mm-1]) + trunc(dd) ) ;
+    d :=  ( lyyyy + lyyyy div 4 - lyyyy div 100 + lyyyy div 400 + trunc(t[lmm-1]) + trunc(ldd) ) ;
     d := d - 7 * (int(d/7) );
 
     day := trunc(d);
@@ -335,13 +354,8 @@ uses
 
   procedure TDateTime.writeDT;
   begin
-    writeln( yyyy,                        '.',
-             lpad(IntToStr(mm),  2, '0'), '.',
-             lpad(IntToStr(dd),  2, '0'), ' ',
-             lpad(IntToStr(hh24),2, '0'), ':',
-             lpad(IntToStr(mi),  2, '0'), ':',
-             lpad(IntToStr(ss),  2, '0'), ' ',
-             tz
+    writeln(isoDate, ' ',
+            tz
            );
   end;
 
@@ -353,7 +367,7 @@ uses
     thisTime    : String;
 
   begin
-    thisDate := date2Str(yyyy, mm, dd, true);
+    thisDate := isoDate;
     thistime := time2Str(hh24, mi, ss, true);
 
     humanDateTime := concat(thisDate, thisTime);
@@ -502,9 +516,9 @@ uses
           :Integer;
   (* Purpose : Calculate date of end of month *)
   begin
-    daysInMonth := daysMon[myDate^.mm];
+    daysInMonth := daysMon[myDate^.getMMFromIso];
 
-    if (myDate^.mm = 2) and (isLeapDay(myDate^.yyyy))
+    if (myDate^.getMMFromIso = 2) and (isLeapDay(myDate^.getYYYYFromIso))
     then
       daysInMonth := 29;
   end;
@@ -530,9 +544,9 @@ uses
     else
       isAllDay := false;
 
-    if     (yyyy = 1970)
-       and (mm   = 1)
-       and (dd   = 1)
+    if     (getYYYYFromIso = 1970)
+       and (getMMFromIso   = 1)
+       and (getDDFromIso   = 1)
     then
     begin
       isAllDay := true;
