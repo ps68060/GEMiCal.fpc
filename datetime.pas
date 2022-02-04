@@ -35,17 +35,14 @@ const
 type
   PDateTime = ^TDateTime;
   TDateTime = object(TObject)
-    hh24 : Integer;
-    mi   : Integer;
-    ss   : Integer;
-    tz   : String;
+    tz      : String;
 
     isoDate : String;
     isoTime : String;
-    epoch  : LongInt;
-    julian : Double;
+    epoch   : LongInt;
+    julian  : Double;
 
-    day    : Integer;
+    day     : Integer;
 
     constructor init;
     destructor  done; virtual;
@@ -61,14 +58,21 @@ type
     function getDDFromIso
             : Integer;
 
+    function getHrFromIso
+            : Integer;
+
+    function getMinFromIso
+            : Integer;
+            
+    function getSecFromIso
+            : Integer;
+
     procedure calcEpoch;
 
     function julianDate
             : Double;
 
     procedure dayOfWeek;
-
-    procedure epoch2Date;
 
     procedure writeDT;
 
@@ -113,9 +117,6 @@ uses
   begin
     isoDate := '19700101';
 
-    hh24 := 0;
-    mi   := 0;
-    ss   := 0;
     isoTime := '000000';
     tz   := '';
 
@@ -144,7 +145,8 @@ uses
     logger^.log(DEBUG, 'converting date-time  ' + dtString);
 
     isoDate := SubStr(dtString, 1, 8);
-
+    isoTime := COPY(dtString, 10, 6);
+(*
     val ( COPY (dtString, 10, 2), hh24, code );
     if (code <> 0)
     then
@@ -159,12 +161,13 @@ uses
     if (code <> 0)
     then
       writeln ('Integer conversion error of ss at ', code, ' in ', dtString);
-
+*)
     if (length(dtString) >= 16 )
     then
       tz := COPY (dtString, 16, length(dtString) );
 
-    (*writeln (yyyy, mm, dd, ' ', hh24, mi, ss); *)
+    logger^.log(DEBUG, 'dtStr2Obj date ' + isoDate);
+  (*  logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);*)
 
     date2 := julianDate;
     (*writeln('JDN      ', date2:12:2 ); *)
@@ -233,6 +236,61 @@ uses
   end;
 
 
+  function TDateTime.getHrFromIso
+          : Integer;
+  var
+    code   : Integer;
+    hr2    : Integer;
+
+  begin
+    hr2 := 0;
+    val ( COPY (isoTime, 1, 2), hr2, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of hour at ', code, ' in ', isoTime);
+
+    getHrFromIso := hr2;
+
+  end;
+
+
+  function TDateTime.getMinFromIso
+          : Integer;
+  var
+    code   : Integer;
+    min2   : Integer;
+
+  begin
+    min2 := 0;
+    val ( COPY (isoTime, 3, 2), min2, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of mi at ', code, ' in ', isoTime);
+
+    getMinFromIso := min2;
+
+  end;
+
+
+  function TDateTime.getSecFromIso
+          : Integer;
+  var
+    code   : Integer;
+    sec2   : Integer;
+
+  begin
+    sec2 := 0;
+    val ( COPY (isoTime, 5, 2), sec2, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of ss at ', code, ' in ', isoTime);
+
+    getSecFromIso := sec2;
+
+  end;
+
+
+
   procedure TDateTime.calcEpoch;
   const
     epochJD = 2440587.50;  (*  1970/01/01 00:00:00 *)
@@ -246,11 +304,11 @@ uses
 
     epoch := trunc( julianDate - epochJD ) * daySec;
 
-    epoch := epoch + trunc(hh24) * hourSec;
+    epoch := epoch + trunc(getHrFromIso) * hourSec;
 
-    epoch := epoch + mi   * 60;
+    epoch := epoch + getMinFromIso   * 60;
 
-    epoch := epoch + ss;
+    epoch := epoch + getSecFromIso;
 
   end;
 
@@ -295,7 +353,7 @@ uses
     julian := part1 + part2 - part3 + part4;
 
     (* Julian day is based on midday so if the hour is less than 12 it is the previous day. *)
-    if (hh24 < 12)
+    if (getHrFromIso < 12)
     then
       julian := julian - 0.5;
 
@@ -346,15 +404,10 @@ uses
   end;
 
 
-  procedure TDateTime.epoch2Date;
-  begin
-    writeln;
-  end;
-
-
   procedure TDateTime.writeDT;
   begin
     writeln(isoDate, ' ',
+            isoTime,
             tz
            );
   end;
@@ -364,13 +417,14 @@ uses
           : String;
   var
     thisDate,
-    thisTime    : String;
+    thisTime : String;
 
   begin
-    thisDate := isoDate;
-    thistime := time2Str(hh24, mi, ss, true);
+    thisDate := date2Str(getYYYYFromIso, getMMFromIso,  getDDFromIso,  true);
+    thistime := time2Str(getHrFromIso,   getMinFromIso, getSecFromIso, true);
 
     humanDateTime := concat(thisDate, thisTime);
+
   end;
 
 
@@ -536,9 +590,9 @@ uses
     logger^.init;
     logger^.level := INFO;
 
-    if     (hh24 = 0)
-       and (mi   = 0)
-       and (ss   = 0)
+    if     (getHrFromIso  = 0)
+       and (getMinFromIso = 0)
+       and (getSecFromIso = 0)
     then
       isAllDay := true
     else
