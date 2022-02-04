@@ -149,7 +149,6 @@ implementation
     dec (entries);
 
     logger^.logInt (DEBUG, 'Entries Read = ', entries +1);
-    writeln;
 
     dispose (logger);
   end;
