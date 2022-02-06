@@ -55,13 +55,13 @@ implementation
 
   const
     endEventTk   = 'END:VEVENT';
-    createdTk    = 'CREATED:';
+    createdTk    = 'CREATED';
     dtStartTk    = 'DTSTART';
     dtEndTk      = 'DTEND';
     SummaryTk    = 'SUMMARY';
-    descrTk      = 'DESCRIPTION:';
-    locationTk   = 'LOCATION:';
-    recurRuleTk  = 'RRULE:';
+    descrTk      = 'DESCRIPTION';
+    locationTk   = 'LOCATION';
+    recurRuleTk  = 'RRULE';
 
     beginAlarmTk  = 'BEGIN:VALARM';
     endAlarmTk    = 'END:VALARM';
@@ -148,47 +148,47 @@ implementation
         tokens^.init;
         tokens^.tokeniseIcal(currentLn);
 
-        if ( pos(createdTk, currentLn) = 1 )
+        if ( pos(createdTk, tokens^.part[0]) = 1 )
         then
           created := tokens^.part[2];
 
-        if ( pos(dtStartTk, currentLn) = 1 )
+        if ( pos(dtStartTk, tokens^.part[0]) = 1 )
         then
         begin
           dtStart   := tokens^.part[2];
           dtStartTz := tokens^.part[1];
         end;
 
-        if ( pos(dtEndTk, currentLn) = 1 )
+        if ( pos(dtEndTk, tokens^.part[0]) = 1 )
         then
         begin
           dtEnd   := tokens^.part[2];
           dtEndTz := tokens^.part[1];
         end;
 
-        if ( pos(SummaryTk, currentLn) = 1 )
+        if ( pos(SummaryTk, tokens^.part[0]) = 1 )
            and (NOT alarm)
         then
           summary := tokens^.part[2];
 
-        if ( pos(descrTk, currentLn) = 1 )
+        if ( pos(descrTk, tokens^.part[0]) = 1 )
            and (NOT alarm)
         then
           description := tokens^.part[2];
 
-        if ( pos(locationTk, currentLn) = 1 )
+        if ( pos(locationTk, tokens^.part[0]) = 1 )
            and (NOT alarm)
         then
           location := tokens^.part[2];
 
         if (NOT alarm)
-            and (pos(beginAlarmTk, currentLn) = 1 )
+            and (pos(beginAlarmTk, tokens^.part[0]) = 1 )
         then
         begin
           alarm := GetAlarm(calFile);
         end;
 
-        if (pos(endAlarmTk, currentLn) = 1 )
+        if (pos(endAlarmTk, tokens^.part[0]) = 1 )
         then
           alarm := FALSE;
 
