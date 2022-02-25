@@ -5,6 +5,7 @@ interface
 uses
   OWindows,
 
+  DlgAbout,
   DlgConv,
   Cal,
   WinCal;
@@ -56,7 +57,6 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
-                     convMenu   : PConvMenu;
                      iCal       : PCal;
                      winCal     : PWinCal;
 
@@ -76,15 +76,11 @@ var
 implementation
 
   uses
-
     Dos,
-    Gem,
-    Cal,
+    gem,
     DateTime,
     CellGrid,
 
-    DlgAbout,
-    DlgConv,
     Logger;
 
 
@@ -96,7 +92,7 @@ var
   myPath        : String;
 
   directory     : String;
-  logger        : PLogger;
+  logg          : PLogger;
 
 
   destructor TMyApplication.done;
@@ -106,11 +102,22 @@ var
 
 
 procedure TMyApplication.INITInstance;
+var
+  appDeskMenu    : PDeskMenu;
+  appLoadMenu    : PLoadMenu;
+  appDialogMenu  : PDialogMenu;
+  appCalMenu     : PCalMenu;
+  appNavPrevMon  : PNavPrevMon;
+  appNavNextMon  : PNavNextMon;
+
+  appNavPrevYear : PNavPrevYear;
+  appNavNextYear : PNavNextYear;
+                     
 begin
 
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
+  new(logg);
+  logg^.init;
+  logg^.level := INFO;
 
   (* Get current path *)
   GetDir (0, directory);
@@ -120,19 +127,20 @@ begin
   (* Load and set-up the menu *)
   LoadMenu (TREE000);
 
-  new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
+  appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
 
   (* File Menu *)
-  new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
-  new (convMenu,   Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
-  new (PCalMenu,   Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
+  apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
+
+  appDialogMenu := new (PDialogMenu, Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
+  appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
 
   (* Navigation menu *)
-  new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
-  new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
+  appNavPrevMon := new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
+  appNavNextMon := new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
 
-  new (PNavPrevYear,  Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
-  new (PNavNextYear,  Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
+  appNavPrevYear := new (PNavPrevYear,  Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
+  appNavNextYear := new (PNavNextYear,  Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
@@ -151,9 +159,9 @@ var
   dtStr     : String;
 
 begin
-  logger^.level := INFO;
+  logg^.level := INFO;
 
-  logger^.log(DEBUG, 'INIT Main Window');
+  logg^.log(DEBUG, 'INIT Main Window');
 
   if MyApplication.winCal = NIL
   then
@@ -180,7 +188,7 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  dispose(logger);
+  dispose(logg);
 
 end;
 
@@ -196,7 +204,7 @@ var
   dtStr     : String;
 
 begin
-  logger^.log(DEBUG, 'Load Menu Work');
+  logg^.log(DEBUG, 'Load Menu Work');
 
   if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
   then
@@ -226,7 +234,7 @@ begin
     MyApplication.WinCal^.ForceRedraw;
 
     ArrowMouse;
-    logger^.log(DEBUG, 'Loaded');
+    logg^.log(DEBUG, 'Loaded');
   end;
 
 end;
@@ -234,7 +242,7 @@ end;
 
 procedure TCalMenu.Work;
 begin
-  logger^.log(DEBUG, 'CalMenu Work');
+  logg^.log(DEBUG, 'CalMenu Work');
 
   if aDialog <> NIL
   then
@@ -263,7 +271,7 @@ var
   dtStr       : String;
 
 begin
-  logger^.log(DEBUG, 'Prev Month Work');
+  logg^.log(DEBUG, 'Prev Month Work');
 
   month := displayDate^.getMMFromIso;
   year  := displayDate^.getYYYYFromIso;
@@ -294,7 +302,7 @@ var
   dtStr       : String;
 
 begin
-  logger^.log(DEBUG, 'Next Month Work');
+  logg^.log(DEBUG, 'Next Month Work');
 
   month := displayDate^.getMMFromIso;
   year  := displayDate^.getYYYYFromIso;
@@ -324,7 +332,7 @@ var
   dtStr       : String;
 
 begin
-  logger^.log(DEBUG, 'Prev Year Work');
+  logg^.log(DEBUG, 'Prev Year Work');
 
   year  := displayDate^.getYYYYFromIso;
 
@@ -346,7 +354,7 @@ var
   dtStr       : String;
 
 begin
-  logger^.log(DEBUG, 'Next Year Work');
+  logg^.log(DEBUG, 'Next Year Work');
 
   year  := displayDate^.getYYYYFromIso;
 
@@ -368,12 +376,12 @@ begin
   new(myApplication.iCal);
   myApplication.iCal^.init;
 
-  logger^.log(DEBUG, 'Load ICS files from ' + directory);
+  logg^.log(DEBUG, 'Load ICS files from ' + directory);
 
   (* Load iCal events *)
   myApplication.iCal^.loadICS(directory);
 
-  logger^.logInt(DEBUG, 'loaded ', myApplication.iCal^.entries );
+  logg^.logInt(DEBUG, 'loaded ', myApplication.iCal^.entries );
 
 end;
 
@@ -381,7 +389,7 @@ end;
 procedure FilterCal(dtStr : String);
 
 begin
-  logger^.log(DEBUG, 'FilterCal ' );
+  logg^.log(DEBUG, 'FilterCal ' );
 
   if (displayDate <> NIL)
   then
@@ -391,7 +399,7 @@ begin
   displayDate^.init;
   displayDate^.dtStr2Obj(dtStr);
 
-  logger^.log(DEBUG, 'Filter ' + dtStr );
+  logg^.log(DEBUG, 'Filter ' + dtStr );
 
   if (cellGr <> NIL)
   then
@@ -401,7 +409,7 @@ begin
   cellGr^.init;
   cellGr^.FilterEvents(myApplication.iCal,
                        displayDate);
-  logger^.log(DEBUG, 'Cal displayed');
+  logg^.log(DEBUG, 'Cal displayed');
 
 end;
 

@@ -14,26 +14,26 @@ const
   dAppName = 'GEMiCal';
 
 type
-  PConvMenu  = ^TConvMenu;
+  PDialogMenu  = ^TDialogMenu;
 
-  (* Menu2 > Convert Dialogue *)
-  TConvMenu  =  OBJECT(TKeyMenu)
-                  o_Button_A,
-                  o_Button_B,
-                  o_Button_C,
-                  o_Button_D,
-                  o_Exit        : PButton;
-                  o_Box         : PGroupBox;
-                  procedure Work; VIRTUAL;
-                end;
+  (* Menu2 > Dialogue Dialogue *)
+  TDialogMenu  =  OBJECT(TKeyMenu)
+                    o_Button_A,
+                    o_Button_B,
+                    o_Button_C,
+                    o_Button_D,
+                    o_Exit        : PButton;
+                    o_Box         : PGroupBox;
+                    procedure Work; VIRTUAL;
+                  end;
 
 
-  PConvDial  = ^TConvDial; 
-  TConvDial  =  OBJECT(TDialog)
+  PDialogDial  = ^TDialogDial; 
+  TDialogDial  =  OBJECT(TDialog)
                     function ExitDlg (anIndx: Integer): Boolean; VIRTUAL;
                     function OK                       : Boolean; VIRTUAL;
                     function GetIconTitle: String;               VIRTUAL;
-                end;
+                  end;
 
 
 implementation
@@ -45,7 +45,7 @@ var
                end;
 
 
-procedure TConvMenu.Work;
+procedure TDialogMenu.Work;
 
 (* Purpose Create and render the Calendar Dialogue. *)
 
@@ -55,7 +55,7 @@ begin
   if aDialog = NIL
   then
   begin
-    aDialog := new (PConvDial, INIT (NIL, dAppName, TREE002));
+    aDialog := new (PDialogDial, INIT (NIL, dAppName, TREE002));
 
     new (o_Exit,     INIT (aDialog, B_EXIT,       id_NO, TRUE,       (* id_NO calls the .ExitDlg function *)
                            'Close the dialog'));
@@ -87,7 +87,7 @@ begin
 end;
 
 
-function TConvDial.OK: Boolean;
+function TDialogDial.OK: Boolean;
 
 (* Purpose : If any OK button is pressed then this routine is called *)
 
@@ -110,8 +110,6 @@ begin
 
     (* Convert from Latitude/Longitude to Grid reference *)
 
-    WRITELN ('Lat & Long to Grid Reference');
-
     Latitude  := Buffer.Latitude;
     Longitude := Buffer.Longitude;
 
@@ -127,7 +125,7 @@ begin
 end;  
 
 
-function TConvDial.ExitDlg (AnIndx:Integer): Boolean;
+function TDialogDial.ExitDlg (AnIndx:Integer): Boolean;
 
 (* Purpose : If any EXIT button is pressed this routine is called *)
 
@@ -154,7 +152,7 @@ begin
   end;
 end;  
 
-function TConvDial.GetIconTitle : String;
+function TDialogDial.GetIconTitle : String;
 begin
   GetIconTitle := 'Button';
 end;
