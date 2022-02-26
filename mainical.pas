@@ -178,8 +178,13 @@ begin
     displayDate^.dtStr2Obj(dtStr);
 
     LoadCal;
-    MyApplication.iCal^.sort;
-    FilterCal(dtStr);
+
+    if (myApplication.iCal^.entries > 0)
+    then
+    begin
+      MyApplication.iCal^.sort;
+      FilterCal(dtStr);
+    end;
 
   end;
 
@@ -381,8 +386,6 @@ begin
 
   (* Load iCal events *)
   myApplication.iCal^.loadICS(directory);
-
-  logg^.logInt(DEBUG, 'loaded ', myApplication.iCal^.entries );
 
 end;
 

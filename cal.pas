@@ -74,7 +74,7 @@ implementation
   begin
     new (logg);
     logg^.init;
-    logg^.level := DEBUG;
+    logg^.level := INFO;
 
     findFirst(directory + '/*.ics', attr, fileRec);
 
@@ -92,6 +92,9 @@ implementation
   
     dec (entries);
     dispose (logg);
+
+    logg^.logInt(DEBUG, 'loaded ', entries );
+
   end;
 
 
