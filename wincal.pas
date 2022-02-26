@@ -3,6 +3,8 @@ unit WinCal;
 interface
 
   uses
+    vdi,
+    aes,
     OTypes,
     OWindows,
 
@@ -57,7 +59,7 @@ type
                  END;
 
 var
-  config          : PConfig;
+  conf            : PConfig;
 
   displayDate     : PDateTime;  (* 1st of the month *)
 
@@ -225,8 +227,8 @@ begin
   logger^.init;
   logger^.level := INFO;
 
-  new (config);
-  config^.init;
+  new (conf);
+  conf^.init;
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
@@ -244,7 +246,7 @@ begin
   todayDate^.init;
   todayDate^.dtStr2Obj(dtStr);
 
-  sunRiseSet(config^.lat, config^.lng, config^.UTCoffset
+  sunRiseSet(conf^.lat, conf^.lng, conf^.UTCoffset
             ,todayDate,  sunrise, sunset);
   dispose(todayDate);
   logger^.log(DEBUG, 'sunrise ' + sunrise);

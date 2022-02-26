@@ -38,7 +38,7 @@ implementation
     Logger;
 
   var
-    logger : PLogger;
+    logg : PLogger;
 
   constructor TCal.init;
   var
@@ -72,16 +72,16 @@ implementation
     calName : String;
 
   begin
-    new (logger);
-    logger^.init;
-    logger^.level := INFO;
+    new (logg);
+    logg^.init;
+    logg^.level := INFO;
 
     findFirst(directory + '/*.ics', attr, fileRec);
 
     while DosError = 0
     do
     begin
-      logger^.log (DEBUG, 'Loading ' + fileRec.name);
+      logg^.log (DEBUG, 'Loading ' + fileRec.name);
       calName := directory + '/' +  fileRec.name;
 
       DivideIcs (calName);
@@ -91,7 +91,7 @@ implementation
     end;
   
     dec (entries);
-    dispose (logger);
+    dispose (logg);
   end;
 
 
@@ -104,7 +104,7 @@ implementation
    *)
 
   var
-    logger   : PLogger;
+    logg   : PLogger;
     calFile  : Text;
 
     checkStart  : String;
@@ -113,9 +113,9 @@ implementation
     i           : Integer;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    new(logg);
+    logg^.init;
+    logg^.level := INFO;
 
     checkStart := 'BEGIN:VEVENT';
 
@@ -123,14 +123,14 @@ implementation
     assign (calFile, calName);
     reset  (calFile);
 
-    logger^.log (DEBUG, 'Reading from ' + calName);
+    logg^.log (DEBUG, 'Reading from ' + calName);
 
     while ( NOT eof(calFile) ) 
     do
     begin
 
       readln ( calFile, currentLn );
-      logger^.log (DEBUG, currentLn);
+      logg^.log (DEBUG, currentLn);
 
       if ( pos (checkStart, currentLn) = 1 )
       then
@@ -148,9 +148,9 @@ implementation
 
     dec (entries);
 
-    logger^.logInt (DEBUG, 'Entries Read = ', entries +1);
+    logg^.logInt (DEBUG, 'Entries Read = ', entries +1);
 
-    dispose (logger);
+    dispose (logg);
   end;
 
 
@@ -160,11 +160,11 @@ implementation
     swapper : PEvent;
 
   begin
-    new (logger);
-    logger^.init;
-    logger^.level := INFO;
+    new (logg);
+    logg^.init;
+    logg^.level := INFO;
 
-    logger^.logInt (DEBUG, 'Starting sort of ', entries);
+    logg^.logInt (DEBUG, 'Starting sort of ', entries);
 
     for i := 0 to entries - 1
     do
@@ -201,8 +201,8 @@ implementation
       end;
     end;
 
-    logger^.log(DEBUG, 'Sorted');
-    dispose (logger);
+    logg^.log(DEBUG, 'Sorted');
+    dispose (logg);
 
   end;
 

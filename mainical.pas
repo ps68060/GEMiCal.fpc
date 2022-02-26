@@ -78,6 +78,7 @@ implementation
   uses
     Dos,
     gem,
+    aes,
     DateTime,
     CellGrid,
 
