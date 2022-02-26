@@ -170,10 +170,6 @@ begin
 
     myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
-    LoadCal;
-
-    MyApplication.iCal^.sort;
-
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
@@ -181,6 +177,8 @@ begin
     displayDate^.init;
     displayDate^.dtStr2Obj(dtStr);
 
+    LoadCal;
+    MyApplication.iCal^.sort;
     FilterCal(dtStr);
 
   end;
@@ -222,15 +220,17 @@ begin
 
     directory := myPath;
 
-    LoadCal;
-
-    myApplication.iCal^.sort;
-
     GetDate (year, month, day, dayOfWeek) ;
-
     dtStr := date2str(year, month, 1, FALSE);
 
-    FilterCal(dtStr);
+    LoadCal;
+   
+    if (myApplication.iCal^.entries > 0)
+    then
+    begin
+      myApplication.iCal^.sort;
+      FilterCal(dtStr);
+    end;
 
     MyApplication.WinCal^.ForceRedraw;
 
