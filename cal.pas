@@ -74,7 +74,7 @@ implementation
   begin
     new (logg);
     logg^.init;
-    logg^.level := INFO;
+    logg^.level := DEBUG;
 
     findFirst(directory + '/*.ics', attr, fileRec);
 
