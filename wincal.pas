@@ -82,11 +82,6 @@ const
 
 
 var
-  leftPos,
-  topPos,
-  xSpace,
-  ySpace       : Integer;
-
   daysInMon    : Integer;
   endMonthDate : PDateTime;
 
@@ -99,8 +94,8 @@ procedure TWinCal.CalcPos(row,
 
 begin
 
-  x := leftPos + (col)  * xSpace;
-  y := topPos  + (row)  * ySpace;
+  x := Work.X  + (col)  * cellWidth;
+  y := Work.Y + headerHeight  + (row)  * cellHeight;
 
 end;
 
@@ -206,6 +201,10 @@ var
 
   pxArray     : Array [1..10] of Integer;
 
+  headerHeight,
+  cellHeight,
+  cellWidth   : Integer;
+
   wch,
   hch,
   wcell,
@@ -232,11 +231,6 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
-  leftPos    := 10;
-  topPos     := 80;
-  xSpace     := 14 * wCell; (*110;*)
-  ySpace     :=  6 * hCell;
-
   GetDate(year, month, day, dayOfWeek) ;
   GetTime(hour, minute, second, sec100);
 
@@ -256,12 +250,14 @@ begin
   new_Y := Scroller^.GetYOrg;
 
   (* Display date and time at top left *)
-  v_gtext(vdiHandle, new_x + Attr.charWidth,
-          new_y + Attr.boxHeight,
+  v_gtext(vdiHandle,
+          Work.X + Attr.charWidth,
+          Work.Y + (headerHeight div 3),
           date2Str(year, month, day, TRUE) );
 
-  v_gtext(vdiHandle, new_x + Attr.charWidth + Attr.charWidth * 13,
-          new_y + Attr.boxHeight,
+  v_gtext(vdiHandle,
+          Work.X + Work.W - (Attr.charWidth * 8),
+          Work.Y + (headerHeight div 3),
           time2Str(hour, minute, second, TRUE) );
 
   (* Display the year and month in larger text *)
@@ -270,17 +266,17 @@ begin
   DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
 
   (* Display Sunrise and sunset times at top right *)
-  v_gtext(vdiHandle, new_x + Attr.charWidth * 84,
-          new_y + Attr.boxHeight,
-          'Sunrise/set: '
-          + SubStr(sunrise, 1, 5) );
+  v_gtext(vdiHandle,
+          Work.X + Work.W - (10 * Attr.charWidth),
+          Work.Y + Attr.boxHeight,
+          'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
 
   v_gtext(vdiHandle, new_x + Attr.charWidth * 106,
           new_y + Attr.boxHeight,
           SubStr(sunset, 1, 5) );
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
-  DrawGrid(new_X, new_Y, 6, ySpace);
+  DrawGrid(Work.X, Work.Y + headerHeight, 6, cellHeight);
 
   WriteDates(new_X, new_Y);
 
@@ -317,7 +313,7 @@ function TWinCal.GetStyle
 (* set the Element of Windows *)
 
 begin
-  GetStyle := INHERITED GetStyle OR SLIDER;
+  GetStyle := INHERITED GetStyle or SLIDER or SIZER;
 end;
 
 
@@ -340,15 +336,16 @@ procedure TWinCal.SetupSize;
 
 begin
   INHERITED SetupSize;
-  with Work do
-    begin
-      X :=  10;        (* X,Y correspond to the coordinates of the working area *)
-      Y :=  60;        (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
-      W := WINWIDTH;   (* W:=113, smallest width of the working area *)
-      H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
-    end;
 
-  Calc(WC_BORDER,Work,Curr)
+  (* Work contains the window work area *)
+  with Work do
+  begin
+    headerHeight := H div 10;
+    cellHeight   := (H - headerHeight) div 6;
+    cellWidth    := w div 7;
+  end;
+
+  Calc(WC_BORDER, Work, Curr)
 end;
 
 
@@ -367,7 +364,7 @@ begin
   GetDate (year, month, day, dayOfWeek) ;
   str (day, dayStr);
 
-  v_gtext(vdiHandle, Work.X, Work.Y+(Work.h shr 1), ' ' + dayStr);
+  v_gtext(vdiHandle, Work.X, Work.Y + (Work.h shr 1), ' ' + dayStr);
 
 end;
 
@@ -397,8 +394,8 @@ begin
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
 
   v_gtext(vdiHandle,
-          newX + WINWIDTH div 2,
-          newY + 2 * Attr.boxHeight,
+          Work.X + (Work.W div 2,
+          Work.Y + (headerHeight div 2),
           title);
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
@@ -437,8 +434,8 @@ begin
   begin
     calcPos(0, i, x, y);
     v_gtext(vdiHandle,
-            newX + x + Attr.boxWidth,
-            newY + y + hCell,
+            x + Attr.boxWidth,
+            y + (cellHeight div 2),
             day1[i] );
   end;
 
@@ -450,50 +447,35 @@ procedure TWinCal.DrawGrid(newX,
                            rows,
                            height  : Integer);
 var
-  lineLength : Integer;
+  r, c : Integer;
+  x1, y1, x2, y2 : integer;  (* Declare in correct order for passing to v_pline *)
 
-  pxArray      : Array [1..10] of Integer;
-
-  i : Integer;
 
 begin
   (* Draw horizontal lines for weeks by changing y co-ords *)
 
-  lineLength := 7 * xSpace;
-
-  pxArray[1] := newX + leftPos;
-  pxArray[2] := newY + topPos;
-
-  pxArray[3] := newX + leftPos + lineLength;
-  pxArray[4] := newY + topPos;
-
-  for i := 1 to rows + 1
+  for r := 0 to rows
   do
   begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[2] := pxArray[2] + height;
-    pxArray[4] := pxArray[4] + height;
+    (* create a list of coords, declaration order above is the important bit *)
+    x1 := Work.X;
+    x2 := Work.X + Work.W;
+    y1 := Work.Y + headerHeight + r + cellHeight;
+    y2 := y1;  (* constant y for horizontal line *)
+    v_pline(vdiHandle, 2, @x1);  (* @x1 passes the list of coords *)
   end;
 
 
   (* Draw vertical lines for days by changing x co-ords *)
 
-  lineLength := topPos + rows * height;
-
-  pxArray[1] := newX + leftPos;
-  pxArray[2] := newY + topPos;
-
-  pxArray[3] := newX + leftPos;
-  pxArray[4] := newY + lineLength;
-
-  for i := 1 to 8
+  for i := 0 to 7
   do
   begin
-    v_pline(vdiHandle, 2, pxArray);
-
-    pxArray[1] := pxArray[1] + xSpace;
-    pxArray[3] := pxArray[3] + xSpace;
+    x1 := Work.X + c;
+    x2 := x1;  (* constant x for vertical line *)
+    y1 := Work.Y + headerHeight;
+    y2 := Work.Y + headerHeight + rows * cellHeight;
+    v_pline(vdiHandle, 2, @x1);  (* @x1 passes the list of coords *)
   end;
 
 
@@ -541,7 +523,7 @@ begin
   offset    := hCell + hcell div 2;
 
   vst_point(vdiHandle, 7, wch, hch, wCell, hCell);
-  lineSpace := (2 * hCell) div 3;
+  lineSpace := cellHeight div 3;
 
   for j := 1 to 31
   do
@@ -567,13 +549,13 @@ begin
       logger^.logInt(DEBUG, 'counter ', i);
 
       v_gtext(vdiHandle,
-              newX + x + Attr.boxWidth,
-              newY + y + offset + i*lineSpace + (i * 2) * hCell,
+              x + Attr.boxWidth,
+              y + (i * (cellHeight div 3),
               summ );
 
       v_gtext(vdiHandle,
-              newX + x + Attr.boxWidth,
-              newY + y + offset + i*lineSpace + (i * 2 + 1) * hCell,
+              x + Attr.boxWidth,
+              y + (i + 1) * lineSpace,
               timePlace );
     end;
 
