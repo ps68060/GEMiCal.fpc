@@ -36,13 +36,10 @@ type
                    procedure WriteDates(newX,
                                         newY   : LongInt);             VIRTUAL;
 
-                   procedure DrawTitle(newX,
-                                       newY   : LongInt;
-                                       year,
+                   procedure DrawTitle(year,
                                        month  : Word);
 
-                   procedure DrawHeading(newX,
-                                         newY   : LongInt);
+                   procedure DrawHeading;
 
                    procedure DisplayEvents(newX,
                                            newY    : LongInt);
@@ -52,9 +49,7 @@ type
                                      var x,
                                          y : Integer);
 
-                   procedure DrawGrid(newX,
-                                      newY : LongInt;
-                                      rows,
+                   procedure DrawGrid(rows,
                                       height  : Integer);
                  END;
 
@@ -261,9 +256,9 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   (* Display the year and month in larger text *)
-  DrawTitle(new_X, new_Y, displayDate^.getYYYYFromIso, displayDate^.getMMFromIso);
+  DrawTitle(displayDate^.getYYYYFromIso, displayDate^.getMMFromIso);
 
-  DrawHeading(new_X, new_Y - 2 * Attr.boxHeight);
+  DrawHeading;
 
   (* Display Sunrise and sunset times at top right *)
   v_gtext(vdiHandle,
@@ -276,7 +271,7 @@ begin
           SubStr(sunset, 1, 5) );
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
-  DrawGrid(Work.X, Work.Y + headerHeight, 6, cellHeight);
+  DrawGrid(6, cellHeight);
 
   WriteDates(new_X, new_Y);
 
@@ -294,8 +289,15 @@ procedure TWinCal.GetWindowClass(var AWndClass : TWndClass);
 
 begin
   INHERITED GetWindowClass(AWndClass);
-  AWndClass.Style   := cs_DblClks+cs_CreateOnAccOpen+cs_AutoOpen+cs_WorkBackground+cs_CancelOnClose;
+  AWndClass.Style   := cs_DblClks
+                     + cs_CreateOnAccOpen
+                     + cs_AutoOpen
+                     + cs_WorkBackground
+                     + cs_CancelOnClose;
+
   AWndClass.hCursor := IDC_HELP;
+  MinWidth  := 400;
+  MinHeight := 300;
 end;
 
 
@@ -369,9 +371,7 @@ begin
 end;
 
 
-procedure TWinCal.DrawTitle(newX,
-                            newY   : LongInt;
-                            year,
+procedure TWinCal.DrawTitle(year,
                             month  : Word);
 
 var
@@ -403,8 +403,7 @@ begin
 end;
 
 
-procedure TWinCal.DrawHeading(newX,
-                              newY   : LongInt);
+procedure TWinCal.DrawHeading;
 
 (* Draw the column headings *)
 var
@@ -426,13 +425,13 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
-  DrawGrid (newX, newY, 1, hCell * 2);
+  DrawGrid (1, hCell * 2);
 
   (* Write Day labels *)
   for i := 0 to 6
   do
   begin
-    calcPos(0, i, x, y);
+    CalcPos(0, i, x, y);
     v_gtext(vdiHandle,
             x + Attr.boxWidth,
             y + (cellHeight div 2),
@@ -442,9 +441,7 @@ begin
 end;
 
 
-procedure TWinCal.DrawGrid(newX,
-                           newY    : LongInt;
-                           rows,
+procedure TWinCal.DrawGrid(rows,
                            height  : Integer);
 var
   r, c : Integer;
@@ -528,8 +525,8 @@ begin
   for j := 1 to 31
   do
   begin
-    calcCell (displayDate^.day, j, row, col); 
-    calcPos(row, col, x, y);
+    CalcCell (displayDate^.day, j, row, col);
+    CalcPos(row, col, x, y);
 
     logger^.logInt (DEBUG, 'row ', row);
     logger^.logInt (DEBUG, 'col ', col);
