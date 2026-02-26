@@ -72,15 +72,12 @@ uses
 
 
   procedure TToken.TokeniseIcal (line : String);
-    var
-    logger       : PLogger;
+  var
+    log          : TLogger;
     posn         : Integer;
 
   begin
-    new(logger);
-    logger^.init;
-
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     (* Token before colon *)
     splitAt (':', line, part[0], part[2]);
@@ -88,33 +85,30 @@ uses
     (* Split part 0 at semi-colon *)
     splitAt (';', part[0], part[0], part[1]);
 
-    logger^.log(DEBUG, 'tag    = ' + part[0]);
-    logger^.log(DEBUG, 'qual   = ' + part[1]);
+    log.debug('tag    = ' + part[0]);
+    log.debug('qual   = ' + part[1]);
  
-    logger^.log (DEBUG, 'value = ' + part[2]);
+    log.debug ('value = ' + part[2]);
 
-    dispose(logger);
+    log.Free;
   end;
 
 
   procedure TToken.TokeniseInf (line : String);
   var
-    logger       : PLogger;
+    log          : TLogger;
     posn         : Integer;
 
   begin
-    new(logger);
-    logger^.init;
-
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     (* Token before equals *)
     splitAt ('=', line, part[0], part[1]);
 
-    logger^.log(DEBUG, 'key    = ' + part[0]);
-    logger^.log(DEBUG, 'value  = ' + part[1]);
+    log.debug('key    = ' + part[0]);
+    log.debug('value  = ' + part[1]);
  
-    dispose(logger);
+    log.Free;
   end;
 
 end.

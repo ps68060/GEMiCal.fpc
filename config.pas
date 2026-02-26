@@ -53,7 +53,7 @@ uses
 
   procedure TConfig.readConfig;
   var
-    logger       : PLogger;
+    log          : TLogger;
     cnfFile      : Text;
 
     currentLn    : String;
@@ -63,9 +63,7 @@ uses
     valReal      : Real;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     (* Open the config file for reading *)
     assign (cnfFile, 'GEMICAL.CNF');
@@ -99,7 +97,7 @@ uses
 
         if (abs(valReal) > 90.0)
         then
-          logger^.log(INFO, 'lat invalid, check gemical.cnf')
+          log.info('lat invalid, check gemical.cnf')
         else
           lat := valReal;
 
@@ -118,7 +116,7 @@ uses
 
         if (abs(valReal) > 180.0)
         then
-          logger^.log(INFO, 'long invalid, check gemical.cnf')
+          log.info('long invalid, check gemical.cnf')
         else
           lng := valReal;
 
@@ -136,7 +134,7 @@ uses
 
         if (abs(valReal) > 12.0)
         then
-          logger^.log(INFO, 'UTCoffset invalid, check gemical.cnf')
+          log.info('UTCoffset invalid, check gemical.cnf')
         else
           UTCoffset := valReal;
 
@@ -145,13 +143,13 @@ uses
       dispose (keyValue);
     end;  (* while *)
 
-    logger^.log(DEBUG, 'location = ' + name);
-    logger^.logReal(DEBUG,'lat = ', lat);
-    logger^.logReal(DEBUG,'lng = ', lng);
-    logger^.logReal(DEBUG,'UTC = ', UTCoffset);
+    log.debug('location = ' + name);
+    log.logReal(LLDEBUG,'lat = ', lat);
+    log.logReal(LLDEBUG,'lng = ', lng);
+    log.logReal(LLDEBUG,'UTC = ', UTCoffset);
 
     close(cnfFile);
-    dispose (logger);
+    log.Free;
 
   end;
 

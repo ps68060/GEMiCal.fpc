@@ -22,7 +22,12 @@ type
   PWinCal      = ^TWinCal;
 
   TWinCal     = OBJECT(TWindow)
+                private
+                    cellWidth,
+                    cellHeight,
+                    headerHeight : integer;
 
+                public
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : Integer;                VIRTUAL;
@@ -77,7 +82,9 @@ const
 
 
 var
-  daysInMon    : Integer;
+  leftPos,
+  topPos       : integer;
+  daysInMon    : integer;
   endMonthDate : PDateTime;
 
 
@@ -98,7 +105,7 @@ end;
 procedure TWinCal.WriteDates(newX,
                              newY   : LongInt);
 var
-  logger    : PLogger;
+  log          : TLogger;
 
   x,
   y            : Integer;
@@ -120,12 +127,10 @@ var
 
 begin
 
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
+  log := TLogger.Create(LLINFO);
 
-  logger^.logInt(DEBUG, 'year ', displayDate^.getYYYYFromIso );
-  logger^.log(DEBUG, mon1[displayDate^.getMMFromIso] );
+  log.logInt(LLDEBUG, 'year ', displayDate^.getYYYYFromIso );
+  log.debug (mon1[displayDate^.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek) ;
@@ -170,7 +175,7 @@ begin
               IntToStr(i) );
   end;
 
-  Dispose (logger, Done);
+  log.Free;
 end;
 
 
@@ -179,7 +184,7 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
 (* Purpose : called on every change *)
 
 var
-  logger    : PLogger;
+  log         : TLogger;
 
   year,
   month,
@@ -196,10 +201,10 @@ var
 
   pxArray     : Array [1..10] of Integer;
 
-  headerHeight,
+(*  headerHeight,
   cellHeight,
   cellWidth   : Integer;
-
+*)
   wch,
   hch,
   wcell,
@@ -217,9 +222,7 @@ var
 
 begin
 
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
+  log := TLogger.Create(LLINFO);
 
   new (conf);
   conf^.init;
@@ -238,8 +241,8 @@ begin
   sunRiseSet(conf^.lat, conf^.lng, conf^.UTCoffset
             ,todayDate,  sunrise, sunset);
   dispose(todayDate);
-  logger^.log(DEBUG, 'sunrise ' + sunrise);
-  logger^.log(DEBUG, 'sunset '  + sunset);
+  log.debug ('sunrise ' + sunrise);
+  log.debug ('sunset '  + sunset);
 
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
@@ -279,7 +282,7 @@ begin
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
-  dispose (logger);
+  log.Free;
 
 end;
 
@@ -296,8 +299,6 @@ begin
                      + cs_CancelOnClose;
 
   AWndClass.hCursor := IDC_HELP;
-  MinWidth  := 400;
-  MinHeight := 300;
 end;
 
 
@@ -342,6 +343,14 @@ begin
   (* Work contains the window work area *)
   with Work do
   begin
+    X := 10;         (* X,Y correspond to the coordinates of the working area *)
+    Y := 60;         (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
+    W := WINWIDTH;   (* W:=113, smallest width of the working area *)
+    H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
+
+    leftPos := Work.X;
+    topPos  := Work.Y + HeaderHeight;
+
     headerHeight := H div 10;
     cellHeight   := (H - headerHeight) div 6;
     cellWidth    := w div 7;
@@ -394,7 +403,7 @@ begin
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
 
   v_gtext(vdiHandle,
-          Work.X + (Work.W div 2,
+          Work.X + (Work.W div 2),
           Work.Y + (headerHeight div 2),
           title);
 
@@ -407,8 +416,7 @@ procedure TWinCal.DrawHeading;
 
 (* Draw the column headings *)
 var
-  lineLength,
-  cellHeight  : Integer;
+  lineLength  : Integer;
   pxArray     : Array [1..10] of Integer;
 
   x,
@@ -444,35 +452,59 @@ end;
 procedure TWinCal.DrawGrid(rows,
                            height  : Integer);
 var
-  r, c : Integer;
-  x1, y1, x2, y2 : integer;  (* Declare in correct order for passing to v_pline *)
+  log       : TLogger;
+  r, c      : Integer;
+  pxy       : array[0..3] of integer;  (* Declare in correct order for passing to v_pline *)
+  newX,
+  newY,
+  Y         : integer;
 
 
 begin
-  (* Draw horizontal lines for weeks by changing y co-ords *)
+  log := TLogger.Create(LLDEBUG);
 
+  newX := Scroller^.GetXOrg;
+  newY := Scroller^.GetYOrg;
+
+  Y := Work.Y + topPos;
+
+  (* Draw heading line *)
+  pxy[0] := Work.X + leftPos;
+  pxy[2] := Work.X + leftPos + (7 * cellWidth);  (* constant X for horizontal line *)
+
+  pxy[1] := y;
+  pxy[3] := pxy[1];
+
+  (* Draw horizontal lines for weeks by changing y co-ords *)
   for r := 0 to rows
   do
   begin
+    log.logInt (LLINFO, 'Y=', Y);
+    v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of coords *)
+
     (* create a list of coords, declaration order above is the important bit *)
-    x1 := Work.X;
-    x2 := Work.X + Work.W;
-    y1 := Work.Y + headerHeight + r + cellHeight;
-    y2 := y1;  (* constant y for horizontal line *)
-    v_pline(vdiHandle, 2, @x1);  (* @x1 passes the list of coords *)
+    pxy[1] := y;
+    pxy[3] := y;
+
+    if r=0 then
+      y := y + headerHeight
+    else
+      y := y + cellHeight;
+
   end;
 
 
   (* Draw vertical lines for days by changing x co-ords *)
+  pxy[1] := Work.Y + HeaderHeight;  (* constant X for vertical line *)
+  pxy[3] := Work.Y + headerHeight + rows * cellHeight;
 
-  for i := 0 to 7
+  for c := 0 to 7
   do
   begin
-    x1 := Work.X + c;
-    x2 := x1;  (* constant x for vertical line *)
-    y1 := Work.Y + headerHeight;
-    y2 := Work.Y + headerHeight + rows * cellHeight;
-    v_pline(vdiHandle, 2, @x1);  (* @x1 passes the list of coords *)
+    pxy[0] := Work.X + c * CellWidth;
+    pxy[2] := pxy[0];
+
+    v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of coords *)
   end;
 
 
@@ -485,7 +517,7 @@ procedure TWinCal.DisplayEvents(newX,
 (* Purpose : Display Events for a month  *)
 
 var
-  logger      : PLogger;
+ log         : TLogger;
 
   row,
   col,
@@ -510,11 +542,9 @@ var
 
 begin
 
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
+  log := TLogger.Create(LLINFO);
 
-  logger^.log (DEBUG, 'DisplayEvents');
+  log.debug ('DisplayEvents');
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
   offset    := hCell + hcell div 2;
@@ -528,8 +558,8 @@ begin
     CalcCell (displayDate^.day, j, row, col);
     CalcPos(row, col, x, y);
 
-    logger^.logInt (DEBUG, 'row ', row);
-    logger^.logInt (DEBUG, 'col ', col);
+    log.logInt (LLDEBUG, 'row ', row);
+    log.logInt (LLDEBUG, 'col ', col);
 
 
     for i := 0 to cellGr^.cell[j]^.counter - 1
@@ -542,12 +572,12 @@ begin
                                   ';',
                                   cellGr^.cell[j]^.cellEvents[i]^.location), 1, 16 );
 
-      logger^.log(DEBUG, 'Summary  ' + summ );
-      logger^.logInt(DEBUG, 'counter ', i);
+      log.debug('Summary  ' + summ );
+      log.logInt(LLDEBUG, 'counter ', i);
 
       v_gtext(vdiHandle,
               x + Attr.boxWidth,
-              y + (i * (cellHeight div 3),
+              y + (i * (cellHeight div 3)),
               summ );
 
       v_gtext(vdiHandle,
@@ -560,7 +590,7 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
 
-  Dispose(logger, Done);
+  log.Free;
 
 end;
 

@@ -37,9 +37,6 @@ implementation
     Dos,
     Logger;
 
-  var
-    logg : PLogger;
-
   constructor TCal.init;
   var
     i : Integer;
@@ -67,21 +64,20 @@ implementation
   *)
 
   var
+    log     : TLogger;
     attr    : Word;
     fileRec : SearchRec;
     calName : String;
 
   begin
-    new (logg);
-    logg^.init;
-    logg^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     findFirst(directory + '/*.ics', attr, fileRec);
 
     while DosError = 0
     do
     begin
-      logg^.log (DEBUG, 'Loading ' + fileRec.name);
+      log.debug ('Loading ' + fileRec.name);
       calName := directory + '/' +  fileRec.name;
 
       DivideIcs (calName);
@@ -91,9 +87,9 @@ implementation
     end;
   
     dec (entries);
-    dispose (logg);
 
-    logg^.logInt(DEBUG, 'loaded ', entries );
+    log.logInt(LLDEBUG, 'loaded ', entries );
+    log.Free;
 
   end;
 
@@ -107,7 +103,7 @@ implementation
    *)
 
   var
-    logg   : PLogger;
+    log      : TLogger;
     calFile  : Text;
 
     checkStart  : String;
@@ -116,9 +112,7 @@ implementation
     i           : Integer;
 
   begin
-    new(logg);
-    logg^.init;
-    logg^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     checkStart := 'BEGIN:VEVENT';
 
@@ -126,14 +120,14 @@ implementation
     assign (calFile, calName);
     reset  (calFile);
 
-    logg^.log (DEBUG, 'Reading from ' + calName);
+    log.debug ('Reading from ' + calName);
 
     while ( NOT eof(calFile) ) 
     do
     begin
 
       readln ( calFile, currentLn );
-      logg^.log (DEBUG, currentLn);
+      log.debug (currentLn);
 
       if ( pos (checkStart, currentLn) = 1 )
       then
@@ -151,23 +145,22 @@ implementation
 
     dec (entries);
 
-    logg^.logInt (DEBUG, 'Entries Read = ', entries +1);
+    log.logInt (LLDEBUG, 'Entries Read = ', entries +1);
 
-    dispose (logg);
+    log.Free;
   end;
 
 
   Procedure TCal.Sort;
   var
+    log     : TLogger;
     i, j    : Integer;
     swapper : PEvent;
 
   begin
-    new (logg);
-    logg^.init;
-    logg^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
-    logg^.logInt (DEBUG, 'Starting sort of ', entries);
+    log.logInt (LLDEBUG, 'Starting sort of ', entries);
 
     for i := 0 to entries - 1
     do
@@ -204,8 +197,9 @@ implementation
       end;
     end;
 
-    logg^.log(DEBUG, 'Sorted');
-    dispose (logg);
+    log.debug('Sorted');
+
+    log.Free;
 
   end;
 

@@ -1,7 +1,8 @@
 unit Event;
 
 (* AUTHOR  : P Slegg
-   DATE    : 16th May 2020 Version 0
+   DATE    : 2020-05-16    Version 0
+             2026-02-23    Version 1
    PURPOSE : TEvent object for iCal Events.
 *)
 
@@ -105,7 +106,7 @@ implementation
    *)
 
   var
-    logger       : PLogger;
+    log          : TLogger;
 
     convStr      : String;
 
@@ -117,10 +118,7 @@ implementation
     tokens       : PToken;
 
   begin
-    new(logger);
-    logger^.init;
-
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     endEvent     := FALSE;
     alarm        := FALSE;
@@ -131,7 +129,7 @@ implementation
     begin
 
       readln ( calFile, currentLn );
-      logger^.log (DEBUG, currentLn);
+      log.debug(currentLn);
 
       (* Look for End Event *)
       if ( pos(endEventTk, currentLn) = 1 )
@@ -216,7 +214,7 @@ implementation
       endDate^.dtStr2Obj(dtStart);
     end;
 
-    dispose(logger);
+    log.Free;
 
     GetEvent := TRUE;
     (*writeEvent;*)

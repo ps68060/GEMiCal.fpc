@@ -1,3 +1,5 @@
+{$mode objfpc}
+
 unit MainIcal;
 
 interface
@@ -8,7 +10,8 @@ uses
   DlgAbout,
   DlgConv,
   Cal,
-  WinCal;
+  WinCal,
+  Tos, aes, vdi;
 
 {$I gemical.i}
 
@@ -78,11 +81,9 @@ implementation
   uses
     Dos,
     gem,
-    aes,
+    Logger,
     DateTime,
-    CellGrid,
-
-    Logger;
+    CellGrid;
 
 
 (* ------------------------------------------------------------------------------- *)
@@ -93,8 +94,6 @@ var
   myPath        : String;
 
   directory     : String;
-  logg          : PLogger;
-
 
   destructor TMyApplication.done;
   begin
@@ -104,6 +103,8 @@ var
 
 procedure TMyApplication.INITInstance;
 var
+  log            : TLogger;
+
   appDeskMenu    : PDeskMenu;
   appLoadMenu    : PLoadMenu;
   appDialogMenu  : PDialogMenu;
@@ -116,9 +117,7 @@ var
                      
 begin
 
-  new(logg);
-  logg^.init;
-  logg^.level := INFO;
+  log := TLogger.Create(LLINFO);
 
   (* Get current path *)
   GetDir (0, directory);
@@ -145,6 +144,8 @@ begin
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
+  
+  log.Free;
 
 end;
 
@@ -152,6 +153,7 @@ end;
 procedure TMyApplication.INITMainWindow;
 
 var
+  log       : TLogger;
   year,
   month,
   day,
@@ -160,9 +162,9 @@ var
   dtStr     : String;
 
 begin
-  logg^.level := INFO;
+  log := TLogger.Create(LLDEBUG);
 
-  logg^.log(DEBUG, 'INIT Main Window');
+  log.info('INIT Main Window');
 
   if MyApplication.winCal = NIL
   then
@@ -192,7 +194,7 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  dispose(logg);
+  log.Free;
 
 end;
 
@@ -200,6 +202,7 @@ end;
 procedure TLoadMenu.Work;
 
 var
+  log       : TLogger;
   year,
   month,
   day,
@@ -208,7 +211,9 @@ var
   dtStr     : String;
 
 begin
-  logg^.log(DEBUG, 'Load Menu Work');
+  log := TLogger.Create(LLINFO);
+
+  log.info('Load Menu Work');
 
   if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
   then
@@ -240,15 +245,21 @@ begin
     MyApplication.WinCal^.ForceRedraw;
 
     ArrowMouse;
-    logg^.log(DEBUG, 'Loaded');
+    log.debug('Loaded');
   end;
+
+  log.Free;
 
 end;
 
 
 procedure TCalMenu.Work;
+var
+  log       : TLogger;
+
 begin
-  logg^.log(DEBUG, 'CalMenu Work');
+  log := TLogger.Create(LLINFO);
+  log.debug('CalMenu Work');
 
   if aDialog <> NIL
   then
@@ -266,18 +277,23 @@ begin
   then
     MyApplication.WinCal^.MakeWindow;
 
+  log.Free;
+
 end;
 
 
 procedure TNavPrevMon.Work;
 var
+  log        : TLogger;
   month,
   year        : Word;
 
   dtStr       : String;
 
 begin
-  logg^.log(DEBUG, 'Prev Month Work');
+  log := TLogger.Create(LLINFO);
+  log.debug('Prev Month Work');
+
 
   month := displayDate^.getMMFromIso;
   year  := displayDate^.getYYYYFromIso;
@@ -297,18 +313,22 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  log.Free;
+
 end;
 
 
 procedure TNavNextMon.Work;
 var
+  log        : TLogger;
   month,
   year        : Word;
 
   dtStr       : String;
 
 begin
-  logg^.log(DEBUG, 'Next Month Work');
+  log := TLogger.Create(LLINFO);
+  log.debug('Next Month Work');
 
   month := displayDate^.getMMFromIso;
   year  := displayDate^.getYYYYFromIso;
@@ -328,17 +348,21 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  log.Free;
+
 end;
 
 
 procedure TNavPrevYear.Work;
 var
-  year        : Word;
+  log       : TLogger;
+  year      : Word;
 
-  dtStr       : String;
+  dtStr     : String;
 
 begin
-  logg^.log(DEBUG, 'Prev Year Work');
+  log := TLogger.Create(LLINFO);
+  log.debug('Prev Year Work');
 
   year  := displayDate^.getYYYYFromIso;
 
@@ -350,17 +374,21 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  log.Free;
+
 end;
 
 
 procedure TNavNextYear.Work;
 var
+  log       : TLogger;
   year        : Word;
 
-  dtStr       : String;
+  dtStr     : String;
 
 begin
-  logg^.log(DEBUG, 'Next Year Work');
+  log := TLogger.Create(LLINFO);
+  log.debug('Next Year Work');
 
   year  := displayDate^.getYYYYFromIso;
 
@@ -372,28 +400,40 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
+  log.Free;
+
 end;
 
 
 procedure LoadCal;
+var
+  log       : TLogger;
 
 begin
+  log := TLogger.Create(LLINFO);
 
   new(myApplication.iCal);
   myApplication.iCal^.init;
 
-  logg^.log(DEBUG, 'Load ICS files from ' + directory);
+  log.debug('Load ICS files from ' + directory);
 
   (* Load iCal events *)
   myApplication.iCal^.loadICS(directory);
+  
+  log.logInt(LLDEBUG, 'loaded ', myApplication.iCal^.entries );
+
+  log.Free;
 
 end;
 
 
 procedure FilterCal(dtStr : String);
+var
+  log       : TLogger;
 
 begin
-  logg^.log(DEBUG, 'FilterCal ' );
+  log := TLogger.Create(LLINFO);
+  log.debug('FilterCal ' );
 
   if (displayDate <> NIL)
   then
@@ -403,7 +443,7 @@ begin
   displayDate^.init;
   displayDate^.dtStr2Obj(dtStr);
 
-  logg^.log(DEBUG, 'Filter ' + dtStr );
+  log.debug('Filter ' + dtStr );
 
   if (cellGr <> NIL)
   then
@@ -413,7 +453,9 @@ begin
   cellGr^.init;
   cellGr^.FilterEvents(myApplication.iCal,
                        displayDate);
-  logg^.log(DEBUG, 'Cal displayed');
+  log.debug('Cal displayed');
+  
+  log.Free;
 
 end;
 

@@ -75,7 +75,7 @@ SUNRISESET Compute apparent sunrise and sunset times in seconds.
  *)
 
 var
-    logger  : PLogger;
+  log     : TLogger;
 
   E, F,
   G, H : Double;
@@ -102,23 +102,21 @@ var
   ss_mm  : Word;
 
 begin
-  new(logger);
-  logger^.init;
-  logger^.level := INFO;
+  log := TLogger.Create(LLINFO);
 
-  logger^.logReal(DEBUG, 'lat = ', lat);
-  logger^.logReal(DEBUG, 'lng = ', lng);
-  logger^.logReal(DEBUG, 'UTC = ', UTCoff);
+  log.logReal(LLDEBUG, 'lat = ', lat);
+  log.logReal(LLDEBUG, 'lng = ', lng);
+  log.logReal(LLDEBUG, 'UTC = ', UTCoff);
 
   E := 0;
 
   F := date^.julianDate - UTCoff / 24;      (* Julian day *)
-  logger^.logReal(DEBUG, 'JD = ', date^.julianDate);
-  logger^.logReal(DEBUG, 'f = ', F);
+  log.logReal(LLDEBUG, 'JD = ', date^.julianDate);
+  log.logReal(LLDEBUG, 'f = ', F);
 
   G := (F - 2451545) / 36525;               (* Julian century *)
 
-  logger^.logReal(DEBUG, 'g = ', G);
+  log.logReal(LLDEBUG, 'g = ', G);
 
   I  := (280.46646 + G * (36000.76983 + G * 0.0003032));
   I1 := trunc(I / 360);
@@ -126,34 +124,34 @@ begin
 
   J := 357.52911  + G * (35999.05029 - 0.0001537 * G);           (* Sun mean ANOMOLY   *)
 
-  logger^.logReal(DEBUG, 'i = ', I);
-  logger^.logReal(DEBUG, 'j = ', J);
+  log.logReal(LLDEBUG, 'i = ', I);
+  log.logReal(LLDEBUG, 'j = ', J);
 
   K := 0.016708634   - G * (0.000042037 + 0.0000001267 * G);     (* Earth orbit eccentricity *)
 
-  logger^.logReal(DEBUG, 'k = ', K); 
+  log.logReal(LLDEBUG, 'k = ', K);
 
   L := sind(J)     * (1.914602 - G * (0.004817 + 0.000014 * G))
        + sind(2*J) * (0.019993 - 0.000101 * G)
        + sind(3*J) * 0.000289;                                   (* Sun EQ of Centre *)
 
-  logger^.logReal(DEBUG, 'l = ', L);
+  log.logReal(LLDEBUG, 'l = ', L);
 
   M := I + L;  (* Sun True Longitude *)
 
-  logger^.logReal(DEBUG, 'm = ', M);
+  log.logReal(LLDEBUG, 'm = ', M);
 
   P := M - 0.00569 - 0.00478 * sind(125.04 - 1934.136 * G);      (* Sun apparent Longitude *)
-  logger^.logReal(DEBUG, 'p = ', P);
+  log.logReal(LLDEBUG, 'p = ', P);
 
   Q := 23 + (26 + ((21.448 - G * (46.815 + G * (0.00059 - G * 0.001813)))) /60) /60;  (* Mean Oblique Ecliptic *)
-  logger^.logReal(DEBUG, 'q = ', Q);
+  log.logReal(LLDEBUG, 'q = ', Q);
 
   R := Q + 0.00256 * cosd(125.04 - 1934.136 * G);  (* Oblique Correction *)
-  logger^.logReal(DEBUG, 'r = ', R);
+  log.logReal(LLDEBUG, 'r = ', R);
 
   T := asind(sind(R) * sind(P));                   (* Sun Declination *)
-  logger^.logReal(DEBUG, 't = ', T);
+  log.logReal(LLDEBUG, 't = ', T);
 
   U := tand(R/2) * tand(R/2);    (* var y *)
   V := 4 * rad2deg(U * sin(2 * deg2rad(I))
@@ -162,7 +160,7 @@ begin
                   - 0.5  * U * U * sin(4 * deg2rad(I)) 
                   - 1.25 * K * K * sin(2 * deg2rad(J)));  (* Eq of time (min) *)
 
-  logger^.logReal(DEBUG, 'v = ', V);
+  log.logReal(LLDEBUG, 'v = ', V);
 
   AB := trunc(E * 1440.0 + V + 4.0 * lng - 60.0 * UTCoff) mod 1440;    (* True Solar time (min) *)
 
@@ -184,8 +182,8 @@ begin
 
   X  := (720 - 4 * lng - V + UTCoff * 60.0) / 1440;                         (* Solar noon (LST) *)
 
-  logger^.logReal(DEBUG, 'w = ', W);
-  logger^.logReal(DEBUG, 'x = ', X);
+  log.logReal(LLDEBUG, 'w = ', W);
+  log.logReal(LLDEBUG, 'x = ', X);
 
   (* Results in degrees...
 
@@ -220,10 +218,10 @@ begin
   ss_mm   := trunc((sset * 24 - ss_hh) * 60);
   sunset  := time2str(ss_hh, ss_mm, 0, true);  
 
-  logger^.log(DEBUG, 'Sunrise : ' + sunrise);
-  logger^.log(DEBUG, 'Sunset  : ' + sunset);
+  log.log(LLDEBUG, 'Sunrise : ' + sunrise);
+  log.log(LLDEBUG, 'Sunset  : ' + sunset);
 
-  dispose (logger);
+  log.Free;
 
 end;
 

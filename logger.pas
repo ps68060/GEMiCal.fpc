@@ -1,4 +1,5 @@
 {$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$mode objfpc}
 
 unit Logger;
 
@@ -8,58 +9,66 @@ interface
 
 type
 
-  a_level = (ERROR, WARN, INFO, DEBUG);
+  TLogLevel = (LLERROR, LLWARN, LLINFO, LLDEBUG);
 
-  PLogger = ^TLogger;
-  TLogger = object(TObject)
-    level : a_level;
+  TLogger = class
+  public
+    level : TLogLevel;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor Create(msgLevel : TLogLevel);
+    destructor  Destroy; override;
 
-    procedure log(msgLevel : a_level;
+    procedure log(msgLevel       : TLogLevel;
                   message  : String);
 
-    procedure info(message  : String);
+    procedure info (message  : String);
+    procedure debug(message  : String);
+    procedure warn (message  : String);
+    procedure error(message  : String);
 
-    procedure logBool(msgLevel : a_level;
+
+    procedure logBool(msgLevel : TLogLevel;
                       message  : String;
                       logical  : Boolean );
 
-    procedure logInt(msgLevel : a_level;
+    procedure logInt(msgLevel : TLogLevel;
                      message  : String;
                      int      : Integer );
 
-    procedure logLongInt(msgLevel : a_level;
+    procedure logLongInt(msgLevel : TLogLevel;
                          message  : String;
                          int      : LongInt );
 
-    procedure logWord(msgLevel : a_level;
+    procedure logWord(msgLevel : TLogLevel;
                       message  : String;
                       myWord   : Word );
 
-    procedure logReal(msgLevel : a_level;
+    procedure logReal(msgLevel : TLogLevel;
                       message  : String;
                       myReal   : Real );
   end;
 
 implementation
 
-constructor TLogger.init;
+constructor TLogger.Create(msgLevel : TLogLevel);
 begin
+  inherited Create;
+  level := msgLevel;
   (*writeln ('LOGGER ' + 'initiated'); *)
 end;
 
-destructor TLogger.done;
-begin
 
+destructor TLogger.Destroy;
+begin
+  inherited Destroy;
 end;
 
-procedure TLogger.log(msgLevel : a_level;
+
+procedure TLogger.log(msgLevel : TLogLevel;
                       message  : String);
 begin
 
-(**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+  writeln (ord(level), ' ; ', ord(msgLevel) );
 
   if (ord(level) >= ord(msgLevel) )
   then
@@ -71,15 +80,40 @@ end;
 procedure TLogger.info(message  : String);
 begin
 
-(**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
-  if (ord(level) >= 2 )
-  then
-    writeln(message);
+  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+  log(LLINFO, message);
 
 end;
 
 
-procedure TLogger.logBool(msgLevel : a_level;
+procedure TLogger.debug(message  : String);
+begin
+
+  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+  log(LLDEBUG, message);
+
+end;
+
+
+procedure TLogger.warn(message  : String);
+begin
+
+  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+  log(LLWARN, message);
+
+end;
+
+
+procedure TLogger.error(message  : String);
+begin
+
+  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+  log(LLERROR, message);
+
+end;
+
+
+procedure TLogger.logBool(msgLevel : TLogLevel;
                           message  : String;
                           logical  : Boolean );
 begin
@@ -91,7 +125,7 @@ begin
 end;
 
 
-procedure TLogger.logInt(msgLevel : a_level;
+procedure TLogger.logInt(msgLevel : TLogLevel;
                          message  : String;
                          int      : Integer );
 begin
@@ -103,7 +137,7 @@ begin
 end;
 
 
-procedure TLogger.logLongInt(msgLevel : a_level;
+procedure TLogger.logLongInt(msgLevel : TLogLevel;
                              message  : String;
                              int      : LongInt );
 begin
@@ -115,7 +149,7 @@ begin
 end;
 
 
-procedure TLogger.logWord(msgLevel : a_level;
+procedure TLogger.logWord(msgLevel : TLogLevel;
                           message  : String;
                           myWord   : Word );
 begin
@@ -128,7 +162,7 @@ end;
 
 
 
-procedure TLogger.logReal(msgLevel : a_level;
+procedure TLogger.logReal(msgLevel : TLogLevel;
                           message  : String;
                           myReal   : Real );
 begin

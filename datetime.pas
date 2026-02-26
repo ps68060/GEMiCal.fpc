@@ -135,14 +135,12 @@ uses
   var
    code : Integer;
    date1, date2 : Double;
-   logger       : PLogger;
+   log          : TLogger;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
-    logger^.log(DEBUG, 'converting date-time  ' + dtString);
+    log.debug('converting date-time  ' + dtString);
 
     isoDate := SubStr(dtString, 1, 8);
     isoTime := COPY(dtString, 10, 6);
@@ -166,7 +164,7 @@ uses
     then
       tz := COPY (dtString, 16, length(dtString) );
 
-    logger^.log(DEBUG, 'dtStr2Obj date ' + isoDate);
+    log.debug('dtStr2Obj date ' + isoDate);
   (*  logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);*)
 
     date2 := julianDate;
@@ -177,7 +175,7 @@ uses
 
     dayOfWeek;
 
-    Dispose (logger, Done);
+    log.Free;
   end;
 
 
@@ -327,12 +325,10 @@ uses
     part3,
     part4    : double;
 
-    logger   : PLogger;
+    log      : TLogger;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
     
     lyyyy := getYYYYFromIso;
     lmm   := getMMFromIso;
@@ -357,8 +353,8 @@ uses
     then
       julian := julian - 0.5;
 
-    logger^.logReal(DEBUG, 'Julian date is ', julian);
-    Dispose (logger, Done);
+    log.logReal(LLDEBUG, 'Julian date is ', julian);
+    log.Free;
 
     julianDate := julian;
   end;
@@ -459,20 +455,18 @@ uses
                     human : Boolean)
           : String;
   var
-    logger  : PLogger;
+    log     : TLogger;
     tmStr   : String;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     (*writeln('Time is ', hour, ':', minute, ':', second ); *)
 
     if (human)
     then
     begin
-      logger^.log(DEBUG, 'human format');
+      log.debug('human format');
       tmStr :=         LPad( IntToStr(trunc(hour  ) ), 2, '0' ) + ':';
       tmStr := tmStr + LPad( IntToStr(trunc(minute) ), 2, '0' ) + ':';
       tmStr := tmStr + LPad( IntToStr(trunc(second) ), 2, '0' );
@@ -487,7 +481,7 @@ uses
 
     (*writeln(tmStr); *)
 
-    Dispose (logger, Done);
+    log.Free;
 
     time2Str := tmStr;
 
@@ -504,15 +498,13 @@ uses
     diffSec,
     remSec  : LongInt;
 
-    logger  : PLogger;
+    log     : TLogger;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
-    logger^.logLongInt(DEBUG, 'epoch1 ', epoch1);
-    logger^.logLongInt(DEBUG, 'epoch2 ', epoch2);
+    log.logLongInt(LLDEBUG, 'epoch1 ', epoch1);
+    log.logLongInt(LLDEBUG, 'epoch2 ', epoch2);
 
     if (epoch1 < epoch2)
     then
@@ -537,7 +529,7 @@ uses
 
     ss     := remSec mod minSec;
 
-    Dispose (logger, Done);
+    log.Free;
   end;
 
 
@@ -583,12 +575,10 @@ uses
   (* Purpose : Is this an all day event ? *)
 
   var
-    logger       : PLogger;
+    log          : TLogger;
 
   begin
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     if     (getHrFromIso  = 0)
        and (getMinFromIso = 0)
@@ -606,7 +596,7 @@ uses
       isAllDay := true;
     end;
 
-    Dispose (logger, Done);
+    log.Free;
 
   end;
 

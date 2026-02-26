@@ -81,7 +81,7 @@ uses
                cal     = iCal calendar
                calDate = date of 1st of month *)
   var
-    logger       : PLogger;
+    log          : TLogger;
 
     endMonthDate : PDateTime;
     daysInMon    : Integer;
@@ -92,11 +92,9 @@ uses
 
   begin
 
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
-    logger^.log (DEBUG, 'FilterEvents');
+    log.debug ('FilterEvents');
 
     (* Calculate date of end of month *)
     daysInMon := daysInMonth(calDate);
@@ -107,8 +105,8 @@ uses
     endMonthDate^.init;
     endMonthDate^.dtStr2Obj(dtStr);
 
-    logger^.logLongInt(DEBUG, ' 1st epoch ', calDate^.epoch);
-    logger^.logLongInt(DEBUG, 'last epoch ', endMonthDate^.epoch);
+    log.logLongInt(LLDEBUG, ' 1st epoch ', calDate^.epoch);
+    log.logLongInt(LLDEBUG, 'last epoch ', endMonthDate^.epoch);
 
     for i := 0 to cal^.entries do
     begin
@@ -119,7 +117,7 @@ uses
                 or (cal^.eventList[i]^.endDate^.epoch = 0) )
       then
       begin
-        logger^.logInt (DEBUG, 'IN Scope', i );
+        log.logInt (LLDEBUG, 'IN Scope', i );
 
         FilterEvent(cal, calDate, daysInMon, i);
       end;
@@ -127,7 +125,7 @@ uses
     end;  (* for *)
 
     dispose (endMonthDate, Done);
-    dispose (logger);
+    log.Free;
   end;
 
 
@@ -139,7 +137,7 @@ uses
   (* Purpose : Store a single event in the cellGrid *)
 
   var
-    logger      : PLogger;
+    log         : TLogger;
 
     summ,
     locat       : String;
@@ -154,16 +152,14 @@ uses
 
   begin
 
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
-    logger^.logInt(DEBUG, 'end date = ' , cal^.eventList[e]^.endDate^.getDDFromIso);
+    log.logInt(LLDEBUG, 'end date = ' , cal^.eventList[e]^.endDate^.getDDFromIso);
 
     daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
                      cal^.eventList[e]^.startDate^.epoch) / daySec;
 
-    logger^.logReal(DEBUG, 'event lasts ', daysBetween);
+    log.logReal(LLDEBUG, 'event lasts ', daysBetween);
 
 
     (* Does the event Start in the displayed month ? *)
@@ -196,8 +192,8 @@ uses
     for j := sDate to eDate
     do
     begin
-      logger^.logInt(DEBUG, 'event date ',  + j);
-      logger^.logInt(DEBUG, 'slot ', cell[j]^.counter);
+      log.logInt(LLDEBUG, 'event date ',  + j);
+      log.logInt(LLDEBUG, 'slot ', cell[j]^.counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
@@ -208,7 +204,7 @@ uses
 
       cell[j]^.cellEvents[cell[j]^.counter]^.timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
 
-      logger^.log(DEBUG, 'Summary ' +
+      log.log(LLDEBUG, 'Summary ' +
                   cell[j]^.cellEvents[cell[j]^.counter]^.summary );
 
       cell[j]^.eventNum := e;
@@ -216,7 +212,7 @@ uses
       inc (cell[j]^.counter );
     end;
 
-    dispose(logger);
+    log.Free;
 
   end;
 
@@ -235,22 +231,20 @@ uses
    *)
 
   var
-    logger    : PLogger;
+    log       : TLogger;
 
   begin
 
-    new(logger);
-    logger^.init;
-    logger^.level := INFO;
+    log := TLogger.Create(LLINFO);
 
     row := (day - 1 + firstDay) div 7;
     col := (day - 1 + firstDay) mod 7;
 
-    logger^.logInt(DEBUG, 'day ', day);
-    logger^.logInt(DEBUG, 'row ', row);
-    logger^.logInt(DEBUG, 'col ', col);
+    log.logInt(LLDEBUG, 'day ', day);
+    log.logInt(LLDEBUG, 'row ', row);
+    log.logInt(LLDEBUG, 'col ', col);
 
-    dispose (logger);
+    log.Free;
   end;
 
 end.
