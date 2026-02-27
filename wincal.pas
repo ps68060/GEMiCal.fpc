@@ -343,15 +343,15 @@ begin
   (* Work contains the window work area *)
   with Work do
   begin
-    X := 10;         (* X,Y correspond to the coordinates of the working area *)
+    X := 10;         (* X,Y correspond to the co-ordinates of the working area *)
     Y := 60;         (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
     W := WINWIDTH;   (* W:=113, smallest width of the working area *)
     H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
+    headerHeight := H div 10;
     leftPos := Work.X;
     topPos  := Work.Y + HeaderHeight;
 
-    headerHeight := H div 10;
     cellHeight   := (H - headerHeight) div 6;
     cellWidth    := w div 7;
   end;
@@ -480,11 +480,12 @@ begin
   do
   begin
     log.logInt (LLINFO, 'Y=', Y);
-    v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of coords *)
 
-    (* create a list of coords, declaration order above is the important bit *)
+    (* create a list of co-ords, declaration order above is the important bit *)
     pxy[1] := y;
     pxy[3] := y;
+
+    v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
 
     if r=0 then
       y := y + headerHeight
@@ -504,7 +505,7 @@ begin
     pxy[0] := Work.X + c * CellWidth;
     pxy[2] := pxy[0];
 
-    v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of coords *)
+    v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
 
 
