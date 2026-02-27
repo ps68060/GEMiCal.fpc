@@ -267,7 +267,8 @@ begin
           Work.Y + Attr.boxHeight,
           'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
 
-  v_gtext(vdiHandle, new_x + Attr.charWidth * 106,
+  v_gtext(vdiHandle,
+          new_x + Attr.charWidth * 106,
           new_y + Attr.boxHeight,
           SubStr(sunset, 1, 5) );
 
@@ -328,7 +329,7 @@ begin
   (* 1,.,640,. means 1 pixel is scrolled to 640 units         *)
   (* 2,.,320,. means 2 pixels will be scrolled to 320 units   *)
   (* both correspond to a horizontal exposure of 640 pixels	  *)
-  (* the window ausma'e are not determined here               *)
+  (* the window dimensions are not determined here               *)
 end;
 
 
