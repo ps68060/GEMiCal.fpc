@@ -82,8 +82,6 @@ const
 
 
 var
-  leftPos,
-  topPos       : integer;
   daysInMon    : integer;
   endMonthDate : PDateTime;
 
@@ -349,8 +347,6 @@ begin
     H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
     headerHeight := H div 10;
-    leftPos := Work.X;
-    topPos  := Work.Y + HeaderHeight;
 
     cellHeight   := (H - headerHeight) div 6;
     cellWidth    := w div 7;
@@ -466,11 +462,11 @@ begin
   newX := Scroller^.GetXOrg;
   newY := Scroller^.GetYOrg;
 
-  Y := Work.Y + topPos;
+  Y := Work.Y + headerHeight;
 
   (* Draw heading line *)
-  pxy[0] := Work.X + leftPos;
-  pxy[2] := Work.X + leftPos + (7 * cellWidth);  (* constant X for horizontal line *)
+  pxy[0] := Work.X;
+  pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
   pxy[1] := y;
   pxy[3] := pxy[1];
@@ -496,7 +492,7 @@ begin
 
 
   (* Draw vertical lines for days by changing x co-ords *)
-  pxy[1] := Work.Y + HeaderHeight;  (* constant X for vertical line *)
+  pxy[1] := Work.Y + HeaderHeight;  (* constant Y for vertical line *)
   pxy[3] := Work.Y + headerHeight + rows * cellHeight;
 
   for c := 0 to 7
