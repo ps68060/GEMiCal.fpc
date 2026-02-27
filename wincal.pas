@@ -334,7 +334,7 @@ end;
 
 
 procedure TWinCal.SetupSize;
-(* set the Gr”že beim ersten open *)
+(* set the size when first opened *)
 
 begin
   INHERITED SetupSize;
