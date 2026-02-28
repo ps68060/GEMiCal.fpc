@@ -508,8 +508,8 @@ begin
 
 
   (* Draw vertical lines for days by changing x co-ords *)
-  pxy[1] := Work.Y + HeaderHeight;  (* constant Y for vertical line *)
-  pxy[3] := Work.Y + headerHeight + rows * cellHeight;
+  pxy[1] := Work.Y + titleHeight;  (* constant Y for vertical line *)
+  pxy[3] := Work.Y + titleHeight + rows * cellHeight;
 
   for c := 0 to 7
   do
