@@ -42,8 +42,7 @@ type
                    procedure WriteDates(newX,
                                         newY   : LongInt);             VIRTUAL;
 
-                   procedure DrawTitle(year,
-                                       month  : Word);
+                   procedure DrawTitle;
 
                    procedure DrawGridHeading;
 
@@ -146,7 +145,7 @@ begin
   daysInMon := daysInMonth(displayDate);
 
 
-  (* Set the font to getthe dimensions *)
+  (* Set the font to get the dimensions *)
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
   (* Display the dates, highlighting today *)
@@ -155,11 +154,13 @@ begin
   begin
     CalcCell (displayDate^.day, i, row, col);
     CalcPos  (row, col, x, y);
+    writeln ('X = ', x, 'Y = ', y);
 
     if (currentMonth)
        and (i = day)
     then
     begin
+      (* Higlight today *)
       vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
@@ -185,16 +186,6 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
 var
   log         : TLogger;
 
-  year,
-  month,
-  day,
-  dayOfWeek   : Word;
-
-  hour,
-  minute,
-  second,
-  sec100      : Word;
-
   New_X,
   New_Y : LongInt;
 
@@ -209,11 +200,10 @@ var
 
   i           : Integer;
 
-  dtStr,
-  sunrise,
-  sunset        : String;
-
-  todayDate     : PDateTime;
+  year,
+  month,
+  day,
+  dayOfWeek   : Word;
 
 begin
 
@@ -224,50 +214,13 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
-  GetDate(year, month, day, dayOfWeek) ;
-  GetTime(hour, minute, second, sec100);
-
-  dtStr := date2str(year, month, day, FALSE);
-
-  new (todayDate);
-  todayDate^.init;
-  todayDate^.dtStr2Obj(dtStr);
-
-  sunRiseSet(conf^.lat, conf^.lng, conf^.UTCoffset
-            ,todayDate,  sunrise, sunset);
-  dispose(todayDate);
-  log.debug ('sunrise ' + sunrise);
-  log.debug ('sunset '  + sunset);
-
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
 
-  (* Display date and time at top left *)
-  v_gtext(vdiHandle,
-          Work.X + Attr.charWidth,
-          Work.Y + (headerHeight div 3),
-          date2Str(year, month, day, TRUE) );
-
-  v_gtext(vdiHandle,
-          Work.X + Work.W - (Attr.charWidth * 8),
-          Work.Y + (headerHeight div 3),
-          time2Str(hour, minute, second, TRUE) );
-
   (* Display the year and month in larger text *)
-  DrawTitle(displayDate^.getYYYYFromIso, displayDate^.getMMFromIso);
+  DrawTitle;
 
   DrawGridHeading;
-
-  (* Display Sunrise and sunset times at top right *)
-  v_gtext(vdiHandle,
-          Work.X + Work.W - (10 * Attr.charWidth),
-          Work.Y + Attr.boxHeight,
-          'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
-
-  v_gtext(vdiHandle,
-          new_x + Attr.charWidth * 106,
-          new_y + Attr.boxHeight,
-          SubStr(sunset, 1, 5) );
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
   DrawGrid(6, cellHeight);
@@ -361,11 +314,12 @@ begin
     cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
     cellWidth    := W div 7;
     
-    writeln ('W= ', W);
+(***    writeln ('W= ', W);
     writeln ('H= ', H);
     writeln ('headerHeight= ', headerHeight);
     writeln ('cellHeight=   ', cellHeight );
     writeln ('cellWidth=    ', cellWidth);
+***)
   end;
 
   Calc(WC_BORDER, Work, Curr)
@@ -392,11 +346,11 @@ begin
 end;
 
 
-procedure TWinCal.DrawTitle(year,
-                            month  : Word);
+procedure TWinCal.DrawTitle;
 
 var
-  title     : String;
+  log       : TLogger;
+  title      : String;
 
   wch,
   hch,
@@ -405,7 +359,30 @@ var
   hAlign,
   vAlign     : Integer;
 
+  todayDate  : PDateTime;
+
+  year,
+  month,
+  day,
+  dayOfWeek   : Word;
+
+  hour,
+  minute,
+  second,
+  sec100      : Word;
+
+  dtStr,
+  sunrise,
+  sunset     : String;
+
 begin
+
+  log := TLogger.Create(LLDEBUG);
+
+  GetDate(year, month, day, dayOfWeek) ;
+  GetTime(hour, minute, second, sec100);
+
+  dtStr := date2str(year, month, day, FALSE);
 
   (* Display the year and month *)
   str(year, title);
@@ -421,6 +398,41 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
   vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
+
+  (* Display date and time at top left *)
+  v_gtext(vdiHandle,
+          Work.X + Attr.charWidth,
+          Work.Y + (headerHeight div 2),
+          date2Str(year, month, day, TRUE) );
+
+  v_gtext(vdiHandle,
+          Work.X + Attr.charWidth,
+          Work.Y + Attr.charHeight*3,
+          time2Str(hour, minute, second, TRUE) );
+
+  (* Sunrise and Sunset *)
+  new (todayDate);
+  todayDate^.init;
+  todayDate^.dtStr2Obj(dtStr);
+
+  sunRiseSet(conf^.lat, conf^.lng, conf^.UTCoffset
+            ,todayDate,  sunrise, sunset);
+  dispose(todayDate);
+
+  log.debug ('sunrise ' + sunrise);
+  log.debug ('sunset '  + sunset);
+
+  (* Display Sunrise and sunset times at top right *)
+  v_gtext(vdiHandle,
+          Work.X + Work.W - (25 * Attr.charWidth),
+          Work.Y + Attr.boxHeight,
+          'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
+
+  v_gtext(vdiHandle,
+          Attr.charWidth * 106,
+          Attr.boxHeight,
+          SubStr(sunset, 1, 5) );
+
 end;
 
 
@@ -488,7 +500,7 @@ begin
   pxy[3] := pxy[1];
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
-  for r := 0 to rows
+  for r := 0 to rows - 1
   do
   begin
     log.logInt (LLINFO, 'Y=', Y);
@@ -509,7 +521,7 @@ begin
 
   (* Draw vertical lines for days by changing x co-ords *)
   pxy[1] := Work.Y + titleHeight;  (* constant Y for vertical line *)
-  pxy[3] := Work.Y + titleHeight + rows * cellHeight;
+  pxy[3] := Work.Y + titleHeight + (rows-1) * cellHeight;
 
   for c := 0 to 7
   do

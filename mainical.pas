@@ -5,7 +5,7 @@ unit MainIcal;
 interface
 
 uses
-  OWindows,
+  owindows,
 
   DlgAbout,
   DlgConv,
