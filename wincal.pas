@@ -23,9 +23,10 @@ type
 
   TWinCal     = OBJECT(TWindow)
                 private
+                    titleHeight,
+                    headerHeight, 
                     cellWidth,
-                    cellHeight,
-                    headerHeight : integer;
+                    cellHeight : integer;
 
                 public
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
@@ -44,7 +45,7 @@ type
                    procedure DrawTitle(year,
                                        month  : Word);
 
-                   procedure DrawHeading;
+                   procedure DrawGridHeading;
 
                    procedure DisplayEvents(newX,
                                            newY    : LongInt);
@@ -94,8 +95,8 @@ procedure TWinCal.CalcPos(row,
 
 begin
 
-  x := Work.X  + (col)  * cellWidth;
-  y := Work.Y + headerHeight  + (row)  * cellHeight;
+  x := Work.X + (col * cellWidth);
+  y := Work.Y + titleHeight + (row * cellHeight);
 
 end;
 
@@ -199,10 +200,6 @@ var
 
   pxArray     : Array [1..10] of Integer;
 
-(*  headerHeight,
-  cellHeight,
-  cellWidth   : Integer;
-*)
   wch,
   hch,
   wcell,
@@ -259,7 +256,7 @@ begin
   (* Display the year and month in larger text *)
   DrawTitle(displayDate^.getYYYYFromIso, displayDate^.getMMFromIso);
 
-  DrawHeading;
+  DrawGridHeading;
 
   (* Display Sunrise and sunset times at top right *)
   v_gtext(vdiHandle,
@@ -336,6 +333,12 @@ end;
 procedure TWinCal.SetupSize;
 (* set the size when first opened *)
 
+var
+  wch,
+  hch,
+  wCell,
+  hCell   : integer;
+
 begin
   INHERITED SetupSize;
 
@@ -347,10 +350,22 @@ begin
     W := WINWIDTH;   (* W:=113, smallest width of the working area *)
     H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
-    headerHeight := H div 10;
 
-    cellHeight   := (H - headerHeight) div 6;
-    cellWidth    := w div 7;
+    vst_point(vdiHandle, 20, wch, hch, wCell, hCell);
+
+    titleHeight  := hCell * 2; (*H div 10;*)
+
+    vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+    headerHeight := hCell * 2;
+
+    cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
+    cellWidth    := W div 7;
+    
+    writeln ('W= ', W);
+    writeln ('H= ', H);
+    writeln ('headerHeight= ', headerHeight);
+    writeln ('cellHeight=   ', cellHeight );
+    writeln ('cellWidth=    ', cellWidth);
   end;
 
   Calc(WC_BORDER, Work, Curr)
@@ -401,7 +416,7 @@ begin
 
   v_gtext(vdiHandle,
           Work.X + (Work.W div 2),
-          Work.Y + (headerHeight div 2),
+          Work.Y + (titleHeight div 2),
           title);
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
@@ -409,7 +424,7 @@ begin
 end;
 
 
-procedure TWinCal.DrawHeading;
+procedure TWinCal.DrawGridHeading;
 
 (* Draw the column headings *)
 var
@@ -430,7 +445,7 @@ begin
 
   vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
 
-  DrawGrid (1, hCell * 2);
+  DrawGrid (1, headerHeight);
 
   (* Write Day labels *)
   for i := 0 to 6
@@ -439,7 +454,7 @@ begin
     CalcPos(0, i, x, y);
     v_gtext(vdiHandle,
             x + Attr.boxWidth,
-            y + (cellHeight div 2),
+            y + hCell, (*(cellHeight div 2),*)
             day1[i] );
   end;
 
@@ -463,7 +478,7 @@ begin
   newX := Scroller^.GetXOrg;
   newY := Scroller^.GetYOrg;
 
-  Y := Work.Y + headerHeight;
+  Y := Work.Y + titleHeight;
 
   (* Draw heading line *)
   pxy[0] := Work.X;
