@@ -16,6 +16,7 @@ interface
 
 const
   dAppName = 'GEMiCal';
+  TITLE_FONT_SIZE = 20;
 
 type
 
@@ -95,7 +96,11 @@ procedure TWinCal.CalcPos(row,
 begin
 
   x := Work.X + (col * cellWidth);
-  y := Work.Y + titleHeight + (row * cellHeight);
+  y := Work.Y + titleHeight + row  * cellHeight;
+  
+  if (row > 0)
+  then
+    y := y + headerHeight;
 
 end;
 
@@ -154,7 +159,7 @@ begin
   begin
     CalcCell (displayDate^.day, i, row, col);
     CalcPos  (row, col, x, y);
-    writeln ('X = ', x, 'Y = ', y);
+    writeln ('row = ', row, ' col = ', col, 'X = ', x, ' Y = ', y);
 
     if (currentMonth)
        and (i = day)
@@ -304,9 +309,9 @@ begin
     H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
 
-    vst_point(vdiHandle, 20, wch, hch, wCell, hCell);
+    vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wCell, hCell);
 
-    titleHeight  := hCell * 2; (*H div 10;*)
+    titleHeight  := hCell * 2;
 
     vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
     headerHeight := hCell * 2;
@@ -388,7 +393,7 @@ begin
   str(year, title);
   title := title + ' ' + mon1[month];
 
-  vst_point(vdiHandle, 20, wch, hch, wcell, hcell);
+  vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
 
   v_gtext(vdiHandle,
@@ -429,7 +434,7 @@ begin
           'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
 
   v_gtext(vdiHandle,
-          Attr.charWidth * 106,
+          Work.X + Work.W - (20 * Attr.charWidth),
           Attr.boxHeight,
           SubStr(sunset, 1, 5) );
 
@@ -500,7 +505,7 @@ begin
   pxy[3] := pxy[1];
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
-  for r := 0 to rows - 1
+  for r := 0 to rows
   do
   begin
     log.logInt (LLINFO, 'Y=', Y);
@@ -521,7 +526,7 @@ begin
 
   (* Draw vertical lines for days by changing x co-ords *)
   pxy[1] := Work.Y + titleHeight;  (* constant Y for vertical line *)
-  pxy[3] := Work.Y + titleHeight + (rows-1) * cellHeight;
+  pxy[3] := Work.Y + titleHeight + headerHeight + (rows-1) * cellHeight;
 
   for c := 0 to 7
   do
