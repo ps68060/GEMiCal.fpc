@@ -169,14 +169,14 @@ begin
       vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
               newX + x + Attr.boxWidth,
-              newY + y + hCell,
+              newY + y + hch,  (* Use char height and not the char cell height *)
               IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
               newX + x  + Attr.boxWidth,
-              newY + y + hCell,
+              newY + y + hch,
               IntToStr(i) );
   end;
 
@@ -311,7 +311,7 @@ begin
 
     vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wCell, hCell);
 
-    titleHeight  := hCell * 2;
+    titleHeight  := hch * 2;
 
     vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
     headerHeight := hCell * 2;
