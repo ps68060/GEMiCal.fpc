@@ -110,8 +110,8 @@ procedure TWinCal.WriteDates(newX,
 var
   log          : TLogger;
 
-  x,
-  y            : Integer;
+  pixX,
+  pixY         : Integer;
 
   year,
   month,
@@ -123,14 +123,19 @@ var
   row, col,
   i            : Integer;
 
+  scrollX,
+  scrollY: Integer;
+
   wch,
   hch,
   wCell,
   hCell        : Integer;
 
 begin
-
   log := TLogger.Create(LLINFO);
+
+  scrollX := Scroller^.GetXOrg;
+  scrollY := Scroller^.GetYOrg;
 
   log.logInt(LLDEBUG, 'year ', displayDate^.getYYYYFromIso );
   log.debug (mon1[displayDate^.getMMFromIso] );
@@ -158,8 +163,8 @@ begin
   do
   begin
     CalcCell (displayDate^.day, i, row, col);
-    CalcPos  (row, col, x, y);
-    writeln ('row = ', row, ' col = ', col, 'X = ', x, ' Y = ', y);
+    CalcPos  (row, col, pixX, pixY);
+    writeln ('row = ', row, ' col = ', col, 'X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
@@ -168,15 +173,15 @@ begin
       (* Higlight today *)
       vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
-              newX + x + Attr.boxWidth,
-              newY + y + hch,  (* Use char height and not the char cell height *)
+              scrollX + pixX + Attr.boxWidth,
+              scrollY + pixY + hch,  (* Use char height and not the char cell height *)
               IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
-              newX + x  + Attr.boxWidth,
-              newY + y + hch,
+              scrollX + x  + Attr.boxWidth,
+              scrollY + y + hch,
               IntToStr(i) );
   end;
 
