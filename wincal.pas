@@ -180,8 +180,8 @@ begin
     end
     else
       v_gtext(vdiHandle,
-              scrollX + x  + Attr.boxWidth,
-              scrollY + y + hch,
+              scrollX + pixX  + Attr.boxWidth,
+              scrollY + pixY + hch,
               IntToStr(i) );
   end;
 
@@ -323,13 +323,6 @@ begin
 
     cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
     cellWidth    := W div 7;
-    
-(***    writeln ('W= ', W);
-    writeln ('H= ', H);
-    writeln ('headerHeight= ', headerHeight);
-    writeln ('cellHeight=   ', cellHeight );
-    writeln ('cellWidth=    ', cellWidth);
-***)
   end;
 
   Calc(WC_BORDER, Work, Curr)
@@ -391,14 +384,9 @@ begin
 
   log := TLogger.Create(LLDEBUG);
 
-  GetDate(year, month, day, dayOfWeek) ;
-  GetTime(hour, minute, second, sec100);
-
-  dtStr := date2str(year, month, day, FALSE);
-
   (* Display the year and month *)
-  str(year, title);
-  title := title + ' ' + mon1[month];
+  str(displayDate^.getYYYYFromIso, title);
+  title := title + ' ' + mon1[displayDate^.getMMFromIso];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -412,6 +400,11 @@ begin
   vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
 
   (* Display date and time at top left *)
+  GetDate(year, month, day, dayOfWeek) ;
+  GetTime(hour, minute, second, sec100);
+
+  dtStr := date2str(year, month, day, FALSE);
+
   v_gtext(vdiHandle,
           Work.X + Attr.charWidth,
           Work.Y + (headerHeight div 2),
