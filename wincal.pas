@@ -386,6 +386,8 @@ var
   sunset     : String;
 
 begin
+  writeln('TITLE DATE = ', displayDate^.getYYYYFromIso,
+                      '-', displayDate^.getMMFromIso);
 
   log := TLogger.Create(LLDEBUG);
 
