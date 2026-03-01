@@ -116,12 +116,10 @@ end;
 procedure TLogger.logBool(msgLevel : TLogLevel;
                           message  : String;
                           logical  : Boolean );
+var
+  s        : string;
 begin
-
-  if (ord(level) >= ord(msgLevel) )
-  then
-    writeln(message, logical);
-
+  log (msgLevel, message + ':' + BoolToStr(logical, True));
 end;
 
 
