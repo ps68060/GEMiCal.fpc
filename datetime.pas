@@ -353,7 +353,7 @@ uses
     then
       julian := julian - 0.5;
 
-    log.logReal(LLDEBUG, 'Julian date is ', julian);
+    log.debug('Julian date is ', julian);
     log.Free;
 
     julianDate := julian;
@@ -503,8 +503,8 @@ uses
   begin
     log := TLogger.Create(LLINFO);
 
-    log.logLongInt(LLDEBUG, 'epoch1 ', epoch1);
-    log.logLongInt(LLDEBUG, 'epoch2 ', epoch2);
+    log.debug('epoch1 ', epoch1);
+    log.debug('epoch2 ', epoch2);
 
     if (epoch1 < epoch2)
     then

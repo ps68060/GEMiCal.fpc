@@ -105,8 +105,8 @@ uses
     endMonthDate^.init;
     endMonthDate^.dtStr2Obj(dtStr);
 
-    log.logLongInt(LLDEBUG, ' 1st epoch ', calDate^.epoch);
-    log.logLongInt(LLDEBUG, 'last epoch ', endMonthDate^.epoch);
+    log.debug(' 1st epoch ', calDate^.epoch);
+    log.debug('last epoch ', endMonthDate^.epoch);
 
     for i := 0 to cal^.entries do
     begin
@@ -117,7 +117,7 @@ uses
                 or (cal^.eventList[i]^.endDate^.epoch = 0) )
       then
       begin
-        log.logInt (LLDEBUG, 'IN Scope', i );
+        log.debug ('IN Scope', i );
 
         FilterEvent(cal, calDate, daysInMon, i);
       end;
@@ -154,12 +154,12 @@ uses
 
     log := TLogger.Create(LLINFO);
 
-    log.logInt(LLDEBUG, 'end date = ' , cal^.eventList[e]^.endDate^.getDDFromIso);
+    log.debug ('end date = ' , cal^.eventList[e]^.endDate^.getDDFromIso);
 
     daysBetween :=  (cal^.eventList[e]^.endDate^.epoch -
                      cal^.eventList[e]^.startDate^.epoch) / daySec;
 
-    log.logReal(LLDEBUG, 'event lasts ', daysBetween);
+    log.debug ('event lasts ', daysBetween);
 
 
     (* Does the event Start in the displayed month ? *)
@@ -192,8 +192,8 @@ uses
     for j := sDate to eDate
     do
     begin
-      log.logInt(LLDEBUG, 'event date ',  + j);
-      log.logInt(LLDEBUG, 'slot ', cell[j]^.counter);
+      log.debug ('event date ',  + j);
+      log.debug ('slot ', cell[j]^.counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
@@ -240,9 +240,9 @@ uses
     row := (day - 1 + firstDay) div 7;
     col := (day - 1 + firstDay) mod 7;
 
-    log.logInt(LLDEBUG, 'day ', day);
-    log.logInt(LLDEBUG, 'row ', row);
-    log.logInt(LLDEBUG, 'col ', col);
+    log.debug ('day ', day);
+    log.debug ('row ', row);
+    log.debug ('col ', col);
 
     log.Free;
   end;

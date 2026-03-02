@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$B+,D-,I-,L-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 
 unit Cal;
 
@@ -88,7 +88,7 @@ implementation
   
     dec (entries);
 
-    log.logInt(LLDEBUG, 'loaded ', entries );
+    log.debug('loaded ', entries );
     log.Free;
 
   end;
@@ -145,7 +145,7 @@ implementation
 
     dec (entries);
 
-    log.logInt (LLDEBUG, 'Entries Read = ', entries +1);
+    log.debug ('Entries Read = ', entries +1);
 
     log.Free;
   end;
@@ -160,7 +160,7 @@ implementation
   begin
     log := TLogger.Create(LLINFO);
 
-    log.logInt (LLDEBUG, 'Starting sort of ', entries);
+    log.debug ('Starting sort of ', entries);
 
     for i := 0 to entries - 1
     do

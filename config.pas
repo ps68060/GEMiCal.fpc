@@ -143,10 +143,10 @@ uses
       dispose (keyValue);
     end;  (* while *)
 
-    log.debug('location = ' + name);
-    log.logReal(LLDEBUG,'lat = ', lat);
-    log.logReal(LLDEBUG,'lng = ', lng);
-    log.logReal(LLDEBUG,'UTC = ', UTCoffset);
+    log.debug ('location = ' + name);
+    log.debug ('lat = ', lat);
+    log.debug ('lng = ', lng);
+    log.debug ('UTC = ', UTCoffset);
 
     close(cnfFile);
     log.Free;

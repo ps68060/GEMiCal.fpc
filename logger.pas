@@ -22,6 +22,7 @@ type
     procedure log(msgLevel       : TLogLevel;
                   message  : String);
 
+
     procedure info (const message : ShortString);                       overload;
     procedure info (const message : ShortString; value : integer);      overload;
     procedure info (const message : ShortString; value : boolean);      overload;
@@ -33,6 +34,7 @@ type
     procedure debug(const message : ShortString; value : boolean);      overload;
     procedure debug(const message : ShortString; value : real);         overload;
     procedure debug(const message : ShortString; const value : string); overload;
+
     
     procedure warn (const message : ShortString);                       overload;
     procedure warn (const message : ShortString; value : integer);      overload;
@@ -45,27 +47,6 @@ type
     procedure error(const message : ShortString; value : boolean);      overload;
     procedure error(const message : ShortString; value : real);         overload;
     procedure error(const message : ShortString; const value : string); overload;
-
-
-    procedure logBool(msgLevel : TLogLevel;
-                      message  : String;
-                      logical  : Boolean );
-
-    procedure logInt(msgLevel : TLogLevel;
-                     message  : String;
-                     int      : Integer );
-
-    procedure logLongInt(msgLevel : TLogLevel;
-                         message  : String;
-                         int      : LongInt );
-
-    procedure logWord(msgLevel : TLogLevel;
-                      message  : String;
-                      myWord   : Word );
-
-    procedure logReal(msgLevel : TLogLevel;
-                      message  : String;
-                      myReal   : Real );
   end;
 
 
@@ -106,13 +87,11 @@ end;
 
 procedure TLogger.info(const message  : ShortString; value : integer);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLINFO, message + ': ' + IntToStr(value));
 end;
 
 procedure TLogger.info(const message  : ShortString; value : boolean);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   if value
   then
     log(LLINFO, message + ': TRUE')
@@ -125,32 +104,27 @@ var
   s : Shortstring;
 begin
   str(value:0:6, s);
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLINFO, message + ': ' + s);
 end;
 
 procedure TLogger.info(const message : ShortString; const value : Shortstring);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLINFO, message + ': ' + value);
 end;
 
 
 procedure TLogger.debug(const message : ShortString);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLDEBUG, message);
 end;
 
 procedure TLogger.debug(const message  : ShortString; value : integer);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLDEBUG, message + ': ' + IntToStr(value));
 end;
 
 procedure TLogger.debug(const message : ShortString; value : boolean);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   if value
   then
     log(LLDEBUG, message + ': TRUE')
@@ -163,13 +137,12 @@ var
   s : Shortstring;
 begin
   str(value:0:6, s);
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLDEBUG, message + ': ' + s);
 end;
 
+
 procedure TLogger.debug(const message : ShortString; const value : ShortString);
 begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
   log(LLDEBUG, message + ': ' + value);
 end;
 
@@ -240,63 +213,5 @@ begin
   log(LLERROR, message + ': ' + value);
 end;
 
-
-procedure TLogger.logBool(msgLevel : TLogLevel;
-                          message  : String;
-                          logical  : Boolean );
-var
-  s        : string;
-begin
-  log (msgLevel, message + ':' + BoolToStr(logical, True));
-end;
-
-
-procedure TLogger.logInt(msgLevel : TLogLevel;
-                         message  : String;
-                         int      : Integer );
-begin
-
-  if (ord(level) >= ord(msgLevel) )
-  then
-    writeln(message, int);
-
-end;
-
-
-procedure TLogger.logLongInt(msgLevel : TLogLevel;
-                             message  : String;
-                             int      : LongInt );
-begin
-
-  if (ord(level) >= ord(msgLevel) )
-  then
-    writeln(message, int);
-
-end;
-
-
-procedure TLogger.logWord(msgLevel : TLogLevel;
-                          message  : String;
-                          myWord   : Word );
-begin
-
-  if (ord(level) >= ord(msgLevel) )
-  then
-    writeln(message, myWord);
-
-end;
-
-
-
-procedure TLogger.logReal(msgLevel : TLogLevel;
-                          message  : String;
-                          myReal   : Real );
-begin
-
-  if (ord(level) >= ord(msgLevel) )
-  then
-    writeln(message, myReal:10:5);
-
-end;
 
 end.
