@@ -420,7 +420,7 @@ begin
   (* Load iCal events *)
   myApplication.iCal^.loadICS(directory);
   
-  log.logInt(LLDEBUG, 'loaded ', myApplication.iCal^.entries );
+  log.debug('loaded ', myApplication.iCal^.entries );
 
   log.Free;
 

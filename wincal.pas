@@ -20,7 +20,7 @@ const
 
 type
 
-  PWinCal      = ^TWinCal;
+  PWinCal     = ^TWinCal;
 
   TWinCal     = OBJECT(TWindow)
                 private
@@ -137,7 +137,7 @@ begin
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.logInt(LLDEBUG, 'year ', displayDate^.getYYYYFromIso );
+  log.debug ('year ', displayDate^.getYYYYFromIso );
   log.debug (mon1[displayDate^.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
@@ -508,7 +508,7 @@ begin
   for r := 0 to rows
   do
   begin
-    log.logInt (LLINFO, 'Y=', Y);
+    log.info ('Y=', Y);
 
     (* create a list of co-ords, declaration order above is the important bit *)
     pxy[1] := y;
@@ -588,9 +588,8 @@ begin
     CalcCell (displayDate^.day, j, row, col);
     CalcPos(row, col, x, y);
 
-    log.logInt (LLDEBUG, 'row ', row);
-    log.logInt (LLDEBUG, 'col ', col);
-
+    log.debug ('row ', row);
+    log.debug ('col ', col);
 
     for i := 0 to cellGr^.cell[j]^.counter - 1
     do
@@ -603,7 +602,7 @@ begin
                                   cellGr^.cell[j]^.cellEvents[i]^.location), 1, 16 );
 
       log.debug('Summary  ' + summ );
-      log.logInt(LLDEBUG, 'counter ', i);
+      log.debug('counter ', i);
 
       v_gtext(vdiHandle,
               x + Attr.boxWidth,
