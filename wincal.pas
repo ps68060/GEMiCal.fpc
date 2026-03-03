@@ -17,6 +17,7 @@ interface
 const
   dAppName = 'GEMiCal';
   TITLE_FONT_SIZE = 20;
+  BODY_FONT_SIZE  = 10;
 
 type
 
@@ -91,17 +92,19 @@ procedure TWinCal.CalcPos(row,
                           col   : Integer;
                           var x,
                               y : Integer);
-(* Purpose : Calculate the x, y of the cell from row, col. *)
+(* Purpose : Calculate the x, y of the cell from row, col.
+ * inputs  : row 0 to 6
+ *           col 0 to 5
+ * returns : x, y pixel positions of the top left corner of the calendar cell
+ *)
 
 begin
+  x := Work.X + (col * cellWidth);
+  y := Work.Y + titleHeight + row * cellHeight;
 
-  x := Work.X + (col) * cellWidth;
-  y := Work.Y + titleHeight + row  * cellHeight;
-  
   if (row > 0)
   then
     y := y + headerHeight;
-
 end;
 
 
@@ -141,7 +144,7 @@ begin
   log.debug (mon1[displayDate^.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
-  GetDate (year, month, day, dayOfWeek) ;
+  GetDate (year, month, day, dayOfWeek);
 
   CalcCell (displayDate^.day, day, row, col);
 
@@ -154,9 +157,8 @@ begin
   (* Calculate date of end of month *)
   daysInMon := daysInMonth(displayDate);
 
-
   (* Set the font to get the dimensions *)
-  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon
@@ -222,7 +224,7 @@ begin
   new (conf);
   conf^.init;
 
-  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
@@ -315,10 +317,9 @@ begin
 
 
     vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wCell, hCell);
-
     titleHeight  := hch * 2;
 
-    vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+    vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
     headerHeight := hCell * 2;
 
     cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
@@ -396,7 +397,7 @@ begin
           Work.Y + (titleHeight div 2),
           title);
 
-  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
   vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
 
   (* Display date and time at top left *)
@@ -460,7 +461,7 @@ var
 
 begin
 
-  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
   DrawGrid (1, headerHeight);
 
@@ -576,7 +577,7 @@ begin
 
   log.debug ('DisplayEvents');
 
-  vst_point(vdiHandle, 10, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
   offset    := hCell + hcell div 2;
 
   vst_point(vdiHandle, 7, wch, hch, wCell, hCell);
@@ -617,7 +618,7 @@ begin
 
   end;
 
-  vst_point(vdiHandle, 10, wch, hch, wcell, hcell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wcell, hcell);
 
   log.Free;
 

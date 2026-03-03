@@ -22,7 +22,6 @@ type
     procedure log(msgLevel       : TLogLevel;
                   message  : String);
 
-
     procedure info (const message : ShortString);                       overload;
     procedure info (const message : ShortString; value : integer);      overload;
     procedure info (const message : ShortString; value : boolean);      overload;
@@ -34,7 +33,6 @@ type
     procedure debug(const message : ShortString; value : boolean);      overload;
     procedure debug(const message : ShortString; value : real);         overload;
     procedure debug(const message : ShortString; const value : string); overload;
-
     
     procedure warn (const message : ShortString);                       overload;
     procedure warn (const message : ShortString; value : integer);      overload;
@@ -68,13 +66,21 @@ end;
 
 procedure TLogger.log(msgLevel : TLogLevel;
                       message  : String);
-begin
+var
+  year,
+  month,
+  day,
+  dayOfWeek    : Word;
 
+begin
   (*writeln (ord(level), ' ; ', ord(msgLevel) );*)
 
   if (ord(level) >= ord(msgLevel) )
   then
-    writeln(message);
+    (* Get today's date *)
+    GetDate (year, month, day, dayOfWeek);
+    
+    writeln(msgLevel, ': ', message);
 
 end;
 
