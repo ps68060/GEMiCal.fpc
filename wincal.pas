@@ -95,7 +95,7 @@ procedure TWinCal.CalcPos(row,
 
 begin
 
-  x := Work.X + (col * cellWidth);
+  x := Work.X + (col) * cellWidth;
   y := Work.Y + titleHeight + row  * cellHeight;
   
   if (row > 0)
@@ -164,7 +164,7 @@ begin
   begin
     CalcCell (displayDate^.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
-    writeln ('row = ', row, ' col = ', col, 'X = ', pixX, ' Y = ', pixY);
+    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
@@ -173,15 +173,15 @@ begin
       (* Higlight today *)
       vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
       v_gtext(vdiHandle,
-              scrollX + pixX + Attr.boxWidth,
-              scrollY + pixY + hch,  (* Use char height and not the char cell height *)
+              scrollX + pixX + Attr.boxWidth div 2,
+              scrollY + pixY,  (* Use char height and not the char cell height *)
               IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
-              scrollX + pixX  + Attr.boxWidth,
-              scrollY + pixY + hch,
+              scrollX + pixX + Attr.boxWidth div 2,
+              scrollY + pixY,
               IntToStr(i) );
   end;
 
@@ -470,8 +470,8 @@ begin
   begin
     CalcPos(0, i, x, y);
     v_gtext(vdiHandle,
-            x + Attr.boxWidth,
-            y + hCell, (*(cellHeight div 2),*)
+            x + Attr.boxWidth div 2,
+            y + hch, (*(cellHeight div 2),*)
             day1[i] );
   end;
 
@@ -500,6 +500,7 @@ begin
   (* Draw heading line *)
   pxy[0] := Work.X;
   pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
+  log.debug ('grid X start = ', pxy[0]);
 
   pxy[1] := y;
   pxy[3] := pxy[1];
@@ -508,7 +509,7 @@ begin
   for r := 0 to rows
   do
   begin
-    log.info ('Y=', Y);
+    log.info ('grid Y start = ', Y);
 
     (* create a list of co-ords, declaration order above is the important bit *)
     pxy[1] := y;
@@ -522,7 +523,6 @@ begin
       y := y + cellHeight;
 
   end;
-
 
   (* Draw vertical lines for days by changing x co-ords *)
   pxy[1] := Work.Y + titleHeight;  (* constant Y for vertical line *)

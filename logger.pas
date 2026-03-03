@@ -70,7 +70,7 @@ procedure TLogger.log(msgLevel : TLogLevel;
                       message  : String);
 begin
 
-  writeln (ord(level), ' ; ', ord(msgLevel) );
+  (*writeln (ord(level), ' ; ', ord(msgLevel) );*)
 
   if (ord(level) >= ord(msgLevel) )
   then
