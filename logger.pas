@@ -49,6 +49,8 @@ type
 
 
 implementation
+uses
+    Dos;
 
 constructor TLogger.Create(msgLevel : TLogLevel);
 begin
