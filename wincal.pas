@@ -69,7 +69,6 @@ var
 
 
 implementation
-
   uses
     Gem,
     Dos,
@@ -161,8 +160,7 @@ begin
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
   (* Display the dates, highlighting today *)
-  for i := 1 to daysInMon
-  do
+  for i := 1 to daysInMon do
   begin
     CalcCell (displayDate^.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
@@ -466,8 +464,7 @@ begin
   DrawGrid (1, headerHeight);
 
   (* Write Day labels *)
-  for i := 0 to 6
-  do
+  for i := 0 to 6 do
   begin
     CalcPos(0, i, x, y);
     v_gtext(vdiHandle,
@@ -485,33 +482,31 @@ var
   log       : TLogger;
   r, c      : Integer;
   pxy       : array[0..3] of integer;  (* Declare in correct order for passing to v_pline *)
-  newX,
-  newY,
+
+  scrollX,
+  scrollY,
   Y         : integer;
 
+  qx, qy : integer;
 
 begin
   log := TLogger.Create(LLDEBUG);
 
-  newX := Scroller^.GetXOrg;
-  newY := Scroller^.GetYOrg;
+  scrollX := Scroller^.GetXOrg;
+  scrollY := Scroller^.GetYOrg;
 
   Y := Work.Y + titleHeight;
 
   (* Draw heading line *)
   pxy[0] := Work.X;
   pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
-  log.debug ('grid X start = ', pxy[0]);
 
   pxy[1] := y;
   pxy[3] := pxy[1];
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
-  for r := 0 to rows
-  do
+  for r := 0 to rows do
   begin
-    log.info ('grid Y start = ', Y);
-
     (* create a list of co-ords, declaration order above is the important bit *)
     pxy[1] := y;
     pxy[3] := y;
@@ -529,10 +524,10 @@ begin
   pxy[1] := Work.Y + titleHeight;  (* constant Y for vertical line *)
   pxy[3] := Work.Y + titleHeight + headerHeight + (rows-1) * cellHeight;
 
-  for c := 0 to 7
-  do
+  for c := 0 to 7 do
   begin
-    pxy[0] := Work.X + c * CellWidth;
+    CalcPos(0, c,  pxy[0], pxy[1]);
+
     pxy[2] := pxy[0];
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
@@ -583,8 +578,7 @@ begin
   vst_point(vdiHandle, 7, wch, hch, wCell, hCell);
   lineSpace := cellHeight div 3;
 
-  for j := 1 to 31
-  do
+  for j := 1 to 31 do
   begin
     CalcCell (displayDate^.day, j, row, col);
     CalcPos(row, col, x, y);
@@ -592,8 +586,7 @@ begin
     log.debug ('row ', row);
     log.debug ('col ', col);
 
-    for i := 0 to cellGr^.cell[j]^.counter - 1
-    do
+    for i := 0 to cellGr^.cell[j]^.counter - 1 do
     begin
       summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary, 1, 16 );
       time      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.timeStart^.humanDateTime, 11, 5 );
