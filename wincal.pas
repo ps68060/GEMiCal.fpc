@@ -501,9 +501,6 @@ begin
   pxy[0] := Work.X;
   pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
-  pxy[1] := y;
-  pxy[3] := pxy[1];
-
   (* Draw horizontal lines for weeks by changing y co-ords *)
   for r := 0 to rows do
   begin
@@ -517,16 +514,15 @@ begin
       y := y + headerHeight
     else
       y := y + cellHeight;
-
   end;
 
   (* Draw vertical lines for days by changing x co-ords *)
-  pxy[1] := Work.Y + titleHeight;  (* constant Y for vertical line *)
-  pxy[3] := Work.Y + titleHeight + headerHeight + (rows-1) * cellHeight;
+  CalcPos(rows-1, 0,  pxy[0], pxy[3]);
 
-  for c := 0 to 7 do
+  for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
   begin
-    CalcPos(0, c,  pxy[0], pxy[1]);
+    (* Use column to calc X co-ord in [0] *)
+    CalcPos(0, c,  pxy[0], pxy[3]);
 
     pxy[2] := pxy[0];
 
