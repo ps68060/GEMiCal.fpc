@@ -41,8 +41,7 @@ type
                    procedure IconPaint(var PaintInfo : TPaintStruct);  VIRTUAL;
                    procedure SetupSize;                                VIRTUAL;
 
-                   procedure WriteDates(newX,
-                                        newY   : LongInt);             VIRTUAL;
+                   procedure WriteDates;                               VIRTUAL;
 
                    procedure DrawTitle;
 
@@ -61,7 +60,7 @@ type
                  END;
 
 var
-  conf            : PConfig;
+  conf            : TConfig;
 
   displayDate     : PDateTime;  (* 1st of the month *)
 
@@ -107,8 +106,7 @@ begin
 end;
 
 
-procedure TWinCal.WriteDates(newX,
-                             newY   : LongInt);
+procedure TWinCal.WriteDates;
 var
   log          : TLogger;
 
@@ -216,11 +214,9 @@ var
   dayOfWeek   : Word;
 
 begin
-
   log := TLogger.Create(LLINFO);
 
-  new (conf);
-  conf^.init;
+  conf := TConfig.Create;;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -235,12 +231,13 @@ begin
   vsf_interior(vdiHandle, FIS_HOLLOW);
   DrawGrid(6, cellHeight);
 
-  WriteDates(new_X, new_Y);
+  WriteDates;
 
   DisplayEvents(new_X, new_Y);
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
+  conf.Free;
   log.Free;
 
 end;
@@ -419,7 +416,7 @@ begin
   todayDate^.init;
   todayDate^.dtStr2Obj(dtStr);
 
-  sunRiseSet(conf^.lat, conf^.lng, conf^.UTCoffset
+  sunRiseSet(conf.lat, conf.lng, conf.UTCoffset
             ,todayDate,  sunrise, sunset);
   dispose(todayDate);
 

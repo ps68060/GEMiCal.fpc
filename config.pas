@@ -1,21 +1,20 @@
+{$mode objfpc}
 unit Config;
 
 interface
-
   uses
    Objects;
 
 
 type
-  PConfig = ^TConfig;
-  TConfig = object(TObject)
+  TConfig = class
     name        : String;
     lat         : Real;
     lng         : Real;
     UTCoffset   : Real;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor create;
+    destructor  destroy; override;
 
     procedure readConfig;
   end;
@@ -33,7 +32,7 @@ uses
     lngTk        = 'long';
     UTCoffsetTk  = 'UTCoffset';
 
-  constructor TConfig.init;
+  constructor TConfig.create;
   begin
     name      := 'default';
     lat       := 51.4779;
@@ -44,10 +43,9 @@ uses
   end;
 
 
-  destructor TConfig.done;
-
+  destructor TConfig.destroy;
   begin
-
+    inherited Destroy;
   end;
 
 
