@@ -9,7 +9,7 @@ interface
   type
     PCalCell  = ^TCalCell;
     TCalCell  = Object(TObject)
-      cellEvents : array [0..9] of PCellEvent;
+      cellEvents : array [0..9] of TCellEvent;
       eventNum   : Integer;
       counter    : Integer;
 
@@ -31,8 +31,7 @@ implementation
     for i := 0 to 9
     do
     begin
-      new (cellEvents[i]);
-      cellEvents[i]^.init;
+      cellEvents[i] := TCellEvent.create;
     end;
 
   end;
@@ -46,7 +45,7 @@ implementation
     for i := 0 to 9
     do
     begin
-      dispose (cellEvents[i], Done);
+      cellEvents[i].Free;
     end;
   end;
 
