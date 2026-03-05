@@ -175,9 +175,8 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    new (displayDate);
-    displayDate^.init;
-    displayDate^.dtStr2Obj(dtStr);
+    displayDate := TDateTime.create;
+    displayDate.dtStr2Obj(dtStr);
 
     LoadCal;
 
@@ -295,8 +294,8 @@ begin
   log.debug('Prev Month Work');
 
 
-  month := displayDate^.getMMFromIso;
-  year  := displayDate^.getYYYYFromIso;
+  month := displayDate.getMMFromIso;
+  year  := displayDate.getYYYYFromIso;
 
   dec (month);
 
@@ -330,8 +329,8 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Month Work');
 
-  month := displayDate^.getMMFromIso;
-  year  := displayDate^.getYYYYFromIso;
+  month := displayDate.getMMFromIso;
+  year  := displayDate.getYYYYFromIso;
 
   inc (month);
 
@@ -364,11 +363,11 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Prev Year Work');
 
-  year  := displayDate^.getYYYYFromIso;
+  year  := displayDate.getYYYYFromIso;
 
   dec (year);
 
-  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
+  dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
 
   FilterCal(dtStr);
 
@@ -390,11 +389,11 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Year Work');
 
-  year  := displayDate^.getYYYYFromIso;
+  year  := displayDate.getYYYYFromIso;
 
   inc (year);
 
-  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
+  dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
 
   FilterCal(dtStr);
 
@@ -437,11 +436,9 @@ begin
 
   if (displayDate <> NIL)
   then
-    dispose (displayDate, done);
+    displayDate := TDateTime.create;
 
-  new (displayDate);
-  displayDate^.init;
-  displayDate^.dtStr2Obj(dtStr);
+  displayDate.dtStr2Obj(dtStr);
 
   log.debug('Filter ' + dtStr );
 

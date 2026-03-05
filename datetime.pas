@@ -1,3 +1,5 @@
+{$mode objfpc}
+
 unit datetime;
 
 
@@ -33,8 +35,8 @@ const
          = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
 
 type
-  PDateTime = ^TDateTime;
-  TDateTime = object(TObject)
+  TDateTime = class
+  public
     tz      : String;
 
     isoDate : String;
@@ -44,8 +46,8 @@ type
 
     day     : Integer;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor create;
+    destructor  destroy; override;
 
     procedure dtStr2Obj(dtString : String);
 
@@ -103,7 +105,7 @@ type
   function isLeapDay(y : Integer)
           : Boolean;
 
-  function daysInMonth(myDate : PDateTime)
+  function daysInMonth(myDate : TDateTime)
           :Integer;
 
 
@@ -113,7 +115,7 @@ uses
     Logger,
     StrSubs;
 
-  constructor TDateTime.init;
+  constructor TDateTime.create;
   begin
     isoDate := '19700101';
 
@@ -125,9 +127,9 @@ uses
     day    := 4;
   end;
 
-  destructor TDateTime.done;
+  destructor TDateTime.destroy;
   begin
-
+    inherited destroy;
   end;
 
 
@@ -558,13 +560,13 @@ uses
   end;
 
 
-  function daysInMonth(myDate : PDateTime)
+  function daysInMonth(myDate : TDateTime)
           :Integer;
   (* Purpose : Calculate date of end of month *)
   begin
-    daysInMonth := daysMon[myDate^.getMMFromIso];
+    daysInMonth := daysMon[myDate.getMMFromIso];
 
-    if (myDate^.getMMFromIso = 2) and (isLeapDay(myDate^.getYYYYFromIso))
+    if (myDate.getMMFromIso = 2) and (isLeapDay(myDate.getYYYYFromIso))
     then
       daysInMonth := 29;
   end;

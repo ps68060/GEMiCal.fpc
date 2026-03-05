@@ -1,3 +1,4 @@
+{$mode objfpc}
 unit Event;
 
 (* AUTHOR  : P Slegg
@@ -25,8 +26,8 @@ type
     dtEndTz     : String;
     location    : String;
 
-    startDate   : PDateTime;
-    endDate     : PDateTime;
+    startDate   : TDateTime;
+    endDate     : TDateTime;
 
     alarmAction      : String;
     alarmTrigger     : String;
@@ -84,17 +85,12 @@ implementation
     alarmTrigger     := '';
     alarmDescription := '';
 
-    new (startDate);
-    startDate^.init;
-
-    new (endDate);
-    endDate^.init;
+    startDate := TDateTime.create;
+    endDate   := TDateTime.create;
   end;
 
   destructor TEvent.done;
   begin
-    dispose(startDate, Done);
-    dispose(endDate, Done);
   end;
 
 
@@ -200,18 +196,18 @@ implementation
     if (length(dtStart) > 0)
     then
     begin
-      startDate^.dtStr2Obj(dtStart);
+      startDate.dtStr2Obj(dtStart);
     end;
 
 
     if (length(dtEnd) > 0)
     then
     begin
-      endDate^.dtStr2Obj(dtEnd);
+      endDate.dtStr2Obj(dtEnd);
     end
     else
     begin
-      endDate^.dtStr2Obj(dtStart);
+      endDate.dtStr2Obj(dtStart);
     end;
 
     log.Free;
@@ -282,7 +278,7 @@ implementation
 
   begin
     write('Event on     : ');
-    startDate^.writeDT;
+    startDate.writeDT;
 
     WriteNN (summary);
     WriteNN (description);
@@ -293,7 +289,7 @@ implementation
     WriteNN (alarmTrigger);
 
     write('Event ends   : ');
-    endDate^.writeDT;
+    endDate.writeDT;
   end;
 
 
@@ -314,44 +310,39 @@ implementation
 
   var
     pStart,
-    pEnd   : PDateTime;
+    pEnd   : TDateTime;
 
     daysInMon : Integer;
 
   begin
     isMonthEvent := FALSE;
 
-    new(pStart);
-    pStart^.init;
-    pStart^.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
+    pStart := TDateTime.create;
+    pStart.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
 
     daysInMon := daysMon[m];
     if (m = 2) and (isLeapDay(y))
     then
       daysInMon := 29;
 
-    new(pEnd);
-    pEnd^.init;
-    pEnd^.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
+    pEnd := TDateTime.create;
+    pEnd.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
 
     (* Does the event start/end overlap with the period start/end ? *)
 
-    if      (startDate^.epoch > pStart^.epoch)
-        and (startDate^.epoch < pEnd^.epoch)
+    if      (startDate.epoch > pStart.epoch)
+        and (startDate.epoch < pEnd.epoch)
       or
-            (endDate^.epoch > pStart^.epoch)
-        and (endDate^.epoch < pEnd^.epoch)
+            (endDate.epoch > pStart.epoch)
+        and (endDate.epoch < pEnd.epoch)
       or
-            (startDate^.epoch < pStart^.epoch)
-        and (endDate^.epoch   > pEnd^.epoch)
+            (startDate.epoch < pStart.epoch)
+        and (endDate.epoch   > pEnd.epoch)
     then
     begin
       isMonthEvent := TRUE;
       writeln ('Current event');
     end;
-
-    dispose (pStart, Done);
-    dispose (pEnd,   Done);
 
   end;
 

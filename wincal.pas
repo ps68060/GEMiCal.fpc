@@ -1,3 +1,5 @@
+{$mode objfpc}
+
 unit WinCal;
 
 interface
@@ -33,7 +35,7 @@ type
                 public
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
-                   function  GetStyle        : Integer;                VIRTUAL;
+                   function  GetStyle        : smallint;               VIRTUAL;
                    function  GetScroller     : PScroller;              VIRTUAL;
 
                    procedure Paint(var PaintInfo     : TPaintStruct);  VIRTUAL;
@@ -53,7 +55,7 @@ type
                    procedure CalcPos(row,
                                      col   : Integer;
                                      var x,
-                                         y : Integer);
+                                         y : smallInt);
 
                    procedure DrawGrid(rows,
                                       height  : Integer);
@@ -62,7 +64,7 @@ type
 var
   conf            : TConfig;
 
-  displayDate     : PDateTime;  (* 1st of the month *)
+  displayDate     : TDateTime;  (* 1st of the month *)
 
   cellGr          : PCellGrid;
 
@@ -83,13 +85,13 @@ const
 
 var
   daysInMon    : integer;
-  endMonthDate : PDateTime;
+  endMonthDate : TDateTime;
 
 
 procedure TWinCal.CalcPos(row,
                           col   : Integer;
                           var x,
-                              y : Integer);
+                              y : smallInt);
 (* Purpose : Calculate the x, y of the cell from row, col.
  * inputs  : row 0 to 6
  *           col 0 to 5
@@ -111,7 +113,7 @@ var
   log          : TLogger;
 
   pixX,
-  pixY         : Integer;
+  pixY         : smallInt;
 
   year,
   month,
@@ -129,7 +131,7 @@ var
   wch,
   hch,
   wCell,
-  hCell        : Integer;
+  hCell        : smallInt;
 
 begin
   log := TLogger.Create(LLINFO);
@@ -137,17 +139,17 @@ begin
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.debug ('year ', displayDate^.getYYYYFromIso );
-  log.debug (mon1[displayDate^.getMMFromIso] );
+  log.debug ('year ', displayDate.getYYYYFromIso );
+  log.debug (mon1[displayDate.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek);
 
-  CalcCell (displayDate^.day, day, row, col);
+  CalcCell (displayDate.day, day, row, col);
 
   currentMonth := FALSE;
-  if     (displayDate^.getYYYYFromIso = year)
-     and (displayDate^.getMMFromIso   = month)
+  if     (displayDate.getYYYYFromIso = year)
+     and (displayDate.getMMFromIso   = month)
   then
     currentMonth := TRUE;
 
@@ -160,7 +162,7 @@ begin
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon do
   begin
-    CalcCell (displayDate^.day, i, row, col);
+    CalcCell (displayDate.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
     writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
@@ -173,7 +175,7 @@ begin
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(displayDate.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -197,12 +199,12 @@ var
   New_X,
   New_Y : LongInt;
 
-  pxArray     : Array [1..10] of Integer;
+  pxArray     : array [1..10] of longInt;
 
   wch,
   hch,
   wcell,
-  hcell       : Integer;
+  hcell       : smallint;
 
   lineLength  : Integer;
 
@@ -267,8 +269,7 @@ begin
 end;
 
 
-function TWinCal.GetStyle
-        : Integer;
+function TWinCal.GetStyle : smallint;
 (* set the Element of Windows *)
 
 begin
@@ -297,7 +298,7 @@ var
   wch,
   hch,
   wCell,
-  hCell   : integer;
+  hCell   : smallint;
 
 begin
   INHERITED SetupSize;
@@ -354,11 +355,12 @@ var
   wch,
   hch,
   wCell,
-  hCell,
-  hAlign,
-  vAlign     : Integer;
+  hCell      : smallint;
 
-  todayDate  : PDateTime;
+  hAlign,
+  vAlign     : smallint;
+
+  todayDate  : TDateTime;
 
   year,
   month,
@@ -375,14 +377,14 @@ var
   sunset     : String;
 
 begin
-  writeln('TITLE DATE = ', displayDate^.getYYYYFromIso,
-                      '-', displayDate^.getMMFromIso);
+  writeln('TITLE DATE = ', displayDate.getYYYYFromIso,
+                      '-', displayDate.getMMFromIso);
 
   log := TLogger.Create(LLDEBUG);
 
   (* Display the year and month *)
-  str(displayDate^.getYYYYFromIso, title);
-  title := title + ' ' + mon1[displayDate^.getMMFromIso];
+  str(displayDate.getYYYYFromIso, title);
+  title := title + ' ' + mon1[displayDate.getMMFromIso];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -412,13 +414,11 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   (* Sunrise and Sunset *)
-  new (todayDate);
-  todayDate^.init;
-  todayDate^.dtStr2Obj(dtStr);
+  todayDate := TDateTime.create;
+  todayDate.dtStr2Obj(dtStr);
 
   sunRiseSet(conf.lat, conf.lng, conf.UTCoffset
             ,todayDate,  sunrise, sunset);
-  dispose(todayDate);
 
   log.debug ('sunrise ' + sunrise);
   log.debug ('sunset '  + sunset);
@@ -442,17 +442,17 @@ procedure TWinCal.DrawGridHeading;
 (* Draw the column headings *)
 var
   lineLength  : Integer;
-  pxArray     : Array [1..10] of Integer;
+  pxArray     : array [1..10] of longInt;
 
   x,
-  y           : Integer;
+  y           : smallInt;
 
   i           : Integer;
 
   wch,
   hch,
   wcell,
-  hcell       : Integer;
+  hcell       : smallint;
 
 begin
 
@@ -478,7 +478,7 @@ procedure TWinCal.DrawGrid(rows,
 var
   log       : TLogger;
   r, c      : Integer;
-  pxy       : array[0..3] of integer;  (* Declare in correct order for passing to v_pline *)
+  pxy       : array [0..3] of smallint;  (* Declare in correct order for passing to v_pline *)
 
   scrollX,
   scrollY,
@@ -523,6 +523,11 @@ begin
 
     pxy[2] := pxy[0];
 
+    log.debug ('pxy[0] = ', pxy[0]);
+    log.debug ('pxy[0] = ', pxy[1]);
+    log.debug ('pxy[0] = ', pxy[2]);
+    log.debug ('pxy[0] = ', pxy[3]);
+
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
 
@@ -539,14 +544,14 @@ var
  log         : TLogger;
 
   row,
-  col,
+  col         : integer;
   x,
-  y           : Integer;
+  y           : smallInt;
 
   wch,
   hch,
   wCell,
-  hCell,
+  hCell       : smallint;
   offset,
   lineSpace   : Integer;
 
@@ -573,7 +578,7 @@ begin
 
   for j := 1 to 31 do
   begin
-    CalcCell (displayDate^.day, j, row, col);
+    CalcCell (displayDate.day, j, row, col);
     CalcPos(row, col, x, y);
 
     log.debug ('row ', row);
@@ -582,7 +587,7 @@ begin
     for i := 0 to cellGr^.cell[j]^.counter - 1 do
     begin
       summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary, 1, 16 );
-      time      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.timeStart^.humanDateTime, 11, 5 );
+      time      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.timeStart.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',

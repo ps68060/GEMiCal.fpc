@@ -170,8 +170,8 @@ implementation
       do
       begin
 
-        if (eventList[i]^.startDate^.epoch  >
-            eventList[j]^.startDate^.epoch )
+        if (eventList[i]^.startDate.epoch  >
+            eventList[j]^.startDate.epoch )
         then
         begin
           (*

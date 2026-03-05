@@ -12,8 +12,8 @@ interface
     TCellEvent = Object(TObject)
       summary   : String;
       location  : String;
-      timeStart : PDateTime;
-      timeEnd   : PDateTime;
+      timeStart : TDateTime;
+      timeEnd   : TDateTime;
 
       constructor init;
       destructor  done; virtual;
@@ -28,19 +28,14 @@ implementation
     summary   := '';
     location  := '';
 
-    new (timeStart);
-    timeStart^.init;
-
-    new (timeEnd);
-    timeEnd^.init;    
+    timeStart := TDateTime.create;
+    timeEnd   := TDateTime.create;    
 
   end;
 
 
   destructor TCellEvent.done;
   begin
-    dispose (timeStart, Done);
-    dispose (timeEnd,   Done);
   end;
 
 end.
