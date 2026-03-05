@@ -427,12 +427,12 @@ begin
   v_gtext(vdiHandle,
           Work.X + Work.W - (25 * Attr.charWidth),
           Work.Y + Attr.boxHeight,
-          'Sunrise/set: ' + SubStr(sunrise, 1, 5) );
+          'Sunrise: ' + SubStr(sunrise, 1, 5) );
 
   v_gtext(vdiHandle,
-          Work.X + Work.W - (20 * Attr.charWidth),
-          Attr.boxHeight,
-          SubStr(sunset, 1, 5) );
+          Work.X + Work.W - (25 * Attr.charWidth),
+          Work.Y + Attr.charHeight*3,
+          'Sunset:  ' + SubStr(sunset, 1, 5) );
 
 end;
 
