@@ -1,3 +1,5 @@
+{$mode objfpc}
+
 unit CalCell;
 
 interface
