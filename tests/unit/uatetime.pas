@@ -6,21 +6,25 @@ uses
   datetime;
 
 implementation
+const
+  GREEN = #27'[32m';
+  RED   = #27'[31m';
+  RESET = #27'[0m';
 
 procedure assertEqual(Expected, Actual: Integer; const Msg: string);
 begin
   if Expected <> Actual then
-    writeln('FAIL: ', Msg, ' Expected=', Expected, ' Actual=', Actual)
+    writeln(RED,   'FAIL: ', RESET, Msg, ' Expected = ', Expected, ' Actual = ', Actual)
   else
-    writeln('PASS: ', Msg);
+    writeln(GREEN, 'PASS: ', RESET, Msg);
 end;
 
 procedure assertTrue(Expected, Actual: boolean; const msg: string);
 begin
   if Expected <> Actual then
-    writeln('FAIL: ', Msg, ' Expected = ', Expected, ' Actual = ', Actual)
+    writeln(RED,   'FAIL: ', RESET, Msg, ' Expected = ', Expected, ' Actual = ', Actual)
   else
-    writeln('PASS: ', Msg);
+    writeln(GREEN, 'PASS: ', RESET, Msg);
 end;
 
 procedure Test_isLeapDay;
