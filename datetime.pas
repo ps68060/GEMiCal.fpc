@@ -167,13 +167,13 @@ uses
       tz := COPY (dtString, 16, length(dtString) );
 
     log.debug('dtStr2Obj date ' + isoDate);
-  (*  logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);*)
+  (*  log.debug('dtStr2Obj time ' + isoTime);*)
 
     date2 := julianDate;
     (*writeln('JDN      ', date2:12:2 ); *)
 
     calcEpoch;
-    (*writeln('epoch = ', epoch); *)
+    (* log.debug('epoch = ', epoch); *)
 
     dayOfWeek;
 
