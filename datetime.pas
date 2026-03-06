@@ -202,6 +202,10 @@ uses
 
   function TDateTime.getMMFromIso
           : Integer;
+  (* Purpose : Get the Month as an integer from an ISO formatted date
+   *  input  : ISO formatted date 'YYYY-MM-DD'
+   *  return : month number 1-12
+   *)
   var
     code   : Integer;
     month2 : Integer;
