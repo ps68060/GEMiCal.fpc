@@ -7,20 +7,20 @@ interface
     CellEvnt;
 
   type
-    PCalCell  = ^TCalCell;
-    TCalCell  = Object(TObject)
+    TCalCell  = class
+    public
       cellEvents : array [0..9] of TCellEvent;
       eventNum   : Integer;
       counter    : Integer;
 
-      constructor init;
-      destructor  done; virtual;
+      constructor create;
+      destructor  destroy; override;
     end;
 
 
 implementation
 
-  constructor TCalCell.init;
+  constructor TCalCell.create;
   var
     i : Integer;
 
@@ -36,7 +36,7 @@ implementation
 
   end;
 
-  destructor TCalCell.done;
+  destructor TCalCell.destroy;
   var
     i : Integer;
 
@@ -48,5 +48,7 @@ implementation
       cellEvents[i].Free;
     end;
   end;
+  
+  inherited destroy;
 
 end.
