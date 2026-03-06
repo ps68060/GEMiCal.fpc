@@ -1,8 +1,8 @@
 unit Token;
 
 (* AUTHOR  : P Slegg
-   DATE    : 19th Dec 2021 Version 1
-   PURPOSE : TToken object for lines of either iCal Event or INF key=value.
+ * DATE    : 19th Dec 2021 Version 1
+ * PURPOSE : TToken object for lines of either iCal Event or INF key=value.
 *)
 
 interface

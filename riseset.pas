@@ -23,9 +23,8 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
                           sunset  : String);
 
 (*
-
-SUNRISESET Compute apparent sunrise and sunset times in seconds.
-
+* SUNRISESET Compute apparent sunrise and sunset times in seconds.
+*
 *  1  sun_rise_set = sunRiseSet( lat, lng, UTCoff, date)
 *
 *     Computes the *apparent* (refraction corrected) sunrise  and sunset times in seconds from mignight and
@@ -72,8 +71,7 @@ SUNRISESET Compute apparent sunrise and sunset times in seconds.
 
 (* Process input *)
 
-(* Compute
-   Letters correspond to colums in the NOAA Excel
+(* variable letters correspond to columns in the NOAA Excel
  *)
 
 var

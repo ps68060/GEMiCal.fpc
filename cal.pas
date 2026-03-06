@@ -60,8 +60,8 @@ implementation
 
   Procedure TCal.LoadICS (directory : String);
   (*
-    Purpose : Load all the *.ics files from the <directory>.
-  *)
+   * Purpose : Load all the *.ics files from the <directory>.
+   *)
 
   var
     log     : TLogger;
@@ -97,9 +97,9 @@ implementation
   Procedure TCal.DivideIcs (const calName : String);
 
   (*
-    Purpose : Read an ICS file and get all the Events
-              into EventsList.
-              Return the number of events.
+   * Purpose : Read an ICS file and get all the Events
+   *           into EventsList.
+   *           Return the number of events.
    *)
 
   var

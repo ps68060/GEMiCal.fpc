@@ -191,7 +191,8 @@ end;
 
 procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
 
-(* Purpose : called on every change *)
+(* Purpose : called on every change
+ *)
 
 var
   log         : TLogger;
@@ -246,7 +247,8 @@ end;
 
 
 procedure TWinCal.GetWindowClass(var AWndClass : TWndClass);
-(* set general features of windows *)
+(* Purpose : set general features of windows
+ *)
 
 begin
   INHERITED GetWindowClass(AWndClass);
@@ -270,7 +272,8 @@ end;
 
 
 function TWinCal.GetStyle : smallint;
-(* set the Element of Windows *)
+(* Purpose : set the Element of Windows
+ *)
 
 begin
   GetStyle := INHERITED GetStyle or SLIDER or SIZER;
@@ -279,7 +282,7 @@ end;
 
 function TWinCal.GetScroller
         : PScroller;
-(* set the Scroller *)
+(* Purpose : set the Scroller *)
 
 begin
   GetScroller := new(PScroller, Init(@self, 4, 4, 160, 100) );
@@ -292,7 +295,8 @@ end;
 
 
 procedure TWinCal.SetupSize;
-(* set the size when first opened *)
+(* Purpose : set the size when first opened
+ *)
 
 var
   wch,
@@ -327,7 +331,8 @@ end;
 
 
 procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
-(* write a Text in the iconified Window *)
+(* Purpose : Write a Text in the iconified Window
+ *)
 
 var
   year,
@@ -440,8 +445,9 @@ end;
 
 
 procedure TWinCal.DrawGridHeading;
+(* Purpose : Draw the column headings
+ *)
 
-(* Draw the column headings *)
 var
   lineLength  : Integer;
   pxArray     : array [1..10] of longInt;
@@ -539,8 +545,8 @@ end;
 
 procedure TWinCal.DisplayEvents(newX,
                                 newY   : LongInt);
-
-(* Purpose : Display Events for a month  *)
+(* Purpose : Display Events for a month
+ *)
 
 var
  log         : TLogger;

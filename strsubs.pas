@@ -3,9 +3,9 @@
 unit StrSubs;
 
 (* AUTHOR  : P SLEGG
-   DATE    : 26th April 2020 Version 1
-   PURPOSE : 
-*)
+ * DATE    : 26th April 2020 Version 1
+ * PURPOSE : 
+ *)
 
 interface
 
@@ -57,7 +57,8 @@ function INTEGER_TO_CHAR (     Value      : INTEGER;
                            var Conversion : CHAR )
         : Boolean;
 
-(* PURPOSE : Converts a single integer into a character representation *)
+(* PURPOSE : Converts a single integer into a character representation
+ *)
 
 begin
 
@@ -77,7 +78,8 @@ function CHAR_TO_INTEGER (     Character  : CHAR;
                            var Conversion : INTEGER )
         : Boolean;
 
-(* PURPOSE : Converts a single character into an integer representation *)
+(* PURPOSE : Converts a single character into an integer representation
+ *)
 
 begin
   Conversion := ORD ( Character ) - ORD('0');
@@ -101,8 +103,10 @@ begin
 end;
 
 
-function INDEX (Key, Text : STRING) : INTEGER;
-{ Purpose : Find the index position of string Key in the string Text }
+function INDEX (Key, Text : STRING) 
+        : integer;
+(* Purpose : Find the index position of string Key in the string Text
+ *)
 
 var
   TextLen, KeyLen, TextCursor, KeyCursor : INTEGER;
@@ -180,9 +184,9 @@ end;
 function Get_Token (var Text : string)
         : string;
 (*
-  Purpose: Get the first token
-           Return the token
-           Text = the remainder of the string 
+ * Purpose: Get the first token
+ *          Return the token
+ *          Text = the remainder of the string 
  *)
 var
   Token    : string;
