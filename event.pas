@@ -91,6 +91,8 @@ implementation
 
   destructor TEvent.done;
   begin
+    dispose (startDate);
+    dispose (endDate);
   end;
 
 
@@ -98,7 +100,7 @@ implementation
           : Boolean;
 
   (*
-    Purpose : Get one iCS event.
+   * Purpose : Get one iCS event.
    *)
 
   var
@@ -210,11 +212,10 @@ implementation
       endDate.dtStr2Obj(dtStart);
     end;
 
-    log.Free;
-
     GetEvent := TRUE;
     (*writeEvent;*)
 
+    log.Free;
   end;
 
 
@@ -297,15 +298,15 @@ implementation
           : Boolean;
 
   (* Purpose : Determine if thisEvent falls within the period (month)
-               There are 4 cases in the period:
-               1: overlap start of period
-               2: contained within period
-               3: overlap end of period
-               4: start before, end after period
-
-               and 2 cases outside the period:
-               5: start/end before period
-               6: start/end after period
+   *           There are 4 cases in the period:
+   *           1: overlap start of period
+   *           2: contained within period
+   *           3: overlap end of period
+   *           4: start before, end after period
+   *
+   *           and 2 cases outside the period:
+   *           5: start/end before period
+   *           6: start/end after period
    *)
 
   var
@@ -344,6 +345,8 @@ implementation
       writeln ('Current event');
     end;
 
+    pStart.Free;
+    pEnd.Free;
   end;
 
 

@@ -193,6 +193,7 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
+  displayDate.Free;
   log.Free;
 
 end;
@@ -451,7 +452,8 @@ begin
   cellGr^.FilterEvents(myApplication.iCal,
                        displayDate);
   log.debug('Cal displayed');
-  
+
+  displayDate.Free;
   log.Free;
 
 end;

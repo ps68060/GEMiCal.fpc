@@ -80,8 +80,9 @@ uses
                                    calDate   : TDateTime);
 
   (* Purpose : Decide which Events should be displayed in the month
-               cal     = iCal calendar
-               calDate = date of 1st of month *)
+   *           cal     = iCal calendar
+   *           calDate = date of 1st of month
+   *)
   var
     log          : TLogger;
 
@@ -125,6 +126,7 @@ uses
 
     end;  (* for *)
 
+    endMonthDate.Free;
     log.Free;
   end;
 

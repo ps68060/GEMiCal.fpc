@@ -38,6 +38,8 @@ implementation
 
   destructor TCellEvent.destroy;
   begin
+    timeStart.Free;
+    timeEnd.Free;
     inherited destroy;
   end;
 

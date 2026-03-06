@@ -434,6 +434,8 @@ begin
           Work.Y + Attr.charHeight*3,
           'Sunset:  ' + SubStr(sunset, 1, 5) );
 
+  todayDate.Free;
+  log.Free;
 end;
 
 
@@ -531,7 +533,7 @@ begin
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
 
-
+  log.Free;
 end;
 
 
@@ -565,7 +567,6 @@ var
   i           : Integer;
 
 begin
-
   log := TLogger.Create(LLINFO);
 
   log.debug ('DisplayEvents');
