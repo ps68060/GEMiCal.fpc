@@ -19,7 +19,7 @@ type
   PCal = ^TCal;
   TCal = object(TObject)
     version   : String;
-    eventList : array [0..maxEvents] of PEvent;
+    eventList : array [0..maxEvents] of TEvent;
     entries   : Integer;
 
     constructor init;
@@ -53,7 +53,7 @@ implementation
     for i := 0 to entries
     do
     begin
-      dispose(eventList[i], Done);
+      eventList[i].Free;
     end;
   end;
 
@@ -155,10 +155,11 @@ implementation
   var
     log     : TLogger;
     i, j    : Integer;
-    swapper : PEvent;
+    swapper : TEvent;
 
   begin
     log := TLogger.Create(LLINFO);
+    swapper = TEvent.Create;
 
     log.debug ('Starting sort of ', entries);
 
@@ -199,6 +200,7 @@ implementation
 
     log.debug('Sorted');
 
+    swapper.Free;
     log.Free;
 
   end;

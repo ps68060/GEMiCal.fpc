@@ -14,8 +14,8 @@ interface
 
 
 type
-  PEvent = ^TEvent;
-  TEvent = object(TObject)
+  TEvent = class
+  public
     filename    : String;
     created     : String;
     summary     : String;
@@ -33,8 +33,8 @@ type
     alarmTrigger     : String;
     alarmDescription : String;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor create;
+    destructor  destroy; override;
 
     Function GetEvent (VAR calFile : Text)
             : Boolean;
@@ -71,7 +71,7 @@ implementation
     alarmDescTk   = 'DESCRIPTION:';
     alarmActionTk = 'ACTION:';
 
-  constructor TEvent.init;
+  constructor TEvent.Create;
   begin
     filename    := '';
     created     := '';
@@ -89,10 +89,11 @@ implementation
     endDate   := TDateTime.create;
   end;
 
-  destructor TEvent.done;
+  destructor TEvent.Destroy;
   begin
-    dispose (startDate);
-    dispose (endDate);
+    startDate.Free;
+    endDate.Free;
+    inherited destroy;
   end;
 
 
