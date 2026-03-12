@@ -17,15 +17,15 @@ interface
       timeStart : TDateTime;
       timeEnd   : TDateTime;
 
-      constructor create;
-      destructor  destroy; override;
+      constructor Create;
+      destructor  Destroy; override;
 
     end;
 
 
 implementation
 
-  constructor TCellEvent.create;
+  constructor TCellEvent.Create;
   begin
     summary   := '';
     location  := '';
@@ -36,7 +36,7 @@ implementation
   end;
 
 
-  destructor TCellEvent.destroy;
+  destructor TCellEvent.Destroy;
   begin
     timeStart.Free;
     timeEnd.Free;

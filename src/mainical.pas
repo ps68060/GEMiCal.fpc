@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit MainIcal;
@@ -60,7 +61,7 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
-                     iCal       : PCal;
+                     iCal       : TCal;
                      winCal     : PWinCal;
 
                      destructor done; virtual;
@@ -165,6 +166,7 @@ begin
   log := TLogger.Create(LLDEBUG);
 
   log.info('INIT Main Window');
+  writeln('pause'); readln;
 
   if MyApplication.winCal = NIL
   then
@@ -175,15 +177,15 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    displayDate := TDateTime.create;
+    displayDate := TDateTime.Create;
     displayDate.dtStr2Obj(dtStr);
 
     LoadCal;
 
-    if (myApplication.iCal^.entries > 0)
+    if (myApplication.iCal.entries > 0)
     then
     begin
-      MyApplication.iCal^.sort;
+      MyApplication.iCal.sort;
       FilterCal(dtStr);
     end;
 
@@ -220,13 +222,10 @@ begin
   begin
     BusyMouse;
 
-    Dispose(myApplication.iCal, Done);
-    if (cellGr <> NIL)
-    then
-      Dispose(cellGr, Done);
+    myApplication.iCal.Free;
 
-    new (cellGr);
-    cellGr^.init;
+    cellGr.Free;
+    cellGr.Create;
 
     directory := myPath;
 
@@ -235,10 +234,10 @@ begin
 
     LoadCal;
    
-    if (myApplication.iCal^.entries > 0)
+    if (myApplication.iCal.entries > 0)
     then
     begin
-      myApplication.iCal^.sort;
+      myApplication.iCal.sort;
       FilterCal(dtStr);
     end;
 
@@ -412,15 +411,14 @@ var
 begin
   log := TLogger.Create(LLINFO);
 
-  new(myApplication.iCal);
-  myApplication.iCal^.init;
+  myApplication.iCal.Create;
 
   log.debug('Load ICS files from ' + directory);
 
   (* Load iCal events *)
-  myApplication.iCal^.loadICS(directory);
+  myApplication.iCal.loadICS(directory);
   
-  log.debug('loaded ', myApplication.iCal^.entries );
+  log.debug('loaded ', myApplication.iCal.entries );
 
   log.Free;
 
@@ -443,14 +441,10 @@ begin
 
   log.debug('Filter ' + dtStr );
 
-  if (cellGr <> NIL)
-  then
-    dispose (cellGr, done);
-
-  new (cellGr);
-  cellGr^.init;
-  cellGr^.FilterEvents(myApplication.iCal,
-                       displayDate);
+  cellGr.Free;
+  cellGr.Create;
+  cellGr.FilterEvents(myApplication.iCal,
+                      displayDate);
   log.debug('Cal displayed');
 
   displayDate.Free;

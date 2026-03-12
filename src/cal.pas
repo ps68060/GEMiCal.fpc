@@ -1,4 +1,5 @@
 {$B+,D-,I-,L-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$mode objfpc}
 
 unit Cal;
 
@@ -16,14 +17,14 @@ const
   maxEvents = 999;
 
 type
-  PCal = ^TCal;
-  TCal = object(TObject)
+  TCal = class
+  public
     version   : String;
     eventList : array [0..maxEvents] of TEvent;
     entries   : Integer;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor Create;
+    destructor  Destroy; override;
 
     Procedure LoadICS (directory : String);
     Procedure DivideIcs (const calName : String);
@@ -35,23 +36,28 @@ implementation
 
   uses
     Dos,
+    SysUtils,
     Logger;
 
-  constructor TCal.init;
+  constructor TCal.Create;
   var
     i : Integer;
   begin
     version := '2.0';
     entries := 0;
+    
+    for i := 0 to maxEvents do
+    begin
+      eventList[i].Create;
+    end;
   end;
 
 
-  destructor TCal.done;
+  destructor TCal.Destroy;
   var
     i : Integer;
   begin
-    for i := 0 to entries
-    do
+    for i := 0 to entries do
     begin
       eventList[i].Free;
     end;
@@ -66,13 +72,13 @@ implementation
   var
     log     : TLogger;
     attr    : Word;
-    fileRec : SearchRec;
+    fileRec : TRawbyteSearchRec;
     calName : String;
 
   begin
     log := TLogger.Create(LLINFO);
 
-    findFirst(directory + '/*.ics', attr, fileRec);
+    findFirst(directory + '/*.ics', FAANYFILE, fileRec);
 
     while DosError = 0
     do
@@ -132,11 +138,10 @@ implementation
       if ( pos (checkStart, currentLn) = 1 )
       then
       begin
-        new (eventList[entries]);
-        eventList[entries]^.init;
+        eventList[entries].Create;
       
-        eventList[entries]^.getEvent(calFile);
-        eventList[entries]^.filename := calName;
+        eventList[entries].getEvent(calFile);
+        eventList[entries].filename := calName;
 
         inc (entries);
       end;
@@ -159,7 +164,7 @@ implementation
 
   begin
     log := TLogger.Create(LLINFO);
-    swapper = TEvent.Create;
+    swapper := TEvent.Create;
 
     log.debug ('Starting sort of ', entries);
 
@@ -171,8 +176,8 @@ implementation
       do
       begin
 
-        if (eventList[i]^.startDate.epoch  >
-            eventList[j]^.startDate.epoch )
+        if (eventList[i].startDate.epoch  >
+            eventList[j].startDate.epoch )
         then
         begin
           (*

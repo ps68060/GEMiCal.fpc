@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit CalCell;
@@ -49,8 +50,8 @@ implementation
     begin
       cellEvents[i].Free;
     end;
+
+    inherited destroy;
   end;
   
-  inherited destroy;
-
 end.

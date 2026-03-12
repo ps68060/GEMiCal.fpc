@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit datetime;
@@ -46,8 +47,8 @@ type
 
     day     : Integer;
 
-    constructor create;
-    destructor  destroy; override;
+    constructor Create;
+    destructor  Destroy; override;
 
     procedure dtStr2Obj(dtString : String);
 
@@ -115,7 +116,7 @@ uses
     Logger,
     StrSubs;
 
-  constructor TDateTime.create;
+  constructor TDateTime.Create;
   begin
     isoDate := '19700101';
 
@@ -127,7 +128,7 @@ uses
     day    := 4;
   end;
 
-  destructor TDateTime.destroy;
+  destructor TDateTime.Destroy;
   begin
     inherited destroy;
   end;
@@ -193,7 +194,7 @@ uses
     val ( COPY (isoDate, 1, 4), year4, code );
     if (code <> 0)
     then
-      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
+      writeln ('Integer conversion error of year at ', code, ' in ', isoDate, '"');
 
     getYYYYFromIso := year4;
 
@@ -215,7 +216,7 @@ uses
     val ( COPY (isoDate, 5, 2), month2, code );
     if (code <> 0)
     then
-      writeln ('Integer conversion error of month at ', code, ' in ', isoDate);
+      writeln ('Integer conversion error of month at ', code, ' in ', isoDate, '"');
 
     getMMFromIso := month2;
 
@@ -233,7 +234,7 @@ uses
     val ( COPY (isoDate, 7, 2), day2, code );
     if (code <> 0)
     then
-      writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate);
+      writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate, '"');
 
     getDDFromIso := day2;
 
@@ -251,7 +252,7 @@ uses
     val ( COPY (isoTime, 1, 2), hr2, code );
     if (code <> 0)
     then
-      writeln ('Integer conversion error of hour at ', code, ' in ', isoTime);
+      writeln ('Integer conversion error of hour at ', code, ' in "', isoTime, '"');
 
     getHrFromIso := hr2;
 
@@ -269,7 +270,7 @@ uses
     val ( COPY (isoTime, 3, 2), min2, code );
     if (code <> 0)
     then
-      writeln ('Integer conversion error of mi at ', code, ' in ', isoTime);
+      writeln ('Integer conversion error of mi at ', code, ' in ', isoTime, '"');
 
     getMinFromIso := min2;
 
@@ -287,7 +288,7 @@ uses
     val ( COPY (isoTime, 5, 2), sec2, code );
     if (code <> 0)
     then
-      writeln ('Integer conversion error of ss at ', code, ' in ', isoTime);
+      writeln ('Integer conversion error of ss at ', code, ' in ', isoTime, '"');
 
     getSecFromIso := sec2;
 

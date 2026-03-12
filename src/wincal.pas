@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit WinCal;
@@ -66,7 +67,7 @@ var
 
   displayDate     : TDateTime;  (* 1st of the month *)
 
-  cellGr          : PCellGrid;
+  cellGr          : TCellGrid;
 
 
 implementation
@@ -574,6 +575,7 @@ var
 
 begin
   log := TLogger.Create(LLINFO);
+  cellGr.Create;
 
   log.debug ('DisplayEvents');
 
@@ -591,14 +593,14 @@ begin
     log.debug ('row ', row);
     log.debug ('col ', col);
 
-    for i := 0 to cellGr^.cell[j]^.counter - 1 do
+    for i := 0 to cellGr.cell[j].counter - 1 do
     begin
-      summ      := SubStr (cellGr^.cell[j]^.cellEvents[i].summary, 1, 16 );
-      time      := SubStr (cellGr^.cell[j]^.cellEvents[i].timeStart.humanDateTime, 11, 5 );
+      summ      := SubStr (cellGr.cell[j].cellEvents[i].summary, 1, 16 );
+      time      := SubStr (cellGr.cell[j].cellEvents[i].timeStart.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
-                                  cellGr^.cell[j]^.cellEvents[i].location), 1, 16 );
+                                  cellGr.cell[j].cellEvents[i].location), 1, 16 );
 
       log.debug('Summary  ' + summ );
       log.debug('counter ', i);
@@ -618,6 +620,7 @@ begin
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wcell, hcell);
 
+  cellGr.Free;
   log.Free;
 
 end;
