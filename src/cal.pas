@@ -46,9 +46,9 @@ implementation
     version := '2.0';
     entries := 0;
     
-    for i := 0 to maxEvents do
+    for i := 0 to MAXEVENTS do
     begin
-      eventList[i].Create;
+      eventList[i] := TEvent.Create;
     end;
   end;
 
@@ -57,7 +57,7 @@ implementation
   var
     i : Integer;
   begin
-    for i := 0 to entries do
+    for i := 0 to MAXEVENTS do
     begin
       eventList[i].Free;
     end;

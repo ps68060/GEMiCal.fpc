@@ -203,22 +203,28 @@ implementation
 
     end;  (* while *)
 
-
     if (length(dtStart) > 0)
     then
     begin
+     log.debug('dtStart = ' + dtStart);
+  
+      if (startDate = nil)
+      then
+        writeln ('StartDate is NIL');
+
       startDate.dtStr2Obj(dtStart);
     end;
 
-    if (length(dtEnd) > 0)
-    then
-    begin
-      endDate.dtStr2Obj(dtEnd);
-    end
-    else
-    begin
-      endDate.dtStr2Obj(dtStart);
-    end;
+//    if (length(dtEnd) > 0)
+//    then
+//    begin
+//  log.debug('dtEnd   = ' + dtEnd);
+//      endDate.dtStr2Obj(dtEnd);
+//    end
+//    else
+//    begin
+//      endDate.dtStr2Obj(dtStart);
+//    end;
 
     GetEvent := TRUE;
     (*writeEvent;*)
