@@ -123,8 +123,6 @@ implementation
     endEvent     := FALSE;
     alarm        := FALSE;
 
-    tokens := TToken.Create;
-
     log.debug ('enter while loop');
     while (NOT eof (calFile) 
            AND NOT endEvent )
@@ -143,6 +141,8 @@ implementation
 
       else
       begin
+        tokens := TToken.Create;
+
         log.debug ('Tokenise ', currentLn);
         tokens.tokeniseIcal(currentLn);
         writeln ('token 0 = ', tokens.part[0]);
@@ -198,6 +198,7 @@ implementation
         then
           alarm := FALSE;
 
+        tokens.Free;
       end;  (* if *)
 
     end;  (* while *)
