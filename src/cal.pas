@@ -118,7 +118,7 @@ implementation
     i           : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
     checkStart := 'BEGIN:VEVENT';
 
@@ -138,8 +138,6 @@ implementation
       if ( pos (checkStart, currentLn) = 1 )
       then
       begin
-        eventList[entries].Create;
-      
         eventList[entries].getEvent(calFile);
         eventList[entries].filename := calName;
 

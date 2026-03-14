@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit Token;
@@ -31,15 +31,16 @@ type
 implementation
 
 uses
+  StrUtils,
   Logger;
 
   constructor TToken.Create;
   var
     i : Integer;
   begin
-    for i := 0 to 3
-    do
-      part[i] := '';
+//    for i := 0 to 3
+//    do
+//      part[i] := '';
   end;
 
   destructor TToken.Destroy;
@@ -62,8 +63,8 @@ uses
     if (posn > 0)
     then
     begin
-      before := COPY (line, 0,      posn-1 );
-      after  := COPY (line, posn+1, length(line) );
+      before := COPY (line, 1,      posn-1 );
+      after  := COPY (line, posn+1, MAXINT );
     end
     else
     begin
@@ -80,18 +81,18 @@ uses
     posn         : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
-    (* Token before colon *)
     splitAt (':', line, part[0], part[2]);
+    log.debug ('// Token before colon', part[0]);
 
-    (* Split part 0 at semi-colon *)
+    log.debug ('// Split part 0 at semi-colon');
     splitAt (';', part[0], part[0], part[1]);
 
     log.debug('tag    = ' + part[0]);
     log.debug('qual   = ' + part[1]);
  
-    log.debug ('value = ' + part[2]);
+    log.debug('value  = ' + part[2]);
 
     log.Free;
   end;

@@ -78,15 +78,17 @@ implementation
     summary     := '';
     description := '';
     dtstart     := '';
+    dtstartTz   := '';
     dtend       := '';
+    dtendTz     := '';
     location    := '';
 
     alarmAction      := '';
     alarmTrigger     := '';
     alarmDescription := '';
 
-    startDate := TDateTime.create;
-    endDate   := TDateTime.create;
+    startDate := TDateTime.Create;
+    endDate   := TDateTime.Create;
   end;
 
   destructor TEvent.Destroy;
@@ -108,7 +110,6 @@ implementation
     log          : TLogger;
 
     convStr      : String;
-
     currentLn    : String;
 
     alarm        : Boolean;
@@ -117,11 +118,12 @@ implementation
     tokens       : TToken;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
     endEvent     := FALSE;
     alarm        := FALSE;
 
+    log.debug ('enter while loop');
     while (NOT eof (calFile) 
            AND NOT endEvent )
     do
@@ -134,19 +136,26 @@ implementation
       if ( pos(endEventTk, currentLn) = 1 )
       then
       begin
-
         endEvent := TRUE;
-
       end
 
       else
       begin
-        tokens.Create;
+        tokens := TToken.Create;
+        log.debug ('Tokenise ', currentLn);
         tokens.tokeniseIcal(currentLn);
+        log.debug('token 0 = ', tokens.part[0]);
+        log.debug('token 1 = ', tokens.part[1]);
+        log.debug('token 2 = ', tokens.part[2]);
 
         if ( pos(createdTk, tokens.part[0]) = 1 )
         then
+        begin
+          log.debug('token 2 = ', tokens.part[2]);
           created := tokens.part[2];
+        end;
+          
+        log.debug('Created = ', created);
 
         if ( pos(dtStartTk, tokens.part[0]) = 1 )
         then
