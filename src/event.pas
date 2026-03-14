@@ -203,7 +203,6 @@ implementation
 
     end;  (* while *)
 
-    tokens.Free;
 
     if (length(dtStart) > 0)
     then
