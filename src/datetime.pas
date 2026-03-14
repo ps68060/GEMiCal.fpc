@@ -160,7 +160,6 @@ uses
 
     if (timestampLen > 10) and (dtString[9] = 'T')
     then
-      isoTime := Copy(dtString, 10, 6);
       if (timestampLen > 15)
       then
         isoTime := Copy(dtString, 10, 6)
@@ -376,13 +375,11 @@ uses
     part3 := (3 * ((lyyyy + 4900 + (lmm - 14) div 12) div 100)) div 4 ;
     part4 := ldd - 32075 ;
 
-    (*
     writeln('part1 : ', part1:20:10);
     writeln('part2 : ', part2:20:10);
     writeln('part3 : ', part3:20:10);
     writeln('part4 : ', part4:20:10);
-    *)
-
+    
     julian := part1 + part2 - part3 + part4;
 
     (* Julian day is based on midday so if the hour is less than 12 it is the previous day. *)
