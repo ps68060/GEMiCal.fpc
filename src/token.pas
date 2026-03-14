@@ -81,20 +81,20 @@ uses
     posn         : Integer;
 
   begin
-    log := TLogger.Create(LLDEBUG);
+//    log := TLogger.Create(LLDEBUG);
 
     splitAt (':', line, part[0], part[2]);
-    log.debug ('// Token before colon', part[0]);
+//    log.debug ('// Token before colon', part[0]);
 
-    log.debug ('// Split part 0 at semi-colon');
+//    log.debug ('// Split part 0 at semi-colon');
     splitAt (';', part[0], part[0], part[1]);
 
-    log.debug('tag    = ' + part[0]);
-    log.debug('qual   = ' + part[1]);
+//    log.debug('tag    = ' + part[0]);
+//    log.debug('qual   = ' + part[1]);
  
-    log.debug('value  = ' + part[2]);
+//    log.debug('value  = ' + part[2]);
 
-    log.Free;
+//    log.Free;
   end;
 
 

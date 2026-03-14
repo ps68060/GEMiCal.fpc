@@ -123,6 +123,8 @@ implementation
     endEvent     := FALSE;
     alarm        := FALSE;
 
+    tokens := TToken.Create;
+
     log.debug ('enter while loop');
     while (NOT eof (calFile) 
            AND NOT endEvent )
@@ -141,12 +143,11 @@ implementation
 
       else
       begin
-        tokens := TToken.Create;
         log.debug ('Tokenise ', currentLn);
         tokens.tokeniseIcal(currentLn);
-        log.debug('token 0 = ', tokens.part[0]);
-        log.debug('token 1 = ', tokens.part[1]);
-        log.debug('token 2 = ', tokens.part[2]);
+        writeln ('token 0 = ', tokens.part[0]);
+        writeln ('token 1 = ', tokens.part[1]);
+        writeln ('token 2 = ', tokens.part[2]);
 
         if ( pos(createdTk, tokens.part[0]) = 1 )
         then
@@ -154,7 +155,7 @@ implementation
           log.debug('token 2 = ', tokens.part[2]);
           created := tokens.part[2];
         end;
-          
+
         log.debug('Created = ', created);
 
         if ( pos(dtStartTk, tokens.part[0]) = 1 )
@@ -197,19 +198,17 @@ implementation
         then
           alarm := FALSE;
 
-        tokens.Free;
-
       end;  (* if *)
 
     end;  (* while *)
 
+    tokens.Free;
 
     if (length(dtStart) > 0)
     then
     begin
       startDate.dtStr2Obj(dtStart);
     end;
-
 
     if (length(dtEnd) > 0)
     then
