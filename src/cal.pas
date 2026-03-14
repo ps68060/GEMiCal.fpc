@@ -78,22 +78,17 @@ implementation
   begin
     log := TLogger.Create(LLINFO);
 
-    findFirst(directory + '/*.ics', FAANYFILE, fileRec);
-
-    while DosError = 0
-    do
+    entries := 0;
+    if (findFirst(directory + '/*.ics', FAANYFILE, fileRec) = 0) then
     begin
-      log.debug ('Loading ' + fileRec.name);
-      calName := directory + '/' +  fileRec.name;
+      repeat
+        log.debug ('Loading ' + fileRec.name);
+        calName := directory + '/' +  fileRec.name;
 
-      DivideIcs (calName);
-      inc (entries);
-
-      FindNext( fileRec );
+        DivideIcs (calName);
+      until FindNext(fileRec) <> 0;
     end;
   
-    dec (entries);
-
     log.debug('loaded ', entries );
     log.Free;
 
