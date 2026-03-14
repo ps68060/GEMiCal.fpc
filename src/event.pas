@@ -143,7 +143,7 @@ implementation
       begin
         tokens := TToken.Create;
 
-        log.debug ('Tokenise ', currentLn);
+        log.debug ('Tokenise ' + currentLn);
         tokens.tokeniseIcal(currentLn);
         writeln ('token 0 = ', tokens.part[0]);
         writeln ('token 1 = ', tokens.part[1]);
@@ -152,11 +152,11 @@ implementation
         if ( pos(createdTk, tokens.part[0]) = 1 )
         then
         begin
-          log.debug('token 2 = ', tokens.part[2]);
+          log.debug('token 2 = ' + tokens.part[2]);
           created := tokens.part[2];
         end;
 
-        log.debug('Created = ', created);
+        log.debug('Created = ' + created);
 
         if ( pos(dtStartTk, tokens.part[0]) = 1 )
         then

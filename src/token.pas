@@ -84,9 +84,9 @@ uses
 //    log := TLogger.Create(LLDEBUG);
 
     splitAt (':', line, part[0], part[2]);
-//    log.debug ('// Token before colon', part[0]);
+    // Token before colon
 
-//    log.debug ('// Split part 0 at semi-colon');
+    // Split part 0 at semi-colon
     splitAt (';', part[0], part[0], part[1]);
 
 //    log.debug('tag    = ' + part[0]);

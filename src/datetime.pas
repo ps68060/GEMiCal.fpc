@@ -177,7 +177,7 @@ uses
     (*writeln('JDN      ', date2:12:2 ); *)
 
     calcEpoch;
-    (* log.debug('epoch = ', epoch); *)
+    (* log.debug('epoch = ' + epoch); *)
 
     dayOfWeek;
 

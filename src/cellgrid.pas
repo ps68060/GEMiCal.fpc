@@ -197,7 +197,7 @@ uses
     for j := sDate to eDate
     do
     begin
-      log.debug ('event date ',  + j);
+      log.debug ('event date ', j);
       log.debug ('slot ', cell[j].counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
