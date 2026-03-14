@@ -225,7 +225,7 @@ begin
     myApplication.iCal.Free;
 
     cellGr.Free;
-    cellGr.Create;
+    cellGr := TCellGrid.Create;
 
     directory := myPath;
 
@@ -411,7 +411,7 @@ var
 begin
   log := TLogger.Create(LLINFO);
 
-  myApplication.iCal.Create;
+  myApplication.iCal := TCal.Create;
 
   log.debug('Load ICS files from ' + directory);
 
@@ -442,7 +442,7 @@ begin
   log.debug('Filter ' + dtStr );
 
   cellGr.Free;
-  cellGr.Create;
+  cellGr := TCellGrid.Create;
   cellGr.FilterEvents(myApplication.iCal,
                       displayDate);
   log.debug('Cal displayed');
