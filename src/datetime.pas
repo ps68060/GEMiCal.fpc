@@ -136,21 +136,40 @@ uses
 
   procedure TDateTime.dtStr2Obj(dtString : String);
   var
-   code : Integer;
-   date1, date2 : Double;
+   code         : integer;
+   date1, date2 : double;
    log          : TLogger;
+   timestampLen : integer;
 
   begin
     log := TLogger.Create(LLDEBUG);
 
-    log.debug('converting date-time  ' + dtString);
+    try
+    timestampLen := Length(dtString);
 
-    isoDate := SubStr(dtString, 1, 8);
-    isoTime := COPY(dtString, 10, 6);
-
-    if (length(dtString) >= 16 )
+    if (timestampLen < 8)
     then
-      tz := COPY (dtString, 16, length(dtString) );
+    begin
+      log.error('Invalid date time. Could be FATAL');
+      exit;
+    end;
+
+    log.debug('converting date-time: ' + dtString);
+
+    isoDate := Copy(dtString, 1, 8);
+
+    if (timestampLen > 10) and (dtString[9] = 'T')
+    then
+      isoTime := Copy(dtString, 10, 6);
+      if (timestampLen > 15)
+      then
+        isoTime := Copy(dtString, 10, 6)
+      else
+        isoTime := '0000';
+
+    if (timeStampLen > 15)
+    then
+      tz := COPY (dtString, 16, MAXINT);
 
     log.debug('dtStr2Obj date ' + isoDate);
     log.debug('dtStr2Obj time ' + isoTime);
@@ -163,7 +182,9 @@ uses
 
     dayOfWeek;
 
-    log.Free;
+    finally
+      log.Free;
+    end;
   end;
 
 
