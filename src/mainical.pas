@@ -430,10 +430,10 @@ var
   log       : TLogger;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log := TLogger.Create(LLDEBUG);
   log.debug('FilterCal ' );
 
-  if (displayDate <> NIL)
+  if (displayDate = NIL)
   then
     displayDate := TDateTime.create;
 

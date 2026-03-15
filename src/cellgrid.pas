@@ -51,7 +51,7 @@ uses
     for i := 1 to NUMCELLS
     do
     begin
-      cell[i].Create;
+      cell[i] := TCalCell.Create;
     end;
 
   end;
@@ -98,7 +98,7 @@ uses
 
   begin
 
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
     log.debug ('FilterEvents');
 
@@ -157,7 +157,7 @@ uses
 
   begin
 
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
     log.debug ('end date = ' , cal.eventList[e].endDate.getDDFromIso);
 
@@ -165,7 +165,6 @@ uses
                      cal.eventList[e].startDate.epoch) / daySec;
 
     log.debug ('event lasts ', daysBetween);
-
 
     (* Does the event Start in the displayed month ? *)
 

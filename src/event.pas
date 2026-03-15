@@ -190,9 +190,7 @@ implementation
         if (NOT alarm)
             and (pos(beginAlarmTk, tokens.part[0]) = 1 )
         then
-        begin
           alarm := GetAlarm(calFile);
-        end;
 
         if (pos(endAlarmTk, tokens.part[0]) = 1 )
         then
@@ -203,11 +201,12 @@ implementation
 
     end;  (* while *)
 
+  log.debug('dtStart = ' + dtStart);
+  log.debug('dtEnd   = ' + dtEnd);
+
     if (length(dtStart) > 0)
     then
     begin
-     log.debug('dtStart = ' + dtStart);
-  
       if (startDate = nil)
       then
         writeln ('StartDate is NIL');
@@ -215,16 +214,11 @@ implementation
       startDate.dtStr2Obj(dtStart);
     end;
 
-//    if (length(dtEnd) > 0)
-//    then
-//    begin
-//  log.debug('dtEnd   = ' + dtEnd);
-//      endDate.dtStr2Obj(dtEnd);
-//    end
-//    else
-//    begin
-//      endDate.dtStr2Obj(dtStart);
-//    end;
+    if (length(dtEnd) > 0)
+    then
+      endDate.dtStr2Obj(dtEnd)
+    else
+      endDate.dtStr2Obj(dtStart);
 
     GetEvent := TRUE;
     (*writeEvent;*)

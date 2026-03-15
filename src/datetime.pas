@@ -333,16 +333,13 @@ end;
     calc : LongInt;
 
   begin
-
     (*writeln (yyyy, '/', mm, '/', dd, ' ', hh24, ':', mi, ':', ss); *)
 
     epoch := trunc( julianDate - epochJD ) * daySec;
-
     epoch := epoch + trunc(getHrFromIso) * hourSec;
-
     epoch := epoch + getMinFromIso   * 60;
-
     epoch := epoch + getSecFromIso;
+    writeln('After calcepoch');
 
   end;
 
@@ -375,10 +372,10 @@ end;
     part3 := (3 * ((lyyyy + 4900 + (lmm - 14) div 12) div 100)) div 4 ;
     part4 := ldd - 32075 ;
 
-    writeln('part1 : ', part1:20:10);
-    writeln('part2 : ', part2:20:10);
-    writeln('part3 : ', part3:20:10);
-    writeln('part4 : ', part4:20:10);
+//    writeln('part1 : ', part1:20:10);
+//    writeln('part2 : ', part2:20:10);
+//    writeln('part3 : ', part3:20:10);
+//    writeln('part4 : ', part4:20:10);
     
     julian := part1 + part2 - part3 + part4;
 
@@ -431,6 +428,7 @@ end;
     d := d - 7 * (int(d/7) );
 
     day := trunc(d);
+    writeln('After dayOfWeek');
   end;
 
 

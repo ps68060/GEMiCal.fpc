@@ -87,8 +87,10 @@ implementation
 
         DivideIcs (calName);
       until FindNext(fileRec) <> 0;
+
+      FindClose(fileRec);
     end;
-  
+
     log.debug('loaded ', entries );
     log.Free;
 
@@ -140,10 +142,6 @@ implementation
       end;
 
     end;
-
-    dec (entries);
-
-    log.debug ('Entries Read = ', entries +1);
 
     log.Free;
   end;
