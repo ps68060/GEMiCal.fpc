@@ -31,9 +31,10 @@ type
                     headerHeight, 
                     cellWidth,
                     cellHeight  : integer;
-                    displayDate : TDateTime;  (* 1st of the month *)
 
                 public
+                   displayDate : TDateTime;  (* 1st of the month *)
+ 
                    procedure InitInstance;
                    procedure Done;
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
