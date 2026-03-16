@@ -136,6 +136,7 @@ var
 
 begin
   log := TLogger.Create(LLINFO);
+  log.debug ('WRITEDATES');
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -218,7 +219,8 @@ var
   dayOfWeek   : Word;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log := TLogger.Create(LLDEBUG);
+  log.debug ('PAINT');
 
   conf := TConfig.Create;;
 
@@ -230,6 +232,7 @@ begin
   (* Display the year and month in larger text *)
   DrawTitle;
 
+  log.debug('DrawGridHeading');
   DrawGridHeading;
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
@@ -383,10 +386,11 @@ var
   sunset     : String;
 
 begin
+  log := TLogger.Create(LLDEBUG);
   writeln('TITLE DATE = ', displayDate.getYYYYFromIso,
                       '-', displayDate.getMMFromIso);
 
-  log := TLogger.Create(LLDEBUG);
+  log.debug ('DRAWTITLE');
 
   (* Display the year and month *)
   str(displayDate.getYYYYFromIso, title);
@@ -464,6 +468,9 @@ var
   hcell       : smallint;
 
 begin
+writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
+writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
+writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -497,6 +504,7 @@ var
 
 begin
   log := TLogger.Create(LLDEBUG);
+  log.debug('DRAWGRID');
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -508,6 +516,7 @@ begin
   pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
+  log.debug('Draw horizontal grid');
   for r := 0 to rows do
   begin
     (* create a list of co-ords, declaration order above is the important bit *)
@@ -523,6 +532,7 @@ begin
   end;
 
   (* Draw vertical lines for days by changing x co-ords *)
+  log.debug('Draw vertical grid');
   CalcPos(rows-1, 0,  pxy[0], pxy[3]);
 
   for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
@@ -574,10 +584,9 @@ var
   i           : Integer;
 
 begin
-  log := TLogger.Create(LLINFO);
-  cellGr.Create;
-
-  log.debug ('DisplayEvents');
+  log := TLogger.Create(LLDEBUG);
+  log.debug('DISPLAYEVENTS');
+  cellGr := TCellGrid.Create;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
   offset    := hCell + hcell div 2;

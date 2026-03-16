@@ -195,7 +195,7 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  displayDate.Free;
+//  displayDate.Free;
   log.Free;
 
 end;
@@ -447,7 +447,7 @@ begin
                       displayDate);
   log.debug('Cal displayed');
 
-  displayDate.Free;
+//  displayDate.Free;
   log.Free;
 
 end;
