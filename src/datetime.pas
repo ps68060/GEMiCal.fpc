@@ -121,7 +121,7 @@ uses
     isoDate := '19700101';
 
     isoTime := '000000';
-    tz   := '';
+    tz   := 'UTC';
 
     epoch  := 0;
     julian := 2440587.5;
@@ -135,56 +135,57 @@ uses
 
 
   procedure TDateTime.dtStr2Obj(dtString : String);
-var
-  timestampLen : Integer;
-  date2        : Double;
-  log          : TLogger;
-begin
-  log := TLogger.Create(LLDEBUG);
+  var
+    timestampLen : Integer;
+    date2        : Double;
+    log          : TLogger;
 
-  log.debug('A: entering dtStr2Obj, dtString=' + dtString);
-  isoTime := '1';
-
-  timestampLen := Length(dtString);
-  log.debug('B: timestampLen=' + IntToStr(timestampLen));
-
-  if (timestampLen < 8) then
   begin
-    log.debug('C: too short, exiting');
-    log.Free;
-    Exit;
-  end;
+    log := TLogger.Create(LLDEBUG);
 
-  log.debug('C: before isoDate');
-  isoDate := Copy(dtString, 1, 8);
-  log.debug('D: isoDate=' + isoDate);
+    log.debug('A: entering dtStr2Obj, dtString=' + dtString);
+    isoTime := '1';
 
-  if (timestampLen > 10) and (dtString[9] = 'T') then
-  begin
+    timestampLen := Length(dtString);
+    log.debug('B: timestampLen=' + IntToStr(timestampLen));
+
+    if (timestampLen < 8) then
+    begin
+      log.debug('C: too short, exiting');
+      log.Free;
+      Exit;
+    end;
+
+    log.debug('C: before isoDate');
+    isoDate := Copy(dtString, 1, 8);
+    log.debug('D: isoDate=' + isoDate);
+
+    if (timestampLen > 10) and (dtString[9] = 'T') then
+    begin
     log.debug('E: before isoTime');
     if (timestampLen > 15) then
       isoTime := Copy(dtString, 10, 6)
     else
       isoTime := '0000';
-  end;
-  log.debug('F: isoTime=' + isoTime);
+    end;
+    log.debug('F: isoTime=' + isoTime);
 
-  if (timestampLen > 15) then
-  begin
+    if (timestampLen > 15) then
+    begin
     log.debug('G: before tz');
     tz := Copy(dtString, 16, MaxInt);
+    end;
+    log.debug('H: tz=' + tz);
+
+    log.debug('I: before julianDate');
+    date2 := julianDate;
+    log.debug('J: after julianDate');
+
+    calcEpoch;
+    dayOfWeek;
+
+    log.Free;
   end;
-  log.debug('H: tz=' + tz);
-
-  log.debug('I: before julianDate');
-  date2 := julianDate;
-  log.debug('J: after julianDate');
-
-  calcEpoch;
-  dayOfWeek;
-
-  log.Free;
-end;
 
 
 

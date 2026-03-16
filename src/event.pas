@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 unit Event;
 
@@ -145,9 +146,6 @@ implementation
 
         log.debug ('Tokenise ' + currentLn);
         tokens.tokeniseIcal(currentLn);
-        writeln ('token 0 = ', tokens.part[0]);
-        writeln ('token 1 = ', tokens.part[1]);
-        writeln ('token 2 = ', tokens.part[2]);
 
         if ( pos(createdTk, tokens.part[0]) = 1 )
         then

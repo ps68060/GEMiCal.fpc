@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit CellEvnt;
@@ -7,7 +8,6 @@ interface
   uses
     Objects,
     DateTime;
-
 
   type
     TCellEvent = class
