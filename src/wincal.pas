@@ -34,6 +34,8 @@ type
                     displayDate : TDateTime;  (* 1st of the month *)
 
                 public
+                   procedure InitInstance;
+                   procedure Done;
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : smallint;               VIRTUAL;
@@ -85,6 +87,16 @@ var
   daysInMon    : integer;
   endMonthDate : TDateTime;
 
+
+procedure InitInstance;
+begin
+  displayDate := TDateTime.Create;
+end;
+
+procedure Done;
+begin
+  displayDate.Free;
+end;
 
 procedure TWinCal.CalcPos(row,
                           col   : Integer;

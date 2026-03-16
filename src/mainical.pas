@@ -178,7 +178,6 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    myApplication.winCal^.displayDate := TDateTime.Create;
     myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
     LoadCal;
@@ -196,7 +195,7 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-//  displayDate.Free;
+  myApplication.winCal^.displayDate.Free;
   log.Free;
 
 end;
