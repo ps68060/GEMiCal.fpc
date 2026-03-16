@@ -5,15 +5,15 @@ unit MainIcal;
 
 interface
 
-uses
-  owindows,
+  uses
+    owindows,
 
-  Config,
-  DlgAbout,
-  DlgConv,
-  Cal,
-  WinCal,
-  Tos, aes, vdi;
+    Config,
+    WinCal,
+    DlgAbout,
+    DlgConv,
+    Cal,
+    Tos, aes, vdi;
 
 {$I gemical.i}
 

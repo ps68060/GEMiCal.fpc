@@ -73,6 +73,7 @@ implementation
     Dos,
 
     Logger,
+    MainIcal,
     StrSubs,
     RiseSet;
 
