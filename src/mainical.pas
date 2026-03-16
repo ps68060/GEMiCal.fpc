@@ -8,6 +8,7 @@ interface
 uses
   owindows,
 
+  Config,
   DlgAbout,
   DlgConv,
   Cal,
@@ -17,14 +18,12 @@ uses
 {$I gemical.i}
 
 const
-
   dAppName = 'GEMiCal';
 
 type
   (* Each object has variables and methods associated with it. *)
 
   (* Main Menu *)
-
 
   PLoadMenu    = ^TLoadMenu;
 
@@ -75,7 +74,7 @@ type
 
 var
   myApplication : TMyApplication;
-
+  conf          : TConfig;
 
 implementation
 
@@ -117,11 +116,12 @@ var
   appNavNextYear : PNavNextYear;
                      
 begin
-
   log := TLogger.Create(LLINFO);
 
   (* Get current path *)
   GetDir (0, directory);
+
+  conf := TConfig.Create;
 
   LoadResource ('GEMICAL.RSC','');
 
@@ -145,7 +145,8 @@ begin
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
-  
+
+  conf.Free;
   log.Free;
 
 end;

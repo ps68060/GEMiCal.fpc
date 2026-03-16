@@ -11,7 +11,6 @@ interface
     OTypes,
     OWindows,
 
-    Config,
     CellGrid,
     DateTime;
 
@@ -63,8 +62,6 @@ type
                  END;
 
 var
-  conf            : TConfig;
-
   displayDate     : TDateTime;  (* 1st of the month *)
 
   cellGr          : TCellGrid;
@@ -222,8 +219,6 @@ begin
   log := TLogger.Create(LLDEBUG);
   log.debug ('PAINT');
 
-  conf := TConfig.Create;;
-
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
   new_X := Scroller^.GetXOrg;
@@ -244,7 +239,6 @@ begin
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
-  conf.Free;
   log.Free;
 
 end;
