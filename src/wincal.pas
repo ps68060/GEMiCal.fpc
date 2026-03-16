@@ -30,7 +30,8 @@ type
                     titleHeight,
                     headerHeight, 
                     cellWidth,
-                    cellHeight : integer;
+                    cellHeight  : integer;
+                    displayDate : TDateTime;  (* 1st of the month *)
 
                 public
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
@@ -62,8 +63,6 @@ type
                  END;
 
 var
-  displayDate     : TDateTime;  (* 1st of the month *)
-
   cellGr          : TCellGrid;
 
 
