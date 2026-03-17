@@ -79,10 +79,16 @@ begin
 
   if (ord(level) >= ord(msgLevel) )
   then
+  begin
     (* Get today's date *)
     GetDate (year, month, day, dayOfWeek);
     
     writeln(msgLevel, ': ', message);
+
+    if (msgLevel = LLDEBUG)
+    then
+      readln;
+  end;
 
 end;
 

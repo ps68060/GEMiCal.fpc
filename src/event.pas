@@ -91,8 +91,8 @@ implementation
 
   destructor TEvent.done;
   begin
-    dispose (startDate);
-    dispose (endDate);
+    startDate.Free;
+    endDate.Free;
   end;
 
 

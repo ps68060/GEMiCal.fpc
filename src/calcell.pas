@@ -49,8 +49,9 @@ implementation
     begin
       cellEvents[i].Free;
     end;
+
+    inherited destroy;
   end;
-  
-  inherited destroy;
+ 
 
 end.

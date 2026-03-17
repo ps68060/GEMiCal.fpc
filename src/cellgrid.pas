@@ -42,7 +42,7 @@ implementation
 uses
   Logger;
 
-  constructor TCellGrid.init;
+  constructor TCellGrid.Init;
   var
     i : Integer;
 
@@ -50,13 +50,12 @@ uses
     for i := 1 to NUMCELLS
     do
     begin
-      new (cell[i]);
-      cell[i].create;
+      cell[i] := TCalCell.create;
     end;
 
   end;
 
-  destructor TCellGrid.done;
+  destructor TCellGrid.Done;
   var
     i : Integer;
 
