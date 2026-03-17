@@ -161,6 +161,7 @@ var
   dayOfWeek : Word;
 
   dtStr     : String;
+  displayDate : TDateTime;
 
 begin
   log := TLogger.Create(LLDEBUG);
@@ -176,7 +177,7 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    displayDate := TDateTime.create;
+    displayDate.Init;
     displayDate.dtStr2Obj(dtStr);
 
     LoadCal;

@@ -64,9 +64,6 @@ type
 
 var
   conf            : TConfig;
-
-  displayDate     : TDateTime;  (* 1st of the month *)
-
   cellGr          : PCellGrid;
 
 
@@ -141,22 +138,22 @@ begin
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.debug ('year ', displayDate.getYYYYFromIso );
-  log.debug (mon1[displayDate.getMMFromIso] );
+  log.debug ('year ', myApplication.displayDate.getYYYYFromIso );
+  log.debug (mon1[myApplication.displayDate.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek);
 
-  CalcCell (displayDate.day, day, row, col);
+  CalcCell (myApplication.displayDate.day, day, row, col);
 
   currentMonth := FALSE;
-  if     (displayDate.getYYYYFromIso = year)
-     and (displayDate.getMMFromIso   = month)
+  if     (myApplication.displayDate.getYYYYFromIso = year)
+     and (myApplication.displayDate.getMMFromIso   = month)
   then
     currentMonth := TRUE;
 
   (* Calculate date of end of month *)
-  daysInMon := daysInMonth(displayDate);
+  daysInMon := daysInMonth(myApplication.displayDate);
 
   (* Set the font to get the dimensions *)
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
@@ -164,7 +161,7 @@ begin
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon do
   begin
-    CalcCell (displayDate.day, i, row, col);
+    CalcCell (myApplication.displayDate.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
     writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
@@ -177,7 +174,7 @@ begin
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(displayDate.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(myApplication.displayDate.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -386,12 +383,12 @@ var
 begin
   log := TLogger.Create(LLDEBUG);
   log.debug('DrawTitle: ');
-  writeln('DrawTitle: TITLE DATE = ', displayDate.getYYYYFromIso,
-                      '-', displayDate.getMMFromIso);
+  writeln('DrawTitle: TITLE DATE = ', myApplication.displayDate.getYYYYFromIso,
+                      '-', myApplication.displayDate.getMMFromIso);
 
   (* Display the year and month *)
-  str(displayDate.getYYYYFromIso, title);
-  title := title + ' ' + mon1[displayDate.getMMFromIso];
+  str(myApplication.displayDate.getYYYYFromIso, title);
+  title := title + ' ' + mon1[myApplication.displayDate.getMMFromIso];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -590,7 +587,7 @@ begin
 
   for j := 1 to 31 do
   begin
-    CalcCell (displayDate.day, j, row, col);
+    CalcCell (myApplication.displayDate.day, j, row, col);
     CalcPos(row, col, x, y);
 
     log.debug ('row ', row);
