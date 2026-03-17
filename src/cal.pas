@@ -13,13 +13,13 @@ interface
     Event;
 
 const
-  maxEvents = 999;
+  MAXEVENTS = 999;
 
 type
   PCal = ^TCal;
   TCal = object(TObject)
     version   : String;
-    eventList : array [0..maxEvents] of PEvent;
+    eventList : array [0..MAXEVENTS] of PEvent;
     entries   : Integer;
 
     constructor init;
@@ -44,8 +44,7 @@ implementation
     version := '2.0';
     entries := 0;
 
-    for i := 0 to entries
-    do
+    for i := 0 to MAXEVENTS do
     begin
       new (eventList[i]);
       eventList[i]^.init;
@@ -57,8 +56,7 @@ implementation
   var
     i : Integer;
   begin
-    for i := 0 to entries
-    do
+    for i := 0 to MAXEVENTS do
     begin
       dispose(eventList[i], Done);
     end;
@@ -92,7 +90,6 @@ implementation
       FindClose(fileRec);
     end;
 
-    log.debug('loaded ', entries );
     log.Free;
 
   end;
@@ -116,7 +113,8 @@ implementation
     i           : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
+    log.debug('DivideIcs: ');
 
     checkStart := 'BEGIN:VEVENT';
 
@@ -147,6 +145,7 @@ implementation
 
     end;
 
+    log.debug('loaded ', entries );
     log.Free;
   end;
 

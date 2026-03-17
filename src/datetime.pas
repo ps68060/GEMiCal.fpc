@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit datetime;
@@ -120,7 +121,7 @@ uses
     isoDate := '19700101';
 
     isoTime := '000000';
-    tz   := '';
+    tz   := 'UTC';
 
     epoch  := 0;
     julian := 2440587.5;
@@ -135,42 +136,50 @@ uses
 
   procedure TDateTime.dtStr2Obj(dtString : String);
   var
-   code : Integer;
-   date1, date2 : Double;
+   timestampLen : Integer;
+   date2        : Double;
    log          : TLogger;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
     log.debug('converting date-time  ' + dtString);
+    isoTime := '000000';
 
-    isoDate := SubStr(dtString, 1, 8);
-    isoTime := COPY(dtString, 10, 6);
-(*
-    val ( COPY (dtString, 10, 2), hh24, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of hh24 at ', code, ' in ', dtString);
+    timestampLen := Length(dtString);
+    log.debug('B: timestampLen=' + IntToStr(timestampLen));
 
-    val ( COPY (dtString, 12, 2), mi, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of mi at ', code, ' in ', dtString);
+    if (timestampLen < 8) then
+    begin
+      log.debug('C: too short, exiting');
+      log.Free;
+      Exit;
+    end;
 
-    val ( COPY (dtString, 14, 2), ss, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of ss at ', code, ' in ', dtString);
-*)
-    if (length(dtString) >= 16 )
-    then
-      tz := COPY (dtString, 16, length(dtString) );
+    log.debug('C: before isoDate');
+    isoDate := Copy(dtString, 1, 8);
+    log.debug('D: isoDate=' + isoDate);
 
-    log.debug('dtStr2Obj date ' + isoDate);
-  (*  log.debug('dtStr2Obj time ' + isoTime);*)
+    if (timestampLen > 10) and (dtString[9] = 'T') then
+    begin
+    log.debug('E: before isoTime');
+    if (timestampLen > 15) then
+      isoTime := Copy(dtString, 10, 6)
+    else
+      isoTime := '0000';
+    end;
+    log.debug('F: isoTime=' + isoTime);
 
+    if (timestampLen > 15) then
+    begin
+    log.debug('G: before tz');
+    tz := Copy(dtString, 16, MaxInt);
+    end;
+    log.debug('H: tz=' + tz);
+
+    log.debug('I: before julianDate');
     date2 := julianDate;
-    (*writeln('JDN      ', date2:12:2 ); *)
+    log.debug('J: after julianDate');
 
     calcEpoch;
     (* log.debug('epoch = ', epoch); *)
@@ -190,10 +199,13 @@ uses
 
   begin
     year4 := 1970;
-    val ( COPY (isoDate, 1, 4), year4, code );
-    if (code <> 0)
+    if (Length(isoDate) >= 4)
     then
-      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
+    begin
+      val ( COPY (isoDate, 1, 4), year4, code );
+    end
+    else
+      writeln ('Integer conversion error of year at ', code, ' in ', isoDate, '"');
 
     getYYYYFromIso := year4;
 
@@ -212,10 +224,14 @@ uses
 
   begin
     month2 := 1;
-    val ( COPY (isoDate, 5, 2), month2, code );
-    if (code <> 0)
+
+    if (Length(isoDate) >= 6)
     then
-      writeln ('Integer conversion error of month at ', code, ' in ', isoDate);
+    begin
+      val ( COPY (isoDate, 5, 2), month2, code );
+    end
+    else
+      writeln ('Integer conversion error of month at ', code, ' in ', isoDate, '"');
 
     getMMFromIso := month2;
 
@@ -230,10 +246,14 @@ uses
 
   begin
     day2 := 1;
-    val ( COPY (isoDate, 7, 2), day2, code );
-    if (code <> 0)
+
+    if (Length(isoDate) >= 8)
     then
-      writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate);
+    begin
+      val ( COPY (isoDate, 7, 2), day2, code );
+    end
+    else
+      writeln ('Integer conversion error of day in "', isoDate, '"');
 
     getDDFromIso := day2;
 
@@ -248,10 +268,14 @@ uses
 
   begin
     hr2 := 0;
-    val ( COPY (isoTime, 1, 2), hr2, code );
-    if (code <> 0)
+
+    if (Length(isoTime) >= 2)
     then
-      writeln ('Integer conversion error of hour at ', code, ' in ', isoTime);
+    begin
+      val ( COPY (isoTime, 1, 2), hr2, code );
+    end
+    else
+      writeln ('Integer conversion error of hh in "', isoTime, '"');
 
     getHrFromIso := hr2;
 
@@ -266,10 +290,14 @@ uses
 
   begin
     min2 := 0;
-    val ( COPY (isoTime, 3, 2), min2, code );
-    if (code <> 0)
+
+    if (Length(isoTime) >= 4)
     then
-      writeln ('Integer conversion error of mi at ', code, ' in ', isoTime);
+    begin
+      val ( COPY (isoTime, 3, 2), min2, code );
+    end
+    else
+      writeln ('Integer conversion error of mi in "', isoTime, '"');
 
     getMinFromIso := min2;
 
@@ -284,10 +312,14 @@ uses
 
   begin
     sec2 := 0;
-    val ( COPY (isoTime, 5, 2), sec2, code );
-    if (code <> 0)
+
+    if (Length(isoTime) >= 6)
     then
-      writeln ('Integer conversion error of ss at ', code, ' in ', isoTime);
+    begin
+      val ( COPY (isoTime, 5, 2), sec2, code );
+    end
+    else
+      writeln ('Integer conversion error of ss in "', isoTime, '"');
 
     getSecFromIso := sec2;
 
@@ -307,11 +339,8 @@ uses
     (*writeln (yyyy, '/', mm, '/', dd, ' ', hh24, ':', mi, ':', ss); *)
 
     epoch := trunc( julianDate - epochJD ) * daySec;
-
     epoch := epoch + trunc(getHrFromIso) * hourSec;
-
     epoch := epoch + getMinFromIso   * 60;
-
     epoch := epoch + getSecFromIso;
 
   end;
@@ -345,12 +374,10 @@ uses
     part3 := (3 * ((lyyyy + 4900 + (lmm - 14) div 12) div 100)) div 4 ;
     part4 := ldd - 32075 ;
 
-    (*
-    writeln('part1 : ', part1:20:10);
-    writeln('part2 : ', part2:20:10);
-    writeln('part3 : ', part3:20:10);
-    writeln('part4 : ', part4:20:10);
-    *)
+//    writeln('part1 : ', part1:20:10);
+//    writeln('part2 : ', part2:20:10);
+//    writeln('part3 : ', part3:20:10);
+//    writeln('part4 : ', part4:20:10);
 
     julian := part1 + part2 - part3 + part4;
 

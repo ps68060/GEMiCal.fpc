@@ -95,8 +95,7 @@ uses
 
   begin
 
-    log := TLogger.Create(LLINFO);
-
+    log := TLogger.Create(LLDEBUG);
     log.debug ('FilterEvents');
 
     (* Calculate date of end of month *)
@@ -136,6 +135,7 @@ uses
                                   daysInMon : Integer;
                                   e         : Integer);
 
+
   (* Purpose : Store a single event in the cellGrid *)
 
   var
@@ -153,9 +153,7 @@ uses
     eDate       : Integer;
 
   begin
-
-    log := TLogger.Create(LLINFO);
-
+    log := TLogger.Create(LLDEBUG);
     log.debug ('end date = ' , cal^.eventList[e]^.endDate.getDDFromIso);
 
     daysBetween :=  (cal^.eventList[e]^.endDate.epoch -
@@ -163,9 +161,7 @@ uses
 
     log.debug ('event lasts ', daysBetween);
 
-
     (* Does the event Start in the displayed month ? *)
-
     if (cal^.eventList[e]^.startDate.getMMFromIso = calDate.getMMFromIso)
     then
       sDate := cal^.eventList[e]^.startDate.getDDFromIso
@@ -188,9 +184,10 @@ uses
       else
         eDate := cal^.eventList[e]^.endDate.getDDFromIso;
 
+    log.debug('sDate=', sDate);
+    log.debug('eDate=', eDate);
 
     (* Iterate days and put info into cells. *)
-
     for j := sDate to eDate
     do
     begin

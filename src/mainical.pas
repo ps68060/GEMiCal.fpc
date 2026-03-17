@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit MainIcal;
@@ -184,6 +185,7 @@ begin
     then
     begin
       MyApplication.iCal^.sort;
+      log.debug('INITMainWindow: call FilterCal');
       FilterCal(dtStr);
     end;
 
@@ -239,6 +241,7 @@ begin
     then
     begin
       myApplication.iCal^.sort;
+      log.debug('LoadMenu.Work: call FilterCal');
       FilterCal(dtStr);
     end;
 
@@ -309,6 +312,7 @@ begin
 
   dtStr := date2str(year, month, 1, FALSE);
 
+  log.debug('PrevMon.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -344,6 +348,7 @@ begin
 
   dtStr := date2str(year, month, 1, FALSE);
 
+  log.debug('NextMon.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -370,6 +375,7 @@ begin
 
   dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
 
+  log.debug('PrevYear.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -396,6 +402,7 @@ begin
 
   dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
 
+  log.debug('NextYear.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -432,16 +439,14 @@ var
   log       : TLogger;
 
 begin
-  log := TLogger.Create(LLINFO);
-  log.debug('FilterCal ' );
+  log := TLogger.Create(LLDEBUG);
+  log.debug('FilterCal ' + dtStr);
 
-  if (displayDate <> NIL)
+  if (displayDate = NIL)
   then
     displayDate := TDateTime.create;
 
   displayDate.dtStr2Obj(dtStr);
-
-  log.debug('Filter ' + dtStr );
 
   if (cellGr <> NIL)
   then
@@ -453,7 +458,7 @@ begin
                        displayDate);
   log.debug('Cal displayed');
 
-  displayDate.Free;
+//  displayDate.Free;
   log.Free;
 
 end;

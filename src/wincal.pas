@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit WinCal;
@@ -134,7 +135,8 @@ var
   hCell        : smallInt;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log := TLogger.Create(LLDEBUG);
+  log.debug ('WRITEDATES');
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -382,10 +384,10 @@ var
   sunset     : String;
 
 begin
-  writeln('TITLE DATE = ', displayDate.getYYYYFromIso,
-                      '-', displayDate.getMMFromIso);
-
   log := TLogger.Create(LLDEBUG);
+  log.debug('DrawTitle: ');
+  writeln('DrawTitle: TITLE DATE = ', displayDate.getYYYYFromIso,
+                      '-', displayDate.getMMFromIso);
 
   (* Display the year and month *)
   str(displayDate.getYYYYFromIso, title);
@@ -418,7 +420,7 @@ begin
           Work.Y + Attr.charHeight*3,
           time2Str(hour, minute, second, TRUE) );
 
-  (* Sunrise and Sunset *)
+  log.debug('Sunrise and Sunset: ' + dtStr);
   todayDate := TDateTime.create;
   todayDate.dtStr2Obj(dtStr);
 
@@ -463,6 +465,9 @@ var
   hcell       : smallint;
 
 begin
+writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
+writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
+writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -496,6 +501,7 @@ var
 
 begin
   log := TLogger.Create(LLDEBUG);
+  log.debug('DRAWGRID');
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -573,9 +579,8 @@ var
   i           : Integer;
 
 begin
-  log := TLogger.Create(LLINFO);
-
-  log.debug ('DisplayEvents');
+  log := TLogger.Create(LLDEBUG);
+  log.debug('DISPLAYEVENTS');
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
   offset    := hCell + hcell div 2;
