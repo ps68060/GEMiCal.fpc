@@ -34,7 +34,7 @@ type
 implementation
 
   uses
-    Dos,
+    SysUtils,
     Logger;
 
   constructor TCal.init;
@@ -43,6 +43,13 @@ implementation
   begin
     version := '2.0';
     entries := 0;
+
+    for i := 0 to entries
+    do
+    begin
+      new (eventList[i]);
+      eventList[i]^.init;
+    end;
   end;
 
 
@@ -66,27 +73,24 @@ implementation
   var
     log     : TLogger;
     attr    : Word;
-    fileRec : SearchRec;
+    fileRec : TRawbyteSearchRec;
     calName : String;
 
   begin
     log := TLogger.Create(LLINFO);
 
-    findFirst(directory + '/*.ics', attr, fileRec);
-
-    while DosError = 0
-    do
+    entries := 0;
+    if (findFirst(directory + '/*.ics', FAANYFILE, fileRec) = 0) then
     begin
-      log.debug ('Loading ' + fileRec.name);
-      calName := directory + '/' +  fileRec.name;
+      repeat
+        log.debug ('Loading ' + fileRec.name);
+        calName := directory + '/' +  fileRec.name;
 
-      DivideIcs (calName);
-      inc (entries);
+        DivideIcs (calName);
+      until FindNext(fileRec) <> 0;
 
-      FindNext( fileRec );
+      FindClose(fileRec);
     end;
-  
-    dec (entries);
 
     log.debug('loaded ', entries );
     log.Free;
@@ -142,10 +146,6 @@ implementation
       end;
 
     end;
-
-    dec (entries);
-
-    log.debug ('Entries Read = ', entries +1);
 
     log.Free;
   end;
