@@ -35,6 +35,9 @@ type
 
                 public
                    displayDate : TDateTime;
+                   procedure InitInstance; virtual;
+                   procedure Done; virtual;
+
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : smallint;               VIRTUAL;
@@ -89,12 +92,14 @@ var
 
 procedure InitInstance;
 begin
+  inherited InitInstance;
   displayDate := TDateTime.Create;
 end;
 
 procedure Done;
 begin
   displayDate.Free;
+  inherited Done;
 end;
 
 procedure TWinCal.CalcPos(row,
