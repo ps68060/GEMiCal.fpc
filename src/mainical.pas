@@ -11,6 +11,7 @@ uses
   DlgAbout,
   DlgConv,
   Cal,
+  DateTime,
   WinCal,
   Tos, aes, vdi;
 
@@ -61,6 +62,7 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
+                   public
                      iCal       : PCal;
                      winCal     : PWinCal;
 
@@ -83,7 +85,6 @@ implementation
     Dos,
     gem,
     Logger,
-    DateTime,
     CellGrid;
 
 
@@ -95,11 +96,13 @@ var
   myPath        : String;
 
   directory     : String;
+  displayDate   : DateTime.TDateTime;
 
-  destructor TMyApplication.done;
-  begin
 
-  end;
+destructor TMyApplication.done;
+begin
+
+end;
 
 
 procedure TMyApplication.INITInstance;
@@ -161,7 +164,6 @@ var
   dayOfWeek : Word;
 
   dtStr     : String;
-  displayDate : TDateTime;
 
 begin
   log := TLogger.Create(LLDEBUG);
@@ -177,8 +179,8 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    displayDate.Init;
-    displayDate.dtStr2Obj(dtStr);
+    myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
+    log.debug('displayDate = ', myApplication.winCal^.displayDate.isoDate);
 
     LoadCal;
 
@@ -235,6 +237,7 @@ begin
 
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
+    myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
     LoadCal;
    
@@ -312,6 +315,7 @@ begin
   end;
 
   dtStr := date2str(year, month, 1, FALSE);
+  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   log.debug('PrevMon.Work: call FilterCal');
   FilterCal(dtStr);
@@ -348,6 +352,7 @@ begin
   end;
 
   dtStr := date2str(year, month, 1, FALSE);
+  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   log.debug('NextMon.Work: call FilterCal');
   FilterCal(dtStr);
@@ -375,6 +380,7 @@ begin
   dec (year);
 
   dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
+  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   log.debug('PrevYear.Work: call FilterCal');
   FilterCal(dtStr);
@@ -402,6 +408,7 @@ begin
   inc (year);
 
   dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
+  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   log.debug('NextYear.Work: call FilterCal');
   FilterCal(dtStr);
@@ -443,11 +450,12 @@ begin
   log := TLogger.Create(LLDEBUG);
   log.debug('FilterCal ' + dtStr);
 
-  if (displayDate = NIL)
-  then
-    displayDate := TDateTime.create;
+//  if (displayDate = NIL)
+//  then
+//    displayDate := TDateTime.create;
 
-  displayDate.dtStr2Obj(dtStr);
+//  displayDate.dtStr2Obj(dtStr);
+  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   if (cellGr <> NIL)
   then

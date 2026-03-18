@@ -34,12 +34,13 @@ type
                     cellHeight : integer;
 
                 public
+                   displayDate : TDateTime;
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : smallint;               VIRTUAL;
                    function  GetScroller     : PScroller;              VIRTUAL;
 
-                   procedure Paint(var PaintInfo     : TPaintStruct);  VIRTUAL;
+                   procedure Paint(var PaintInfo : TPaintStruct);      VIRTUAL;
 
                    procedure IconPaint(var PaintInfo : TPaintStruct);  VIRTUAL;
                    procedure SetupSize;                                VIRTUAL;
@@ -73,6 +74,7 @@ implementation
     Dos,
 
     Logger,
+    MainIcal,
     StrSubs,
     RiseSet;
 
@@ -138,22 +140,22 @@ begin
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.debug ('year ', myApplication.displayDate.getYYYYFromIso );
-  log.debug (mon1[myApplication.displayDate.getMMFromIso] );
+  log.debug ('year ', displayDate.getYYYYFromIso );
+  log.debug (mon1[displayDate.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek);
 
-  CalcCell (myApplication.displayDate.day, day, row, col);
+  CalcCell (displayDate.day, day, row, col);
 
   currentMonth := FALSE;
-  if     (myApplication.displayDate.getYYYYFromIso = year)
-     and (myApplication.displayDate.getMMFromIso   = month)
+  if     (displayDate.getYYYYFromIso = year)
+     and (displayDate.getMMFromIso   = month)
   then
     currentMonth := TRUE;
 
   (* Calculate date of end of month *)
-  daysInMon := daysInMonth(myApplication.displayDate);
+  daysInMon := daysInMonth(displayDate);
 
   (* Set the font to get the dimensions *)
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
@@ -161,9 +163,9 @@ begin
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon do
   begin
-    CalcCell (myApplication.displayDate.day, i, row, col);
+    CalcCell (displayDate.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
-    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+//    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
@@ -174,7 +176,7 @@ begin
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(myApplication.displayDate.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(displayDate.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -383,12 +385,13 @@ var
 begin
   log := TLogger.Create(LLDEBUG);
   log.debug('DrawTitle: ');
-  writeln('DrawTitle: TITLE DATE = ', myApplication.displayDate.getYYYYFromIso,
-                      '-', myApplication.displayDate.getMMFromIso);
+  writeln('DrawTitle: TITLE DATE = ',
+           displayDate.getYYYYFromIso,
+           '-', displayDate.getMMFromIso);
 
   (* Display the year and month *)
-  str(myApplication.displayDate.getYYYYFromIso, title);
-  title := title + ' ' + mon1[myApplication.displayDate.getMMFromIso];
+  str(displayDate.getYYYYFromIso, title);
+  title := title + ' ' + mon1[displayDate.getMMFromIso];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -462,9 +465,9 @@ var
   hcell       : smallint;
 
 begin
-writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
-writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
-writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
+//writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
+//writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
+//writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -587,7 +590,7 @@ begin
 
   for j := 1 to 31 do
   begin
-    CalcCell (myApplication.displayDate.day, j, row, col);
+    CalcCell (displayDate.day, j, row, col);
     CalcPos(row, col, x, y);
 
     log.debug ('row ', row);

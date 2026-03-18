@@ -47,8 +47,8 @@ type
 
     day     : Integer;
 
-    constructor create;
-    destructor  destroy; override;
+    constructor Create;
+    destructor  Destroy; override;
 
     procedure dtStr2Obj(dtString : String);
 
@@ -116,7 +116,7 @@ uses
     Logger,
     StrSubs;
 
-  constructor TDateTime.create;
+  constructor TDateTime.Create;
   begin
     isoDate := '19700101';
 
@@ -128,13 +128,27 @@ uses
     day    := 4;
   end;
 
-  destructor TDateTime.destroy;
+  destructor TDateTime.Destroy;
   begin
     inherited destroy;
   end;
 
 
   procedure TDateTime.dtStr2Obj(dtString : String);
+  (* Purpose : Converts an ISO style date/time string into
+   *           the internal TDateTime fields (isoDate, isoTime, tz),
+   *           then calculates the Julian date and epoch values.
+   *
+   * Expected input formats include:
+   *  YYYYMMDD
+   *  YYYYMMDDThhmmss
+   *  YYYYMMDDThhmmss+TZ
+   *  YYYYMMDDThhmmssZ
+   *
+   * If the string is shorter than 8 characters,
+   * it exits early because a valid YYYYMMDD date cannot be extracted.
+   *)
+
   var
    timestampLen : Integer;
    date2        : Double;
@@ -162,19 +176,21 @@ uses
 
     if (timestampLen > 10) and (dtString[9] = 'T') then
     begin
-    log.debug('E: before isoTime');
-    if (timestampLen > 15) then
-      isoTime := Copy(dtString, 10, 6)
-    else
-      isoTime := '0000';
+      log.debug('E: before isoTime');
+      if (timestampLen > 15) then
+        isoTime := Copy(dtString, 10, 6)
+      else
+        isoTime := '0000';
     end;
+
     log.debug('F: isoTime=' + isoTime);
 
     if (timestampLen > 15) then
     begin
-    log.debug('G: before tz');
-    tz := Copy(dtString, 16, MaxInt);
+      log.debug('G: before tz');
+      tz := Copy(dtString, 16, MaxInt);
     end;
+
     log.debug('H: tz=' + tz);
 
     log.debug('I: before julianDate');
