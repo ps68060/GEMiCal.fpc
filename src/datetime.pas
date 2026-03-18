@@ -135,16 +135,30 @@ uses
 
 
   procedure TDateTime.dtStr2Obj(dtString : String);
+  (* Purpose : Converts an ISO style date/time string into
+   *           the internal TDateTime fields (isoDate, isoTime, tz),
+   *           then calculates the Julian date and epoch values.
+   *
+   * Expected input formats include:
+   *  YYYYMMDD
+   *  YYYYMMDDThhmmss
+   *  YYYYMMDDThhmmss+TZ
+   *  YYYYMMDDThhmmssZ
+   *
+   * If the string is shorter than 8 characters,
+   * it exits early because a valid YYYYMMDD date cannot be extracted.
+   *)
+
   var
-    timestampLen : Integer;
-    date2        : Double;
-    log          : TLogger;
+   timestampLen : Integer;
+   date2        : Double;
+   log          : TLogger;
 
   begin
     log := TLogger.Create(LLDEBUG);
 
-    log.debug('A: entering dtStr2Obj, dtString=' + dtString);
-    isoTime := '1';
+    log.debug('converting date-time  ' + dtString);
+    isoTime := '000000';
 
     timestampLen := Length(dtString);
     log.debug('B: timestampLen=' + IntToStr(timestampLen));
@@ -162,19 +176,21 @@ uses
 
     if (timestampLen > 10) and (dtString[9] = 'T') then
     begin
-    log.debug('E: before isoTime');
-    if (timestampLen > 15) then
-      isoTime := Copy(dtString, 10, 6)
-    else
-      isoTime := '0000';
+      log.debug('E: before isoTime');
+      if (timestampLen > 15) then
+        isoTime := Copy(dtString, 10, 6)
+      else
+        isoTime := '0000';
     end;
+
     log.debug('F: isoTime=' + isoTime);
 
     if (timestampLen > 15) then
     begin
-    log.debug('G: before tz');
-    tz := Copy(dtString, 16, MaxInt);
+      log.debug('G: before tz');
+      tz := Copy(dtString, 16, MaxInt);
     end;
+
     log.debug('H: tz=' + tz);
 
     log.debug('I: before julianDate');
@@ -182,6 +198,8 @@ uses
     log.debug('J: after julianDate');
 
     calcEpoch;
+    (* log.debug('epoch = ', epoch); *)
+
     dayOfWeek;
 
     log.Free;
@@ -197,7 +215,6 @@ uses
 
   begin
     year4 := 1970;
-
     if (Length(isoDate) >= 4)
     then
     begin
@@ -334,13 +351,13 @@ uses
     calc : LongInt;
 
   begin
+
     (*writeln (yyyy, '/', mm, '/', dd, ' ', hh24, ':', mi, ':', ss); *)
 
     epoch := trunc( julianDate - epochJD ) * daySec;
     epoch := epoch + trunc(getHrFromIso) * hourSec;
     epoch := epoch + getMinFromIso   * 60;
     epoch := epoch + getSecFromIso;
-    writeln('After calcepoch');
 
   end;
 
@@ -377,7 +394,7 @@ uses
 //    writeln('part2 : ', part2:20:10);
 //    writeln('part3 : ', part3:20:10);
 //    writeln('part4 : ', part4:20:10);
-    
+
     julian := part1 + part2 - part3 + part4;
 
     (* Julian day is based on midday so if the hour is less than 12 it is the previous day. *)
@@ -429,7 +446,6 @@ uses
     d := d - 7 * (int(d/7) );
 
     day := trunc(d);
-    writeln('After dayOfWeek');
   end;
 
 

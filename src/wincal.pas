@@ -11,6 +11,7 @@ interface
     OTypes,
     OWindows,
 
+    Config,
     CellGrid,
     DateTime;
 
@@ -30,19 +31,16 @@ type
                     titleHeight,
                     headerHeight, 
                     cellWidth,
-                    cellHeight  : integer;
+                    cellHeight : integer;
 
                 public
-                   displayDate : TDateTime;  (* 1st of the month *)
- 
-                   procedure InitInstance;
-                   procedure Done;
+                   displayDate : TDateTime;
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : smallint;               VIRTUAL;
                    function  GetScroller     : PScroller;              VIRTUAL;
 
-                   procedure Paint(var PaintInfo     : TPaintStruct);  VIRTUAL;
+                   procedure Paint(var PaintInfo     : TPaintStruct);      VIRTUAL;
 
                    procedure IconPaint(var PaintInfo : TPaintStruct);  VIRTUAL;
                    procedure SetupSize;                                VIRTUAL;
@@ -66,7 +64,8 @@ type
                  END;
 
 var
-  cellGr          : TCellGrid;
+  conf            : TConfig;
+  cellGr          : PCellGrid;
 
 
 implementation
@@ -75,7 +74,6 @@ implementation
     Dos,
 
     Logger,
-    MainIcal,
     StrSubs,
     RiseSet;
 
@@ -145,7 +143,7 @@ var
   hCell        : smallInt;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log := TLogger.Create(LLDEBUG);
   log.debug ('WRITEDATES');
 
   scrollX := Scroller^.GetXOrg;
@@ -176,7 +174,7 @@ begin
   begin
     CalcCell (displayDate.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
-    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+//    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
@@ -229,8 +227,9 @@ var
   dayOfWeek   : Word;
 
 begin
-  log := TLogger.Create(LLDEBUG);
-  log.debug ('PAINT');
+  log := TLogger.Create(LLINFO);
+
+  conf := TConfig.Create;;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -240,7 +239,6 @@ begin
   (* Display the year and month in larger text *)
   DrawTitle;
 
-  log.debug('DrawGridHeading');
   DrawGridHeading;
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
@@ -252,6 +250,7 @@ begin
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
+  conf.Free;
   log.Free;
 
 end;
@@ -394,10 +393,10 @@ var
 
 begin
   log := TLogger.Create(LLDEBUG);
-  writeln('TITLE DATE = ', displayDate.getYYYYFromIso,
-                      '-', displayDate.getMMFromIso);
-
-  log.debug ('DRAWTITLE');
+  log.debug('DrawTitle: ');
+  writeln('DrawTitle: TITLE DATE = ',
+           displayDate.getYYYYFromIso,
+           '-', displayDate.getMMFromIso);
 
   (* Display the year and month *)
   str(displayDate.getYYYYFromIso, title);
@@ -430,7 +429,7 @@ begin
           Work.Y + Attr.charHeight*3,
           time2Str(hour, minute, second, TRUE) );
 
-  (* Sunrise and Sunset *)
+  log.debug('Sunrise and Sunset: ' + dtStr);
   todayDate := TDateTime.create;
   todayDate.dtStr2Obj(dtStr);
 
@@ -475,9 +474,9 @@ var
   hcell       : smallint;
 
 begin
-writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
-writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
-writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
+//writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
+//writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
+//writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -523,7 +522,6 @@ begin
   pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
-  log.debug('Draw horizontal grid');
   for r := 0 to rows do
   begin
     (* create a list of co-ords, declaration order above is the important bit *)
@@ -539,7 +537,6 @@ begin
   end;
 
   (* Draw vertical lines for days by changing x co-ords *)
-  log.debug('Draw vertical grid');
   CalcPos(rows-1, 0,  pxy[0], pxy[3]);
 
   for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
@@ -593,7 +590,6 @@ var
 begin
   log := TLogger.Create(LLDEBUG);
   log.debug('DISPLAYEVENTS');
-  cellGr := TCellGrid.Create;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
   offset    := hCell + hcell div 2;
@@ -609,14 +605,14 @@ begin
     log.debug ('row ', row);
     log.debug ('col ', col);
 
-    for i := 0 to cellGr.cell[j].counter - 1 do
+    for i := 0 to cellGr^.cell[j].counter - 1 do
     begin
-      summ      := SubStr (cellGr.cell[j].cellEvents[i].summary, 1, 16 );
-      time      := SubStr (cellGr.cell[j].cellEvents[i].timeStart.humanDateTime, 11, 5 );
+      summ      := SubStr (cellGr^.cell[j].cellEvents[i].summary, 1, 16 );
+      time      := SubStr (cellGr^.cell[j].cellEvents[i].timeStart.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
-                                  cellGr.cell[j].cellEvents[i].location), 1, 16 );
+                                  cellGr^.cell[j].cellEvents[i].location), 1, 16 );
 
       log.debug('Summary  ' + summ );
       log.debug('counter ', i);
@@ -636,7 +632,6 @@ begin
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wcell, hcell);
 
-  cellGr.Free;
   log.Free;
 
 end;

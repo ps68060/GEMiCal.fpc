@@ -1,5 +1,4 @@
 {$B+,D-,I-,L-,P-,Q-,R-,S-,T-,V-,X+,Z-}
-{$mode objfpc}
 
 unit Cal;
 
@@ -14,17 +13,17 @@ interface
     Event;
 
 const
-  maxEvents = 999;
+  MAXEVENTS = 999;
 
 type
-  TCal = class
-  public
+  PCal = ^TCal;
+  TCal = object(TObject)
     version   : String;
-    eventList : array [0..maxEvents] of TEvent;
+    eventList : array [0..MAXEVENTS] of PEvent;
     entries   : Integer;
 
-    constructor Create;
-    destructor  Destroy; override;
+    constructor init;
+    destructor  done; virtual;
 
     Procedure LoadICS (directory : String);
     Procedure DivideIcs (const calName : String);
@@ -35,31 +34,31 @@ type
 implementation
 
   uses
-    Dos,
     SysUtils,
     Logger;
 
-  constructor TCal.Create;
+  constructor TCal.init;
   var
     i : Integer;
   begin
     version := '2.0';
     entries := 0;
-    
+
     for i := 0 to MAXEVENTS do
     begin
-      eventList[i] := TEvent.Create;
+      new (eventList[i]);
+      eventList[i]^.init;
     end;
   end;
 
 
-  destructor TCal.Destroy;
+  destructor TCal.done;
   var
     i : Integer;
   begin
     for i := 0 to MAXEVENTS do
     begin
-      eventList[i].Free;
+      dispose(eventList[i], Done);
     end;
   end;
 
@@ -91,7 +90,6 @@ implementation
       FindClose(fileRec);
     end;
 
-    log.debug('loaded ', entries );
     log.Free;
 
   end;
@@ -116,6 +114,7 @@ implementation
 
   begin
     log := TLogger.Create(LLDEBUG);
+    log.debug('DivideIcs: ');
 
     checkStart := 'BEGIN:VEVENT';
 
@@ -135,14 +134,18 @@ implementation
       if ( pos (checkStart, currentLn) = 1 )
       then
       begin
-        eventList[entries].getEvent(calFile);
-        eventList[entries].filename := calName;
+        new (eventList[entries]);
+        eventList[entries]^.init;
+      
+        eventList[entries]^.getEvent(calFile);
+        eventList[entries]^.filename := calName;
 
         inc (entries);
       end;
 
     end;
 
+    log.debug('loaded ', entries );
     log.Free;
   end;
 
@@ -151,11 +154,10 @@ implementation
   var
     log     : TLogger;
     i, j    : Integer;
-    swapper : TEvent;
+    swapper : PEvent;
 
   begin
     log := TLogger.Create(LLINFO);
-    swapper := TEvent.Create;
 
     log.debug ('Starting sort of ', entries);
 
@@ -167,8 +169,8 @@ implementation
       do
       begin
 
-        if (eventList[i].startDate.epoch  >
-            eventList[j].startDate.epoch )
+        if (eventList[i]^.startDate.epoch  >
+            eventList[j]^.startDate.epoch )
         then
         begin
           (*
@@ -196,7 +198,6 @@ implementation
 
     log.debug('Sorted');
 
-    swapper.Free;
     log.Free;
 
   end;

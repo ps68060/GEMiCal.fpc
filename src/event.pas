@@ -15,8 +15,8 @@ interface
 
 
 type
-  TEvent = class
-  public
+  PEvent = ^TEvent;
+  TEvent = object(TObject)
     filename    : String;
     created     : String;
     summary     : String;
@@ -34,8 +34,8 @@ type
     alarmTrigger     : String;
     alarmDescription : String;
 
-    constructor Create;
-    destructor  Destroy; override;
+    constructor init;
+    destructor  done; virtual;
 
     Function GetEvent (VAR calFile : Text)
             : Boolean;
@@ -72,7 +72,7 @@ implementation
     alarmDescTk   = 'DESCRIPTION:';
     alarmActionTk = 'ACTION:';
 
-  constructor TEvent.Create;
+  constructor TEvent.init;
   begin
     filename    := '';
     created     := '';
@@ -88,15 +88,14 @@ implementation
     alarmTrigger     := '';
     alarmDescription := '';
 
-    startDate := TDateTime.Create;
-    endDate   := TDateTime.Create;
+    startDate := TDateTime.create;
+    endDate   := TDateTime.create;
   end;
 
-  destructor TEvent.Destroy;
+  destructor TEvent.done;
   begin
     startDate.Free;
     endDate.Free;
-    inherited destroy;
   end;
 
 
@@ -116,7 +115,7 @@ implementation
     alarm        : Boolean;
     endEvent     : Boolean;
 
-    tokens       : TToken;
+    tokens       : PToken;
 
   begin
     log := TLogger.Create(LLDEBUG);
@@ -124,7 +123,6 @@ implementation
     endEvent     := FALSE;
     alarm        := FALSE;
 
-    log.debug ('enter while loop');
     while (NOT eof (calFile) 
            AND NOT endEvent )
     do
@@ -142,73 +140,64 @@ implementation
 
       else
       begin
-        tokens := TToken.Create;
+        new (tokens);
+        tokens^.init;
+        tokens^.tokeniseIcal(currentLn);
 
-        log.debug ('Tokenise ' + currentLn);
-        tokens.tokeniseIcal(currentLn);
+        if ( pos(createdTk, tokens^.part[0]) = 1 )
+        then
+          created := tokens^.part[2];
 
-        if ( pos(createdTk, tokens.part[0]) = 1 )
+        if ( pos(dtStartTk, tokens^.part[0]) = 1 )
         then
         begin
-          log.debug('token 2 = ' + tokens.part[2]);
-          created := tokens.part[2];
+          dtStart   := tokens^.part[2];
+          dtStartTz := tokens^.part[1];
         end;
 
-        log.debug('Created = ' + created);
-
-        if ( pos(dtStartTk, tokens.part[0]) = 1 )
+        if ( pos(dtEndTk, tokens^.part[0]) = 1 )
         then
         begin
-          dtStart   := tokens.part[2];
-          dtStartTz := tokens.part[1];
+          dtEnd   := tokens^.part[2];
+          dtEndTz := tokens^.part[1];
         end;
 
-        if ( pos(dtEndTk, tokens.part[0]) = 1 )
-        then
-        begin
-          dtEnd   := tokens.part[2];
-          dtEndTz := tokens.part[1];
-        end;
-
-        if ( pos(SummaryTk, tokens.part[0]) = 1 )
+        if ( pos(SummaryTk, tokens^.part[0]) = 1 )
            and (NOT alarm)
         then
-          summary := tokens.part[2];
+          summary := tokens^.part[2];
 
-        if ( pos(descrTk, tokens.part[0]) = 1 )
+        if ( pos(descrTk, tokens^.part[0]) = 1 )
            and (NOT alarm)
         then
-          description := tokens.part[2];
+          description := tokens^.part[2];
 
-        if ( pos(locationTk, tokens.part[0]) = 1 )
+        if ( pos(locationTk, tokens^.part[0]) = 1 )
            and (NOT alarm)
         then
-          location := tokens.part[2];
+          location := tokens^.part[2];
 
         if (NOT alarm)
-            and (pos(beginAlarmTk, tokens.part[0]) = 1 )
+            and (pos(beginAlarmTk, tokens^.part[0]) = 1 )
         then
+        begin
           alarm := GetAlarm(calFile);
+        end;
 
-        if (pos(endAlarmTk, tokens.part[0]) = 1 )
+        if (pos(endAlarmTk, tokens^.part[0]) = 1 )
         then
           alarm := FALSE;
 
-        tokens.Free;
+        dispose (tokens, Done);
+
       end;  (* if *)
 
     end;  (* while *)
 
-  log.debug('dtStart = ' + dtStart);
-  log.debug('dtEnd   = ' + dtEnd);
 
     if (length(dtStart) > 0)
     then
     begin
-      if (startDate = nil)
-      then
-        writeln ('StartDate is NIL');
-
       startDate.dtStr2Obj(dtStart);
     end;
 
