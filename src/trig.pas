@@ -1,3 +1,5 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+
 unit trig;
 
 interface

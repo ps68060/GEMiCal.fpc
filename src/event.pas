@@ -1,3 +1,4 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 unit Event;
 
@@ -78,7 +79,9 @@ implementation
     summary     := '';
     description := '';
     dtstart     := '';
+    dtstartTz   := '';
     dtend       := '';
+    dtendTz     := '';
     location    := '';
 
     alarmAction      := '';
@@ -107,7 +110,6 @@ implementation
     log          : TLogger;
 
     convStr      : String;
-
     currentLn    : String;
 
     alarm        : Boolean;
@@ -116,7 +118,7 @@ implementation
     tokens       : PToken;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log := TLogger.Create(LLDEBUG);
 
     endEvent     := FALSE;
     alarm        := FALSE;
@@ -133,9 +135,7 @@ implementation
       if ( pos(endEventTk, currentLn) = 1 )
       then
       begin
-
         endEvent := TRUE;
-
       end
 
       else
@@ -201,16 +201,11 @@ implementation
       startDate.dtStr2Obj(dtStart);
     end;
 
-
     if (length(dtEnd) > 0)
     then
-    begin
-      endDate.dtStr2Obj(dtEnd);
-    end
+      endDate.dtStr2Obj(dtEnd)
     else
-    begin
       endDate.dtStr2Obj(dtStart);
-    end;
 
     GetEvent := TRUE;
     (*writeEvent;*)

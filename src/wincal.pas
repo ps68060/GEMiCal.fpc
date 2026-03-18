@@ -40,7 +40,7 @@ type
                    function  GetStyle        : smallint;               VIRTUAL;
                    function  GetScroller     : PScroller;              VIRTUAL;
 
-                   procedure Paint(var PaintInfo : TPaintStruct);      VIRTUAL;
+                   procedure Paint(var PaintInfo     : TPaintStruct);      VIRTUAL;
 
                    procedure IconPaint(var PaintInfo : TPaintStruct);  VIRTUAL;
                    procedure SetupSize;                                VIRTUAL;
@@ -74,7 +74,6 @@ implementation
     Dos,
 
     Logger,
-    MainIcal,
     StrSubs,
     RiseSet;
 
@@ -87,6 +86,16 @@ var
   daysInMon    : integer;
   endMonthDate : TDateTime;
 
+
+procedure InitInstance;
+begin
+  displayDate := TDateTime.Create;
+end;
+
+procedure Done;
+begin
+  displayDate.Free;
+end;
 
 procedure TWinCal.CalcPos(row,
                           col   : Integer;
