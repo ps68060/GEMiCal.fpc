@@ -75,7 +75,7 @@ type
 
 var
   myApplication : TMyApplication;
-  conf          : TConfig;
+//  conf          : TConfig;
 
 implementation
 
@@ -123,7 +123,7 @@ begin
   (* Get current path *)
   GetDir (0, directory);
 
-  conf := TConfig.Create;
+//  conf := TConfig.Create;
 
   LoadResource ('GEMICAL.RSC','');
 
@@ -148,7 +148,7 @@ begin
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
 
-  conf.Free;
+//  conf.Free;
   log.Free;
 
 end;

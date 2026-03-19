@@ -25,7 +25,6 @@ const
 type
 
   PWinCal     = ^TWinCal;
-
   TWinCal     = OBJECT(TWindow)
                 private
                     titleHeight,
@@ -35,9 +34,10 @@ type
 
                 public
                    displayDate : TDateTime;
-                   procedure InitInstance; virtual;
-                   procedure Done; virtual;
-
+                   
+                   constructor Init(AParent: PWindow;  ATitle: string);
+                   destructor  Done;                                   virtual;
+                   
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : smallint;               VIRTUAL;
@@ -89,18 +89,19 @@ var
   daysInMon    : integer;
   endMonthDate : TDateTime;
 
-
-procedure InitInstance;
+constructor TWinCal.Init(AParent: PWindow;  ATitle: string);
 begin
-  inherited InitInstance;
+  inherited init(AParent, ATitle);
   displayDate := TDateTime.Create;
 end;
 
-procedure Done;
+
+destructor TWinCal.Done;
 begin
   displayDate.Free;
   inherited Done;
 end;
+
 
 procedure TWinCal.CalcPos(row,
                           col   : Integer;
@@ -204,7 +205,7 @@ begin
 end;
 
 
-procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
+procedure TWinCal.Paint(var paintInfo : TPaintStruct);
 
 (* Purpose : called on every change
  *)
@@ -234,12 +235,21 @@ var
 begin
   log := TLogger.Create(LLINFO);
 
-  conf := TConfig.Create;;
+  vdiHandle := GetVdiHandle;
+  conf := TConfig.Create;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
-  new_X := Scroller^.GetXOrg;
-  new_Y := Scroller^.GetYOrg;
+  if (Scroller <> nil) then
+  begin
+    new_X := Scroller^.GetXOrg;
+    new_Y := Scroller^.GetYOrg;
+  end
+  else
+  begin
+    new_X := 0;
+    new_Y := 0;
+  end;
 
   (* Display the year and month in larger text *)
   DrawTitle;
@@ -479,9 +489,9 @@ var
   hcell       : smallint;
 
 begin
-//writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
-//writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
-//writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
+writeln('DEBUG: Work=', Work.X, ',', Work.Y, '  size=', Work.W, 'x', Work.H);
+writeln('DEBUG: titleHeight=', titleHeight, ' headerHeight=', headerHeight);
+writeln('DEBUG: cellWidth=', cellWidth, ' cellHeight=', cellHeight);
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -509,7 +519,7 @@ var
 
   scrollX,
   scrollY,
-  Y         : integer;
+  y         : integer;
 
   qx, qy : integer;
 
@@ -517,10 +527,10 @@ begin
   log := TLogger.Create(LLDEBUG);
   log.debug('DRAWGRID');
 
-  scrollX := Scroller^.GetXOrg;
-  scrollY := Scroller^.GetYOrg;
+//  scrollX := Scroller^.GetXOrg;
+//  scrollY := Scroller^.GetYOrg;
 
-  Y := Work.Y + titleHeight;
+  y := Work.Y + titleHeight;
 
   (* Draw heading line *)
   pxy[0] := Work.X;
@@ -552,9 +562,9 @@ begin
     pxy[2] := pxy[0];
 
     log.debug ('pxy[0] = ', pxy[0]);
-    log.debug ('pxy[0] = ', pxy[1]);
-    log.debug ('pxy[0] = ', pxy[2]);
-    log.debug ('pxy[0] = ', pxy[3]);
+    log.debug ('pxy[1] = ', pxy[1]);
+    log.debug ('pxy[2] = ', pxy[2]);
+    log.debug ('pxy[3] = ', pxy[3]);
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
