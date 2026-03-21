@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit Token;
 
 (* AUTHOR  : P Slegg
@@ -12,12 +15,11 @@ interface
 
 type
 
-  PToken = ^TToken;
-  TToken = object(TObject)
+  TToken = class
     part : array [0..3] of String;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor Create;
+    destructor  Destroy; override;
 
     procedure TokeniseIcal (line : String);
 
@@ -30,18 +32,18 @@ implementation
 uses
   Logger;
 
-  constructor TToken.init;
+  constructor TToken.Create;
   var
     i : Integer;
   begin
-    for i := 0 to 3
-    do
-      part[i] := '';
+//    for i := 0 to 3
+//    do
+//      part[i] := '';
   end;
 
-  destructor TToken.done;
+  destructor TToken.Destroy;
   begin
-
+    inherited Destroy;
   end;
 
 

@@ -1,4 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
+
 unit Config;
 
 interface
@@ -55,7 +57,7 @@ uses
     cnfFile      : Text;
 
     currentLn    : String;
-    keyValue     : PToken;
+    keyValue     : TToken;
     code         : Integer;
 
     valReal      : Real;
@@ -72,26 +74,24 @@ uses
     begin
       readln (cnfFile, currentLn );
 
-      new(keyValue);
-      keyValue^.init;
-
-      keyValue^.tokeniseInf(currentLn);
+      keyValue := TToken.Create;
+      keyValue.tokeniseInf(currentLn);
 
       (* Get the name *)
       if ( pos(nameTk, currentLn) = 1 )
       then
-        name := keyValue^.part[1];
+        name := keyValue.part[1];
 
 
       (* Get the latitude, if it is invalid, keep default *)
       if ( pos(latTk, currentLn) = 1 )
       then
       begin
-        val(keyValue^.part[1], valReal, code);
+        val(keyValue.part[1], valReal, code);
 
         if (code <> 0)
         then
-          writeln ('Real conversion error of lat: ', keyValue^.part[1]);
+          writeln ('Real conversion error of lat: ', keyValue.part[1]);
 
         if (abs(valReal) > 90.0)
         then
@@ -106,11 +106,11 @@ uses
       if ( pos(lngTk, currentLn) = 1 )
       then
       begin
-        val(keyValue^.part[1], valReal, code);
+        val(keyValue.part[1], valReal, code);
 
         if (code <> 0)
         then
-          writeln ('Real conversion error of lng: ', keyValue^.part[1]);
+          writeln ('Real conversion error of lng: ', keyValue.part[1]);
 
         if (abs(valReal) > 180.0)
         then
@@ -124,11 +124,11 @@ uses
       if ( pos(UTCoffsetTk, currentLn) = 1 )
       then
       begin
-        val(keyValue^.part[1], valReal, code);
+        val(keyValue.part[1], valReal, code);
 
         if (code <> 0)
         then
-          writeln ('Real conversion error of UTCoffset: ', keyValue^.part[1]);
+          writeln ('Real conversion error of UTCoffset: ', keyValue.part[1]);
 
         if (abs(valReal) > 12.0)
         then
@@ -138,7 +138,7 @@ uses
 
       end;
 
-      dispose (keyValue);
+      keyValue.Free;
     end;  (* while *)
 
     log.debug ('location = ' + name);

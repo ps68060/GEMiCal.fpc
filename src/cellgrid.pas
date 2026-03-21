@@ -15,7 +15,7 @@ interface
   type
     PCellGrid = ^TCellGrid;
     TCellGrid = Object(TObject)
-      cell    : array [1..NUMCELLS] of PCalCell;
+      cell    : array [1..NUMCELLS] of TCalCell;
 
       constructor init;
       destructor  done; virtual;
@@ -48,8 +48,7 @@ uses
     for i := 1 to NUMCELLS
     do
     begin
-      new (cell[i]);
-      cell[i]^.init;
+      cell[i] := TCalCell.Create;
     end;
 
   end;
@@ -62,7 +61,7 @@ uses
     for i := 1 to NUMCELLS
     do
     begin
-      dispose(cell[i], Done);
+      cell[i].Free;
     end;
   end;
 
@@ -193,23 +192,23 @@ uses
     do
     begin
       log.debug ('event date ',  + j);
-      log.debug ('slot ', cell[j]^.counter);
+      log.debug ('slot ', cell[j].counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
-      cell[j]^.cellEvents[cell[j]^.counter].summary   := summ;
+      cell[j].cellEvents[cell[j].counter].summary   := summ;
 
       locat := SubStr (cal^.eventList[e]^.location);
-      cell[j]^.cellEvents[cell[j]^.counter].location  := locat;
+      cell[j].cellEvents[cell[j].counter].location  := locat;
 
-      cell[j]^.cellEvents[cell[j]^.counter].timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
+      cell[j].cellEvents[cell[j].counter].timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
 
       log.log(LLDEBUG, 'Summary ' +
-                  cell[j]^.cellEvents[cell[j]^.counter].summary );
+                  cell[j].cellEvents[cell[j].counter].summary );
 
-      cell[j]^.eventNum := e;
+      cell[j].eventNum := e;
 
-      inc (cell[j]^.counter );
+      inc (cell[j].counter );
     end;
 
     log.Free;

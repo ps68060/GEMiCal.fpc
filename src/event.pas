@@ -115,7 +115,7 @@ implementation
     alarm        : Boolean;
     endEvent     : Boolean;
 
-    tokens       : PToken;
+    tokens       : TToken;
 
   begin
     log := TLogger.Create(LLINFO);
@@ -142,55 +142,54 @@ implementation
 
       else
       begin
-        new (tokens);
-        tokens^.init;
-        tokens^.tokeniseIcal(currentLn);
+        tokens.Create;
+        tokens.tokeniseIcal(currentLn);
 
-        if ( pos(createdTk, tokens^.part[0]) = 1 )
+        if ( pos(createdTk, tokens.part[0]) = 1 )
         then
-          created := tokens^.part[2];
+          created := tokens.part[2];
 
-        if ( pos(dtStartTk, tokens^.part[0]) = 1 )
-        then
-        begin
-          dtStart   := tokens^.part[2];
-          dtStartTz := tokens^.part[1];
-        end;
-
-        if ( pos(dtEndTk, tokens^.part[0]) = 1 )
+        if ( pos(dtStartTk, tokens.part[0]) = 1 )
         then
         begin
-          dtEnd   := tokens^.part[2];
-          dtEndTz := tokens^.part[1];
+          dtStart   := tokens.part[2];
+          dtStartTz := tokens.part[1];
         end;
 
-        if ( pos(SummaryTk, tokens^.part[0]) = 1 )
-           and (NOT alarm)
+        if ( pos(dtEndTk, tokens.part[0]) = 1 )
         then
-          summary := tokens^.part[2];
+        begin
+          dtEnd   := tokens.part[2];
+          dtEndTz := tokens.part[1];
+        end;
 
-        if ( pos(descrTk, tokens^.part[0]) = 1 )
+        if ( pos(SummaryTk, tokens.part[0]) = 1 )
            and (NOT alarm)
         then
-          description := tokens^.part[2];
+          summary := tokens.part[2];
 
-        if ( pos(locationTk, tokens^.part[0]) = 1 )
+        if ( pos(descrTk, tokens.part[0]) = 1 )
            and (NOT alarm)
         then
-          location := tokens^.part[2];
+          description := tokens.part[2];
+
+        if ( pos(locationTk, tokens.part[0]) = 1 )
+           and (NOT alarm)
+        then
+          location := tokens.part[2];
 
         if (NOT alarm)
-            and (pos(beginAlarmTk, tokens^.part[0]) = 1 )
+            and (pos(beginAlarmTk, tokens.part[0]) = 1 )
         then
         begin
           alarm := GetAlarm(calFile);
         end;
 
-        if (pos(endAlarmTk, tokens^.part[0]) = 1 )
+        if (pos(endAlarmTk, tokens.part[0]) = 1 )
         then
           alarm := FALSE;
 
-        dispose (tokens, Done);
+        tokens.Free;
 
       end;  (* if *)
 
