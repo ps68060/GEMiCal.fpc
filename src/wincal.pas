@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit WinCal;
 
 interface
@@ -33,7 +36,7 @@ type
                 public
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
-                   function  GetStyle        : Integer;                VIRTUAL;
+                   function  GetStyle        : SmallInt;               VIRTUAL;
                    function  GetScroller     : PScroller;              VIRTUAL;
 
                    procedure Paint(var PaintInfo     : TPaintStruct);  VIRTUAL;
@@ -52,8 +55,8 @@ type
 
                    procedure CalcPos(row,
                                      col   : Integer;
-                                     var x,
-                                         y : Integer);
+                                     var xVar,
+                                         yVar : SmallInt);
 
                    procedure DrawGrid(rows,
                                       height  : Integer);
@@ -61,10 +64,8 @@ type
 
 var
   conf            : TConfig;
-
   displayDate     : PDateTime;  (* 1st of the month *)
-
-  cellGr          : PCellGrid;
+  cellGr          : TCellGrid;
 
 
 implementation
@@ -86,10 +87,28 @@ var
   endMonthDate : PDateTime;
 
 
+
+procedure TWinCal.GetWindowClass(var AWndClass : TWndClass);
+(* set general features of windows *)
+
+begin
+  INHERITED GetWindowClass(AWndClass);
+  AWndClass.Style   := cs_DblClks
+                     + cs_CreateOnAccOpen
+                     + cs_AutoOpen
+                     + cs_WorkBackground
+                     + cs_CancelOnClose;
+
+  AWndClass.hCursor := IDC_HELP;
+end;
+
+
+
+
 procedure TWinCal.CalcPos(row,
                           col   : Integer;
-                          var x,
-                              y : Integer);
+                          var xVar,
+                              yVar : SmallInt);
 (* Purpose : Calculate the x, y of the cell from row, col.
  * inputs  : row 0 to 6
  *           col 0 to 5
@@ -97,12 +116,12 @@ procedure TWinCal.CalcPos(row,
  *)
 
 begin
-  x := Work.X + (col * cellWidth);
-  y := Work.Y + titleHeight + row * cellHeight;
+  xVar := Work.X + (col * cellWidth);
+  yVar := Work.Y + titleHeight + row * cellHeight;
 
   if (row > 0)
   then
-    y := y + headerHeight;
+    yVar := yVar + headerHeight;
 end;
 
 
@@ -111,7 +130,7 @@ var
   log          : TLogger;
 
   pixX,
-  pixY         : Integer;
+  pixY         : SmallInt;
 
   year,
   month,
@@ -120,16 +139,17 @@ var
 
   currentMonth : Boolean;
 
-  row, col,
+  row, col     : LongInt;
   i            : Integer;
 
   scrollX,
   scrollY: Integer;
 
-  wch,
-  hch,
+  wchar,
+  hchar        : SmallInt;
+
   wCell,
-  hCell        : Integer;
+  hCell        : SmallInt;
 
 begin
   log := TLogger.Create(LLINFO);
@@ -155,7 +175,7 @@ begin
   daysInMon := daysInMonth(displayDate);
 
   (* Set the font to get the dimensions *)
-  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon do
@@ -199,10 +219,10 @@ var
 
   pxArray     : Array [1..10] of Integer;
 
-  wch,
-  hch,
+  wchar,
+  hchar       : SmallInt;
   wcell,
-  hcell       : Integer;
+  hcell       : SmallInt;
 
   lineLength  : Integer;
 
@@ -218,7 +238,7 @@ begin
 
   conf := TConfig.Create;;
 
-  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
   new_X := Scroller^.GetXOrg;
   new_Y := Scroller^.GetYOrg;
@@ -243,21 +263,6 @@ begin
 end;
 
 
-procedure TWinCal.GetWindowClass(var AWndClass : TWndClass);
-(* set general features of windows *)
-
-begin
-  INHERITED GetWindowClass(AWndClass);
-  AWndClass.Style   := cs_DblClks
-                     + cs_CreateOnAccOpen
-                     + cs_AutoOpen
-                     + cs_WorkBackground
-                     + cs_CancelOnClose;
-
-  AWndClass.hCursor := IDC_HELP;
-end;
-
-
 function TWinCal.GetIconTitle
         : String;
 (* Name of iconified Windows *)
@@ -268,7 +273,7 @@ end;
 
 
 function TWinCal.GetStyle
-        : Integer;
+        : SmallInt;
 (* set the Element of Windows *)
 
 begin
@@ -294,10 +299,11 @@ procedure TWinCal.SetupSize;
 (* set the size when first opened *)
 
 var
-  wch,
-  hch,
+  wchar,
+  hchar      : SmallInt;
+
   wCell,
-  hCell   : integer;
+  hCell      : SmallInt;
 
 begin
   INHERITED SetupSize;
@@ -305,20 +311,19 @@ begin
   (* Work contains the window work area *)
   with Work do
   begin
-    X := 10;         (* X,Y correspond to the co-ordinates of the working area *)
-    Y := 60;         (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
+///    X := 10;         (* X,Y correspond to the co-ordinates of the working area *)
+///    Y := 60;         (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
     W := WINWIDTH;   (* W:=113, smallest width of the working area *)
     H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
+    vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wCell, hCell);
+    titleHeight  := hchar * 2;
 
-    vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wCell, hCell);
-    titleHeight  := hch * 2;
-
-    vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
+    vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
     headerHeight := hCell * 2;
 
     cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
-    cellWidth    := W div 7;
+    cellWidth    := (W - X*2) div 7;  // todo - improve calcs
   end;
 
   Calc(WC_BORDER, Work, Curr)
@@ -351,12 +356,14 @@ var
   log       : TLogger;
   title      : String;
 
-  wch,
-  hch,
+  wchar,
+  hchar      : SmallInt;
+
   wCell,
-  hCell,
+  hCell      : SmallInt;
+
   hAlign,
-  vAlign     : Integer;
+  vAlign     : SmallInt;
 
   todayDate  : PDateTime;
 
@@ -384,7 +391,7 @@ begin
   str(displayDate^.getYYYYFromIso, title);
   title := title + ' ' + mon1[displayDate^.getMMFromIso];
 
-  vst_point(vdiHandle, TITLE_FONT_SIZE, wch, hch, wcell, hcell);
+  vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
 
   v_gtext(vdiHandle,
@@ -392,7 +399,7 @@ begin
           Work.Y + (titleHeight div 2),
           title);
 
-  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
 
   (* Display date and time at top left *)
@@ -445,18 +452,18 @@ var
   pxArray     : Array [1..10] of Integer;
 
   x,
-  y           : Integer;
-
+  y           : SmallInt;
+  
   i           : Integer;
 
-  wch,
-  hch,
+  wchar,
+  hchar       : SmallInt;
   wcell,
-  hcell       : Integer;
+  hcell       : SmallInt;
 
 begin
 
-  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
   DrawGrid (1, headerHeight);
 
@@ -466,7 +473,7 @@ begin
     CalcPos(0, i, x, y);
     v_gtext(vdiHandle,
             x + Attr.boxWidth div 2,
-            y + hch, (*(cellHeight div 2),*)
+            y + hchar, (*(cellHeight div 2),*)
             day1[i] );
   end;
 
@@ -478,32 +485,37 @@ procedure TWinCal.DrawGrid(rows,
 var
   log       : TLogger;
   r, c      : Integer;
-  pxy       : array[0..3] of integer;  (* Declare in correct order for passing to v_pline *)
+  pxy       : array[0..3] of SmallInt;  (* Declare in correct order for passing to v_pline *)
+
+  calcX,
+  calcY     : LongInt;
 
   scrollX,
   scrollY,
-  Y         : integer;
+  y         : integer;
 
-  qx, qy : integer;
+  qx, qy    : integer;
 
 begin
   log := TLogger.Create(LLDEBUG);
 
-  scrollX := Scroller^.GetXOrg;
-  scrollY := Scroller^.GetYOrg;
+//  scrollX := Scroller^.GetXOrg;
+//  scrollY := Scroller^.GetYOrg;
 
-  Y := Work.Y + titleHeight;
+  y := Work.Y + titleHeight;
 
   (* Draw heading line *)
-  pxy[0] := Work.X;
+  pxy[0] := Work.X + 10;  // todo - fudged to the right
   pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
+  writeln ('Draw horizontal grid ', work.Y, ':', curr.Y);
   for r := 0 to rows do
   begin
     (* create a list of co-ords, declaration order above is the important bit *)
     pxy[1] := y;
     pxy[3] := y;
+    writeln('Grid : ', rows, '-', pxy[0], ':', pxy[1], ' - ', pxy[2], ':', pxy[3]);
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
 
@@ -514,6 +526,8 @@ begin
   end;
 
   (* Draw vertical lines for days by changing x co-ords *)
+  log.debug ('Draw vertical grid');
+
   CalcPos(rows-1, 0,  pxy[0], pxy[3]);
 
   for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
@@ -539,16 +553,19 @@ var
  log         : TLogger;
 
   row,
-  col,
-  x,
-  y           : Integer;
+  col         : LongInt;
 
-  wch,
-  hch,
+  x,
+  y           : SmallInt;
+
+  wchar,
+  hchar       : SmallInt;
+
   wCell,
-  hCell,
+  hCell       : SmallInt;
+
   offset,
-  lineSpace   : Integer;
+  lineSpace   : LongInt;
 
   summ,
   time,
@@ -565,10 +582,10 @@ begin
 
   log.debug ('DisplayEvents');
 
-  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   offset    := hCell + hcell div 2;
 
-  vst_point(vdiHandle, 7, wch, hch, wCell, hCell);
+  vst_point(vdiHandle, 7, wchar, hchar, wCell, hCell);
   lineSpace := cellHeight div 3;
 
   for j := 1 to 31 do
@@ -579,14 +596,14 @@ begin
     log.debug ('row ', row);
     log.debug ('col ', col);
 
-    for i := 0 to cellGr^.cell[j].counter - 1 do
+    for i := 0 to cellGr.cell[j].counter - 1 do
     begin
-      summ      := SubStr (cellGr^.cell[j].cellEvents[i].summary, 1, 16 );
-      time      := SubStr (cellGr^.cell[j].cellEvents[i].timeStart^.humanDateTime, 11, 5 );
+      summ      := SubStr (cellGr.cell[j].cellEvents[i].summary, 1, 16 );
+      time      := SubStr (cellGr.cell[j].cellEvents[i].timeStart^.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
-                                  cellGr^.cell[j].cellEvents[i].location), 1, 16 );
+                                  cellGr.cell[j].cellEvents[i].location), 1, 16 );
 
       log.debug('Summary  ' + summ );
       log.debug('counter ', i);
@@ -604,7 +621,7 @@ begin
 
   end;
 
-  vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wcell, hcell);
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wcell, hcell);
 
   log.Free;
 

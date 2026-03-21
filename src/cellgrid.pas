@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit CellGrid;
 
 interface
@@ -13,12 +16,11 @@ interface
     NUMCELLS  = 31;
 
   type
-    PCellGrid = ^TCellGrid;
-    TCellGrid = Object(TObject)
+    TCellGrid = class
       cell    : array [1..NUMCELLS] of TCalCell;
 
-      constructor init;
-      destructor  done; virtual;
+      constructor Create;
+      destructor  Destroy; override;
 
       procedure FilterEvents(cal       : PCal;
                              calDate   : PDateTime);
@@ -40,7 +42,7 @@ implementation
 uses
   Logger;
 
-  constructor TCellGrid.init;
+  constructor TCellGrid.Create;
   var
     i : Integer;
 
@@ -53,7 +55,7 @@ uses
 
   end;
 
-  destructor TCellGrid.done;
+  destructor TCellGrid.Destroy;
   var
     i : Integer;
 
@@ -63,6 +65,8 @@ uses
     begin
       cell[i].Free;
     end;
+    
+    inherited Destroy;
   end;
 
 

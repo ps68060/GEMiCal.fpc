@@ -221,12 +221,14 @@ begin
     BusyMouse;
 
     Dispose(myApplication.iCal, Done);
+
+    // todo - is cellGr needed ?
     if (cellGr <> NIL)
     then
-      Dispose(cellGr, Done);
+      cellGr.Free;
 
-    new (cellGr);
-    cellGr^.init;
+    cellGr := TCellGrid.Create;
+    //
 
     directory := myPath;
 
@@ -447,12 +449,11 @@ begin
 
   if (cellGr <> NIL)
   then
-    dispose (cellGr, done);
+    cellGr.Free;
 
-  new (cellGr);
-  cellGr^.init;
-  cellGr^.FilterEvents(myApplication.iCal,
-                       displayDate);
+  cellGr := TCellGrid.Create;
+  cellGr.FilterEvents(myApplication.iCal,
+                      displayDate);
   log.debug('Cal displayed');
   
   log.Free;
