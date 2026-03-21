@@ -1,4 +1,5 @@
 {$B+,D-,I-,L-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$mode objfpc}
 
 unit Cal;
 
@@ -16,14 +17,13 @@ const
   maxEvents = 999;
 
 type
-  PCal = ^TCal;
-  TCal = object(TObject)
+  TCal = class
     version   : String;
     eventList : array [0..maxEvents] of PEvent;
     entries   : Integer;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor Create;
+    destructor  Destroy; override;
 
     Procedure LoadICS (directory : String);
     Procedure DivideIcs (const calName : String);
@@ -37,7 +37,7 @@ implementation
     Dos,
     Logger;
 
-  constructor TCal.init;
+  constructor TCal.Create;
   var
     i : Integer;
   begin
@@ -46,7 +46,7 @@ implementation
   end;
 
 
-  destructor TCal.done;
+  destructor TCal.Destroy;
   var
     i : Integer;
   begin
@@ -55,6 +55,8 @@ implementation
     begin
       dispose(eventList[i], Done);
     end;
+    
+    inherited Destroy;
   end;
 
 

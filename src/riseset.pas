@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit riseset;
 
 interface

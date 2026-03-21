@@ -16,7 +16,7 @@ interface
       counter    : Integer;
 
       constructor Create;
-      destructor  Destroy; virtual;
+      destructor  Destroy; override;
     end;
 
 

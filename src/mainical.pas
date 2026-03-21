@@ -60,7 +60,7 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
-                     iCal       : PCal;
+                     iCal       : TCal;
                      winCal     : PWinCal;
 
                      destructor done; virtual;
@@ -181,10 +181,10 @@ begin
 
     LoadCal;
 
-    if (myApplication.iCal^.entries > 0)
+    if (myApplication.iCal.entries > 0)
     then
     begin
-      MyApplication.iCal^.sort;
+      MyApplication.iCal.sort;
       FilterCal(dtStr);
     end;
 
@@ -220,7 +220,7 @@ begin
   begin
     BusyMouse;
 
-    Dispose(myApplication.iCal, Done);
+    myApplication.iCal.Free;
 
     // todo - is cellGr needed ?
     if (cellGr <> NIL)
@@ -237,10 +237,10 @@ begin
 
     LoadCal;
    
-    if (myApplication.iCal^.entries > 0)
+    if (myApplication.iCal.entries > 0)
     then
     begin
-      myApplication.iCal^.sort;
+      myApplication.iCal.sort;
       FilterCal(dtStr);
     end;
 
@@ -414,15 +414,14 @@ var
 begin
   log := TLogger.Create(LLINFO);
 
-  new(myApplication.iCal);
-  myApplication.iCal^.init;
+  myApplication.iCal := TCal.Create;
 
   log.debug('Load ICS files from ' + directory);
 
   (* Load iCal events *)
-  myApplication.iCal^.loadICS(directory);
+  myApplication.iCal.loadICS(directory);
   
-  log.debug('loaded ', myApplication.iCal^.entries );
+  log.debug('loaded ', myApplication.iCal.entries );
 
   log.Free;
 
