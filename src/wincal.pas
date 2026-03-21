@@ -34,10 +34,10 @@ type
 
                 public
                    displayDate : TDateTime;
-                   
-                   constructor Init(AParent: PWindow;  ATitle: string);
-                   destructor  Done;                                   virtual;
-                   
+
+///                   constructor Init(AParent: PWindow;  ATitle: string);
+///                   destructor  Done;                                   virtual;
+
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : smallint;               VIRTUAL;
@@ -89,6 +89,7 @@ var
   daysInMon    : integer;
   endMonthDate : TDateTime;
 
+(*
 constructor TWinCal.Init(AParent: PWindow;  ATitle: string);
 begin
   inherited init(AParent, ATitle);
@@ -101,7 +102,7 @@ begin
   displayDate.Free;
   inherited Done;
 end;
-
+*)
 
 procedure TWinCal.CalcPos(row,
                           col   : Integer;
@@ -233,10 +234,13 @@ var
   dayOfWeek   : Word;
 
 begin
-  log := TLogger.Create(LLINFO);
-
-  vdiHandle := GetVdiHandle;
+  log := TLogger.Create(LLDEBUG);
+  log.debug('CONFIG CREATE');
   conf := TConfig.Create;
+
+  log.debug('Get vdiHandle');
+  vdiHandle := GetVdiHandle;
+  log.debug('vdiHandle', vdiHandle);
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wch, hch, wCell, hCell);
 
@@ -254,14 +258,14 @@ begin
   (* Display the year and month in larger text *)
   DrawTitle;
 
-  DrawGridHeading;
+///  DrawGridHeading;
 
-  vsf_interior(vdiHandle, FIS_HOLLOW);
-  DrawGrid(6, cellHeight);
+///  vsf_interior(vdiHandle, FIS_HOLLOW);
+///  DrawGrid(6, cellHeight);
 
-  WriteDates;
+///  WriteDates;
 
-  DisplayEvents(new_X, new_Y);
+///  DisplayEvents(new_X, new_Y);
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
@@ -554,6 +558,11 @@ begin
   (* Draw vertical lines for days by changing x co-ords *)
   CalcPos(rows-1, 0,  pxy[0], pxy[3]);
 
+  log.debug ('pxy[0] = ', pxy[0]);
+  log.debug ('pxy[1] = ', pxy[1]);
+  log.debug ('pxy[2] = ', pxy[2]);
+  log.debug ('pxy[3] = ', pxy[3]);
+
   for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
   begin
     (* Use column to calc X co-ord in [0] *)
@@ -565,6 +574,7 @@ begin
     log.debug ('pxy[1] = ', pxy[1]);
     log.debug ('pxy[2] = ', pxy[2]);
     log.debug ('pxy[3] = ', pxy[3]);
+    readln;
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;

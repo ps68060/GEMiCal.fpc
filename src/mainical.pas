@@ -94,7 +94,7 @@ var
   myPath        : String;
 
   directory     : String;
-  displayDate   : DateTime.TDateTime;
+//  displayDate   : DateTime.TDateTime;
 
 
 destructor TMyApplication.done;
@@ -167,7 +167,6 @@ var
 
 begin
   log := TLogger.Create(LLDEBUG);
-
   log.info('INIT Main Window');
 
   if MyApplication.winCal = NIL
@@ -175,6 +174,7 @@ begin
   begin
 
     myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+    myApplication.winCal^.displayDate := TDateTime.Create;
 
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
@@ -198,7 +198,7 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  displayDate.Free;
+  myApplication.winCal^.displayDate.Free;
   log.Free;
 
 end;
@@ -302,8 +302,8 @@ begin
   log.debug('Prev Month Work');
 
 
-  month := displayDate.getMMFromIso;
-  year  := displayDate.getYYYYFromIso;
+  month := myApplication.winCal^.displayDate.getMMFromIso;
+  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
 
   dec (month);
 
@@ -339,8 +339,8 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Month Work');
 
-  month := displayDate.getMMFromIso;
-  year  := displayDate.getYYYYFromIso;
+  month := myApplication.winCal^.displayDate.getMMFromIso;
+  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
 
   inc (month);
 
@@ -375,11 +375,11 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Prev Year Work');
 
-  year  := displayDate.getYYYYFromIso;
+  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
 
   dec (year);
 
-  dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
+  dtStr := date2str(year, myApplication.winCal^.displayDate.getMMFromIso, 1, FALSE);
   myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   log.debug('PrevYear.Work: call FilterCal');
@@ -403,11 +403,11 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Year Work');
 
-  year  := displayDate.getYYYYFromIso;
+  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
 
   inc (year);
 
-  dtStr := date2str(year, displayDate.getMMFromIso, 1, FALSE);
+  dtStr := date2str(year, myApplication.winCal^.displayDate.getMMFromIso, 1, FALSE);
   myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
   log.debug('NextYear.Work: call FilterCal');
@@ -464,7 +464,7 @@ begin
   new (cellGr);
   cellGr^.init;
   cellGr^.FilterEvents(myApplication.iCal,
-                       displayDate);
+                       myApplication.winCal^.displayDate);
   log.debug('Cal displayed');
 
 //  displayDate.Free;
