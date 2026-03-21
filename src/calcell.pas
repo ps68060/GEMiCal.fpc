@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit CalCell;
 
 interface
@@ -9,7 +12,7 @@ interface
   type
     PCalCell  = ^TCalCell;
     TCalCell  = Object(TObject)
-      cellEvents : array [0..9] of PCellEvent;
+      cellEvents : array [0..9] of TCellEvent;
       eventNum   : Integer;
       counter    : Integer;
 
@@ -31,8 +34,7 @@ implementation
     for i := 0 to 9
     do
     begin
-      new (cellEvents[i]);
-      cellEvents[i]^.init;
+      cellEvents[i] := TCellEvent.Create;
     end;
 
   end;
@@ -46,7 +48,7 @@ implementation
     for i := 0 to 9
     do
     begin
-      dispose (cellEvents[i], Done);
+      cellEvents[i].Free;
     end;
   end;
 

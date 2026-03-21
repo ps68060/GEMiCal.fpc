@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit CellEvnt;
 
 interface
@@ -6,24 +9,21 @@ interface
     Objects,
     DateTime;
 
-
   type
-    PCellEvent = ^TCellEvent;
-    TCellEvent = Object(TObject)
+    TCellEvent = class
       summary   : String;
       location  : String;
       timeStart : PDateTime;
       timeEnd   : PDateTime;
 
-      constructor init;
-      destructor  done; virtual;
-
+      constructor Create;
+      destructor  Destroy; override;
     end;
 
 
 implementation
 
-  constructor TCellEvent.init;
+  constructor TCellEvent.Create;
   begin
     summary   := '';
     location  := '';
@@ -37,7 +37,7 @@ implementation
   end;
 
 
-  destructor TCellEvent.done;
+  destructor TCellEvent.Destroy;
   begin
     dispose (timeStart, Done);
     dispose (timeEnd,   Done);

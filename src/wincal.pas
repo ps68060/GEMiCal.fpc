@@ -581,12 +581,12 @@ begin
 
     for i := 0 to cellGr^.cell[j]^.counter - 1 do
     begin
-      summ      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.summary, 1, 16 );
-      time      := SubStr (cellGr^.cell[j]^.cellEvents[i]^.timeStart^.humanDateTime, 11, 5 );
+      summ      := SubStr (cellGr^.cell[j]^.cellEvents[i].summary, 1, 16 );
+      time      := SubStr (cellGr^.cell[j]^.cellEvents[i].timeStart^.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
-                                  cellGr^.cell[j]^.cellEvents[i]^.location), 1, 16 );
+                                  cellGr^.cell[j]^.cellEvents[i].location), 1, 16 );
 
       log.debug('Summary  ' + summ );
       log.debug('counter ', i);

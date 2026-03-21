@@ -197,15 +197,15 @@ uses
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
       summ := SubStr (cal^.eventList[e]^.summary);
-      cell[j]^.cellEvents[cell[j]^.counter]^.summary   := summ;
+      cell[j]^.cellEvents[cell[j]^.counter].summary   := summ;
 
       locat := SubStr (cal^.eventList[e]^.location);
-      cell[j]^.cellEvents[cell[j]^.counter]^.location  := locat;
+      cell[j]^.cellEvents[cell[j]^.counter].location  := locat;
 
-      cell[j]^.cellEvents[cell[j]^.counter]^.timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
+      cell[j]^.cellEvents[cell[j]^.counter].timeStart^.dtStr2Obj(cal^.eventList[e]^.dtStart);
 
       log.log(LLDEBUG, 'Summary ' +
-                  cell[j]^.cellEvents[cell[j]^.counter]^.summary );
+                  cell[j]^.cellEvents[cell[j]^.counter].summary );
 
       cell[j]^.eventNum := e;
 
