@@ -32,10 +32,10 @@ interface
     end;
 
 
-    procedure CalcCell(day,
-                       firstDay : Integer;
-                       var row,
-                           col : Integer);
+    procedure CalcCellGrid(day,
+                           firstDay : Integer;
+                           var row,
+                               col : Integer);
 
 implementation
 
@@ -220,10 +220,10 @@ uses
   end;
 
 
-  procedure CalcCell(day,
-                     firstDay : Integer;
-                     var row,
-                         col : Integer);
+  procedure CalcCellGrid(day,
+                         firstDay : Integer;
+                         var row,
+                             col : Integer);
   (* Purpose : Calculate the row and column of the calendar day
    * inputs  : firstDay = the day number of the 1st of the month
    *           day      = the date in the month

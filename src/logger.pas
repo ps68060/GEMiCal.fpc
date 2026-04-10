@@ -79,13 +79,15 @@ begin
 
   if (ord(level) >= ord(msgLevel) )
   then
+  begin
     (* Get today's date *)
     GetDate (year, month, day, dayOfWeek);
-    
     writeln(msgLevel, ': ', message);
+  end;
 
 end;
 
+// ----- INFO
 
 procedure TLogger.info(const message  : ShortString);
 begin
@@ -120,6 +122,7 @@ begin
   log(LLINFO, message + ': ' + value);
 end;
 
+// ----- DEBUG
 
 procedure TLogger.debug(const message : ShortString);
 begin
@@ -148,12 +151,12 @@ begin
   log(LLDEBUG, message + ': ' + s);
 end;
 
-
 procedure TLogger.debug(const message : ShortString; const value : ShortString);
 begin
   log(LLDEBUG, message + ': ' + value);
 end;
 
+// ----- WARN
 
 procedure TLogger.warn(const message : ShortString);
 begin

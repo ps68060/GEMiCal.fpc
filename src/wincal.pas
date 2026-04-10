@@ -103,107 +103,38 @@ begin
 end;
 
 
+procedure TWinCal.SetupSize;
+(* set the size when first opened *)
 
-
-procedure TWinCal.CalcPos(row,
-                          col   : Integer;
-                          var xVar,
-                              yVar : SmallInt);
-(* Purpose : Calculate the x, y of the cell from row, col.
- * inputs  : row 0 to 6
- *           col 0 to 5
- * returns : x, y pixel positions of the top left corner of the calendar cell
- *)
-
-begin
-  xVar := Work.X + (col * cellWidth);
-  yVar := Work.Y + titleHeight + row * cellHeight;
-
-  if (row > 0)
-  then
-    yVar := yVar + headerHeight;
-end;
-
-
-procedure TWinCal.WriteDates;
 var
-  log          : TLogger;
-
-  pixX,
-  pixY         : SmallInt;
-
-  year,
-  month,
-  day,
-  dayOfWeek    : Word;
-
-  currentMonth : Boolean;
-
-  row, col     : LongInt;
-  i            : Integer;
-
-  scrollX,
-  scrollY: Integer;
-
   wchar,
-  hchar        : SmallInt;
+  hchar      : SmallInt;
 
   wCell,
-  hCell        : SmallInt;
+  hCell      : SmallInt;
 
 begin
-  log := TLogger.Create(LLINFO);
+  INHERITED SetupSize;
 
-  scrollX := Scroller^.GetXOrg;
-  scrollY := Scroller^.GetYOrg;
-
-  log.debug ('year ', displayDate^.getYYYYFromIso );
-  log.debug (mon1[displayDate^.getMMFromIso] );
-
-  (* Get today's date and check if displaying current month *)
-  GetDate (year, month, day, dayOfWeek);
-
-  CalcCell (displayDate^.day, day, row, col);
-
-  currentMonth := FALSE;
-  if     (displayDate^.getYYYYFromIso = year)
-     and (displayDate^.getMMFromIso   = month)
-  then
-    currentMonth := TRUE;
-
-  (* Calculate date of end of month *)
-  daysInMon := daysInMonth(displayDate);
-
-  (* Set the font to get the dimensions *)
-  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
-
-  (* Display the dates, highlighting today *)
-  for i := 1 to daysInMon do
+  (* Work contains the window work area *)
+  with Work do
   begin
-    CalcCell (displayDate^.day, i, row, col);
-    CalcPos  (row, col, pixX, pixY);
-    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+///    X := 10;         (* X,Y correspond to the co-ordinates of the working area *)
+///    Y := 60;         (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
+    W := WINWIDTH;   (* W:=113, smallest width of the working area *)
+    H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
 
-    if (currentMonth)
-       and (i = day)
-    then
-    begin
-      (* Higlight today *)
-      vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
-      v_gtext(vdiHandle,
-              scrollX + pixX + Attr.boxWidth div 2,
-              scrollY + pixY,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
-      vst_effects(vdiHandle, TF_NORMAL);
-    end
-    else
-      v_gtext(vdiHandle,
-              scrollX + pixX + Attr.boxWidth div 2,
-              scrollY + pixY,
-              IntToStr(i) );
+    vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wCell, hCell);
+    titleHeight  := hCell * 2;
+
+    vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
+    headerHeight := hCell * 2;
+
+    cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
+    cellWidth    := (W - X*2) div 7;  // todo - improve calcs
   end;
 
-  log.Free;
+  Calc(WC_BORDER, Work, Curr)
 end;
 
 
@@ -246,7 +177,7 @@ begin
   (* Display the year and month in larger text *)
   DrawTitle;
 
-  DrawGridHeading;
+//  DrawGridHeading;
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
   DrawGrid(6, cellHeight);
@@ -295,41 +226,6 @@ begin
 end;
 
 
-procedure TWinCal.SetupSize;
-(* set the size when first opened *)
-
-var
-  wchar,
-  hchar      : SmallInt;
-
-  wCell,
-  hCell      : SmallInt;
-
-begin
-  INHERITED SetupSize;
-
-  (* Work contains the window work area *)
-  with Work do
-  begin
-///    X := 10;         (* X,Y correspond to the co-ordinates of the working area *)
-///    Y := 60;         (* of Windows, not the Auženmaže, min X:=1, min Y:=56=menu+title+subtitle *)
-    W := WINWIDTH;   (* W:=113, smallest width of the working area *)
-    H := WINHEIGHT;  (* H:=77,  smallest Height, because the window does not go smaller via Sizer *)
-
-    vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wCell, hCell);
-    titleHeight  := hchar * 2;
-
-    vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
-    headerHeight := hCell * 2;
-
-    cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
-    cellWidth    := (W - X*2) div 7;  // todo - improve calcs
-  end;
-
-  Calc(WC_BORDER, Work, Curr)
-end;
-
-
 procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
 (* write a Text in the iconified Window *)
 
@@ -346,6 +242,30 @@ begin
   str (day, dayStr);
 
   v_gtext(vdiHandle, Work.X, Work.Y + (Work.h shr 1), ' ' + dayStr);
+
+end;
+
+
+procedure TWinCal.CalcPos(row,
+                          col   : Integer;
+                          var xVar,
+                              yVar : SmallInt);
+(* Purpose : Calculate the x, y window coords of the cell from row, col.
+ * inputs  : row 0 to 6
+ *           col 0 to 5
+ * returns : x, y pixel positions of the top left corner of the calendar cell
+ *)
+
+begin
+  xVar := Curr.X + (col * cellWidth);
+  yVar := Curr.Y + titleHeight + row * cellHeight;
+
+//  if (row > 0)
+//  then
+    yVar := yVar + headerHeight;
+
+  if row <= 1 then
+    writeln('CalcPos: row=', row,' ', Curr.Y, ' ', titleHeight, ':', headerHeight, ':', cellHeight, ' result=', yvar);
 
 end;
 
@@ -499,27 +419,39 @@ var
 begin
   log := TLogger.Create(LLDEBUG);
 
-//  scrollX := Scroller^.GetXOrg;
-//  scrollY := Scroller^.GetYOrg;
+  scrollX := Scroller^.GetXOrg;
+  scrollY := Scroller^.GetYOrg;
 
   y := Work.Y + titleHeight;
 
   (* Draw heading line *)
-  pxy[0] := Work.X + 10;  // todo - fudged to the right
-  pxy[2] := Work.X + (7 * cellWidth);  (* constant X for horizontal line *)
+  pxy[0] := Curr.X;  // todo - fudged to the right
+  pxy[2] := Curr.X + (7 * cellWidth);  (* constant X for horizontal line *)
+
+  // Try this instead
+  CalcPos (0, 0, pxy[0], pxy[1]);
+  CalcPos (0, 6, pxy[2], pxy[3]);
+  pxy[2] := pxy[2] + cellWidth;
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
   writeln ('Draw horizontal grid ', work.Y, ':', curr.Y);
   for r := 0 to rows do
   begin
     (* create a list of co-ords, declaration order above is the important bit *)
-    pxy[1] := y;
-    pxy[3] := y;
-    writeln('Grid : ', rows, '-', pxy[0], ':', pxy[1], ' - ', pxy[2], ':', pxy[3]);
+///    pxy[1] := y;
+///    pxy[3] := y;
+    CalcPos (r, 0, pxy[0], pxy[1]);
+    CalcPos (r, 6, pxy[2], pxy[3]);
+
+    pxy[2] := pxy[2] + cellWidth;
+    pxy[1] := pxy[1] + scrollY;
+    pxy[3] := pxy[3] + scrollY;
+    writeln('DrawGrid : ', rows, '-', pxy[0], ':', pxy[1], ' - ', pxy[2], ':', pxy[3]);
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
 
-    if r=0 then
+    if (r = 0)
+    then
       y := y + headerHeight
     else
       y := y + cellHeight;
@@ -527,20 +459,102 @@ begin
 
   (* Draw vertical lines for days by changing x co-ords *)
   log.debug ('Draw vertical grid');
-
-  CalcPos(rows-1, 0,  pxy[0], pxy[3]);
-
   for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
   begin
     (* Use column to calc X co-ord in [0] *)
-    CalcPos(0, c,  pxy[0], pxy[3]);
+    CalcPos (0,    c, pxy[0], pxy[1]);
+    CalcPos (rows, c, pxy[2], pxy[3]);
 
-    pxy[2] := pxy[0];
+    pxy[1] := pxy[1] + scrollY;
+    pxy[3] := pxy[3] + scrollY;
+
+//    pxy[2] := pxy[0];
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
 
 
+end;
+
+
+procedure TWinCal.WriteDates;
+var
+  log          : TLogger;
+
+  pixX,
+  pixY         : SmallInt;
+
+  year,
+  month,
+  day,
+  dayOfWeek    : Word;
+
+  currentMonth : Boolean;
+
+  row, col     : LongInt;
+  i            : Integer;
+
+  scrollX,
+  scrollY      : Integer;
+
+  wchar,
+  hchar,
+  wCell,
+  hCell        : SmallInt;
+
+begin
+  log := TLogger.Create(LLINFO);
+
+  scrollX := Scroller^.GetXOrg;
+  scrollY := Scroller^.GetYOrg;
+
+  log.debug ('year ', displayDate^.getYYYYFromIso );
+  log.debug (mon1[displayDate^.getMMFromIso] );
+
+  (* Get today's date and check if displaying current month *)
+  GetDate (year, month, day, dayOfWeek);
+
+  CalcCellGrid (displayDate^.day, day, row, col);
+
+  currentMonth := FALSE;
+  if     (displayDate^.getYYYYFromIso = year)
+     and (displayDate^.getMMFromIso   = month)
+  then
+    currentMonth := TRUE;
+
+  (* Calculate date of end of month *)
+  daysInMon := daysInMonth(displayDate);
+
+  (* Set the font to get the dimensions *)
+  vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
+
+  (* Display the dates, highlighting today *)
+  for i := 1 to daysInMon do
+  begin
+    CalcCellGrid (displayDate^.day, i, row, col);
+    CalcPos  (row, col, pixX, pixY);
+    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+
+    if (currentMonth)
+       and (i = day)
+    then
+    begin
+      (* Highlight today *)
+      vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
+      v_gtext(vdiHandle,
+              scrollX + pixX + Attr.boxWidth div 2,
+              scrollY + pixY + Attr.boxHeight,  (* Use char height and not the char cell height *)
+              IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
+      vst_effects(vdiHandle, TF_NORMAL);
+    end
+    else
+      v_gtext(vdiHandle,
+              scrollX + pixX + Attr.boxWidth div 2,
+              scrollY + pixY + Attr.boxHeight,
+              IntToStr(i) );
+  end;
+
+  log.Free;
 end;
 
 
@@ -590,7 +604,7 @@ begin
 
   for j := 1 to 31 do
   begin
-    CalcCell (displayDate^.day, j, row, col);
+    CalcCellGrid (displayDate^.day, j, row, col);
     CalcPos(row, col, x, y);
 
     log.debug ('row ', row);
