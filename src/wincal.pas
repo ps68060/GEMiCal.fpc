@@ -58,8 +58,7 @@ type
                                      var xVar,
                                          yVar : SmallInt);
 
-                   procedure DrawGrid(rows,
-                                      height  : Integer);
+                   procedure DrawGrid(rows : Integer);
                  END;
 
 var
@@ -177,10 +176,10 @@ begin
   (* Display the year and month in larger text *)
   DrawTitle;
 
-//  DrawGridHeading;
+  DrawGridHeading;
 
   vsf_interior(vdiHandle, FIS_HOLLOW);
-  DrawGrid(6, cellHeight);
+  DrawGrid(6);
 
   WriteDates;
 
@@ -371,10 +370,12 @@ var
   lineLength  : Integer;
   pxArray     : Array [1..10] of Integer;
 
-  x,
-  y           : SmallInt;
-  
-  i           : Integer;
+  pixX,
+  pixY        : SmallInt;
+
+  scrollX,
+  scrollY,  
+  c           : Integer;
 
   wchar,
   hchar       : SmallInt;
@@ -382,26 +383,27 @@ var
   hcell       : SmallInt;
 
 begin
+  scrollX := Scroller^.GetXOrg;
+  scrollY := Scroller^.GetYOrg;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
-  DrawGrid (1, headerHeight);
+  DrawGrid (1);
 
   (* Write Day labels *)
-  for i := 0 to 6 do
+  for c := 0 to 6 do
   begin
-    CalcPos(0, i, x, y);
+    CalcPos(0, c, pixX, pixY);
     v_gtext(vdiHandle,
-            x + Attr.boxWidth div 2,
-            y + hchar, (*(cellHeight div 2),*)
-            day1[i] );
+            scrollX + pixX + Attr.boxWidth div 2,
+            scrollY + pixY + Attr.boxHeight - hCell*2, // hchar, (*(cellHeight div 2),*)
+            day1[c] );
   end;
 
 end;
 
 
-procedure TWinCal.DrawGrid(rows,
-                           height  : Integer);
+procedure TWinCal.DrawGrid(rows  : Integer);
 var
   log       : TLogger;
   r, c      : Integer;
@@ -411,8 +413,8 @@ var
   calcY     : LongInt;
 
   scrollX,
-  scrollY,
-  y         : integer;
+  scrollY   : integer;
+//  y         : integer;
 
   qx, qy    : integer;
 
@@ -421,8 +423,6 @@ begin
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
-
-  y := Work.Y + titleHeight;
 
   (* Draw heading line *)
   pxy[0] := Curr.X;  // todo - fudged to the right
@@ -438,8 +438,6 @@ begin
   for r := 0 to rows do
   begin
     (* create a list of co-ords, declaration order above is the important bit *)
-///    pxy[1] := y;
-///    pxy[3] := y;
     CalcPos (r, 0, pxy[0], pxy[1]);
     CalcPos (r, 6, pxy[2], pxy[3]);
 
@@ -450,11 +448,6 @@ begin
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
 
-    if (r = 0)
-    then
-      y := y + headerHeight
-    else
-      y := y + cellHeight;
   end;
 
   (* Draw vertical lines for days by changing x co-ords *)
@@ -467,8 +460,6 @@ begin
 
     pxy[1] := pxy[1] + scrollY;
     pxy[3] := pxy[3] + scrollY;
-
-//    pxy[2] := pxy[0];
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
