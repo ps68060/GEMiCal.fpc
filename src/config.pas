@@ -121,15 +121,15 @@ uses
     
     if (code <> 0)
     then
-      log.error ('Real conversion error of ' + keyValue.part[0] ': ', keyString);
+      log.error ('Real conversion error of ' + keyValue.part[0] '=', keyValue.part[1]);
     
     if (abs(valReal) > limit)
     then
-      log.warn(keyValue.part[0] + ' invalid, check gemical.cnf')
+      log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
     else
       value := valReal;
 
-    value default;
+    return value;
   end;
 
 end.
