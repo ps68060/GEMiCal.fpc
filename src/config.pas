@@ -51,6 +51,34 @@ uses
   end;
 
 
+  function getValue(keyValue : TToken; value : real; limit: real) : real;
+  var
+    log          : TLogger;
+
+    code         : Integer;
+    valReal      : Real;
+
+  begin
+    log := TLogger.Create(LLINFO);
+
+    getValue := value;
+    val(keyValue.part[1], valReal, code);
+    
+    if (code <> 0)
+    then
+      log.error ('Real conversion error of ' + keyValue.part[0] + '=', keyValue.part[1]);
+    
+    if (abs(valReal) > limit)
+    then
+      log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
+    else
+      getValue := valReal;
+
+    log.Free;
+
+  end;
+
+
   procedure TConfig.readConfig;
   var
     log          : TLogger;
@@ -85,17 +113,17 @@ uses
       (* Get the latitude, if it is invalid, keep default *)
       if ( pos(LAT_TK, currentLn) = 1 )
       then
-        getValue(keyValue, lat, 90.0);
+        lat := getValue(keyValue, lat, 90.0);
 
       (* Get the longitude, if it is invalid, keep default *)
       if ( pos(LNG_TK, currentLn) = 1 )
       then
-        getValue(keyValue, lng, 180.0);
+        lng := getValue(keyValue, lng, 180.0);
 
       (* Get the UTC offset, if it is invalid, keep default *)
       if ( pos(UTC_OFFSET_TK, currentLn) = 1 )
       then
-        getValue(keyValue, UTCoffset, 12.0);
+        UTCoffset := getValue(keyValue, UTCoffset, 12.0);
 
       keyValue.Free;
     end;  (* while *)
@@ -108,28 +136,6 @@ uses
     close(cnfFile);
     log.Free;
 
-  end;
-
-
-  function getValue(keyValue : TToken; value : real; limit: real) : real;
-  var
-    code         : Integer;
-    valReal      : Real;
-
-  begin
-    val(keyValue.part[1], valReal, code);
-    
-    if (code <> 0)
-    then
-      log.error ('Real conversion error of ' + keyValue.part[0] '=', keyValue.part[1]);
-    
-    if (abs(valReal) > limit)
-    then
-      log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
-    else
-      value := valReal;
-
-    return value;
   end;
 
 end.
