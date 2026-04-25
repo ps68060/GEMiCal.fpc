@@ -79,7 +79,7 @@ SUNRISESET Compute apparent sunrise and sunset times in seconds.
 
 var
   log     : TLogger;
-
+arg : real;
   E, F,
   G, H : Double;
   I, I1,
@@ -105,7 +105,7 @@ var
   ss_mm  : Word;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log := TLogger.Create(LLDEBUG);
 
   log.debug ('lat = ', lat);
   log.debug ('lng = ', lng);
@@ -165,7 +165,10 @@ begin
 
   log.debug ('v = ', V);
 
-  AB := trunc(E * 1440.0 + V + 4.0 * lng - 60.0 * UTCoff) mod 1440;    (* True Solar time (min) *)
+
+  // NB NOAA uses -long for WEST !!
+  // So invert the normal convention
+  AB := trunc(E * 1440.0 + V - 4.0 * lng - 60.0 * UTCoff) mod 1440;    (* True Solar time (min) *)
 
   if ((AB/4) < 0)
   then
@@ -175,13 +178,10 @@ begin
 
   AD := acosd(sind(lat) * sind(T) + cosd(lat) * cosd(T) * cosd(AC));        (* Solar Zenith angle *)
 
-  W  := rad2deg(acos(cosd(90.833)
-                     / (cosd(lat) * cosd(T)
-                       )
-                     - tand(lat)
-                     * tand(T)
-                     )
-               );  (* HA Sunrise *)
+  W := acosd(  (cosd(90.833)
+               / (cosd(lat) * cosd(T)))
+               - (tand(lat) * tand(T))
+            );
 
   X  := (720 - 4 * lng - V + UTCoff * 60.0) / 1440;                         (* Solar noon (LST) *)
 
