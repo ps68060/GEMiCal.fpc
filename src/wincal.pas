@@ -341,12 +341,12 @@ begin
   (* Display Sunrise and sunset times at top right *)
   v_gtext(vdiHandle,
           Work.X + Work.W - (25 * Attr.charWidth),
-          Work.Y + Attr.boxHeight,
+          Work.Y + (headerHeight div 2),
           'Sunrise / set ');
 
   v_gtext(vdiHandle,
           Work.X + Work.W - (25 * Attr.charWidth),
-          Work.Y + Attr.boxHeight * 2,
+          Work.Y + Attr.charHeight*3,
           SubStr(sunrise, 1, 5) + ' / ' + SubStr(sunset, 1, 5));
 
 end;
