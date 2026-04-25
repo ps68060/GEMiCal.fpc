@@ -105,7 +105,7 @@ arg : real;
   ss_mm  : Word;
 
 begin
-  log := TLogger.Create(LLDEBUG);
+  log := TLogger.Create(LLINFO);
 
   log.debug ('lat = ', lat);
   log.debug ('lng = ', lng);
