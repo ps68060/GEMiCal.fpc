@@ -19,6 +19,7 @@ const
 
   dAppName = 'GEMiCal';
 
+
 type
   (* Each object has variables and methods associated with it. *)
 
@@ -102,6 +103,7 @@ var
 
 
 procedure TMyApplication.INITInstance;
+
 var
   log            : TLogger;
 
@@ -127,20 +129,20 @@ begin
   (* Load and set-up the menu *)
   LoadMenu (TREE000);
 
-  appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
+  appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));       (* Info *)
 
   (* File Menu *)
-  apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
+  apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));       (* Load *)
 
   appDialogMenu := new (PDialogMenu, Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
-  appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
+  appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));    (* Display calendar *)
 
   (* Navigation menu *)
-  appNavPrevMon := new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
-  appNavNextMon := new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
+  appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
+  appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
 
-  appNavPrevYear := new (PNavPrevYear,  Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
-  appNavNextYear := new (PNavNextYear,  Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
+  appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
+  appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
