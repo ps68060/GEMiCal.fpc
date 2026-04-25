@@ -145,23 +145,12 @@ var
   log         : TLogger;
 
   New_X,
-  New_Y : LongInt;
-
-  pxArray     : Array [1..10] of Integer;
+  New_Y : LongInt; 
 
   wchar,
   hchar       : SmallInt;
   wcell,
   hcell       : SmallInt;
-
-  lineLength  : Integer;
-
-  i           : Integer;
-
-  year,
-  month,
-  day,
-  dayOfWeek   : Word;
 
 begin
   log := TLogger.Create(LLINFO);
@@ -367,7 +356,6 @@ procedure TWinCal.DrawGridHeading;
 
 (* Draw the column headings *)
 var
-  lineLength  : Integer;
   pxArray     : Array [1..10] of Integer;
 
   pixX,
@@ -409,29 +397,19 @@ var
   r, c      : Integer;
   pxy       : array[0..3] of SmallInt;  (* Declare in correct order for passing to v_pline *)
 
-  calcX,
-  calcY     : LongInt;
-
   scrollX,
   scrollY   : integer;
-//  y         : integer;
-
-  qx, qy    : integer;
 
 begin
   log := TLogger.Create(LLDEBUG);
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
+  log.debug('scroll X ', scrollX);
 
   (* Draw heading line *)
   pxy[0] := Curr.X;  // todo - fudged to the right
   pxy[2] := Curr.X + (7 * cellWidth);  (* constant X for horizontal line *)
-
-  // Try this instead
-  CalcPos (0, 0, pxy[0], pxy[1]);
-  CalcPos (0, 6, pxy[2], pxy[3]);
-  pxy[2] := pxy[2] + cellWidth;
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
   writeln ('Draw horizontal grid ', work.Y, ':', curr.Y);
