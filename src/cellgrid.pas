@@ -116,9 +116,9 @@ uses
     begin
 
       (*  calDate is 1st of month *)
-      if      (cal.eventList[i]^.startDate^.epoch < endMonthDate^.epoch)
-          and (    (cal.eventList[i]^.endDate^.epoch   > calDate^.epoch)
-                or (cal.eventList[i]^.endDate^.epoch = 0) )
+      if      (cal.eventList[i].startDate^.epoch < endMonthDate^.epoch)
+          and (    (cal.eventList[i].endDate^.epoch   > calDate^.epoch)
+                or (cal.eventList[i].endDate^.epoch = 0) )
       then
       begin
         log.debug ('IN Scope', i );
@@ -155,29 +155,27 @@ uses
     eDate       : Integer;
 
   begin
-
     log := TLogger.Create(LLINFO);
 
-    log.debug ('end date = ' , cal.eventList[e]^.endDate^.getDDFromIso);
+    log.debug ('end date = ' , cal.eventList[e].endDate^.getDDFromIso);
 
-    daysBetween :=  (cal.eventList[e]^.endDate^.epoch -
-                     cal.eventList[e]^.startDate^.epoch) / daySec;
+    daysBetween :=  (cal.eventList[e].endDate^.epoch -
+                     cal.eventList[e].startDate^.epoch) / daySec;
 
     log.debug ('event lasts ', daysBetween);
 
     (* Does the event Start in the displayed month ? *)
 
-    if (cal.eventList[e]^.startDate^.getMMFromIso = calDate^.getMMFromIso)
+    if (cal.eventList[e].startDate^.getMMFromIso = calDate^.getMMFromIso)
     then
-      sDate := cal.eventList[e]^.startDate^.getDDFromIso
+      sDate := cal.eventList[e].startDate^.getDDFromIso
     else
       sDate := 1;
 
-
-    allDay := cal.eventList[e]^.endDate^.isAllDay;
+    allDay := cal.eventList[e].endDate^.isAllDay;
 
     (* Does the event End after the displayed month ? *)
-    if (cal.eventList[e]^.endDate^.getMMFromIso > calDate^.getMMFromIso)
+    if (cal.eventList[e].endDate^.getMMFromIso > calDate^.getMMFromIso)
     then
       eDate := daysInMon
 
@@ -187,7 +185,7 @@ uses
       then
         eDate := sDate
       else
-        eDate := cal.eventList[e]^.endDate^.getDDFromIso;
+        eDate := cal.eventList[e].endDate^.getDDFromIso;
 
 
     (* Iterate days and put info into cells. *)
@@ -198,13 +196,13 @@ uses
       log.debug ('slot ', cell[j].counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
-      summ := SubStr (cal.eventList[e]^.summary);
+      summ := SubStr (cal.eventList[e].summary);
       cell[j].cellEvents[cell[j].counter].summary   := summ;
 
-      locat := SubStr (cal.eventList[e]^.location);
+      locat := SubStr (cal.eventList[e].location);
       cell[j].cellEvents[cell[j].counter].location  := locat;
 
-      cell[j].cellEvents[cell[j].counter].timeStart^.dtStr2Obj(cal.eventList[e]^.dtStart);
+      cell[j].cellEvents[cell[j].counter].timeStart^.dtStr2Obj(cal.eventList[e].dtStart);
 
       log.log(LLDEBUG, 'Summary ' +
                   cell[j].cellEvents[cell[j].counter].summary );

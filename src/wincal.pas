@@ -573,7 +573,7 @@ var
   i           : Integer;
 
 begin
-  log := TLogger.Create(LLDEBUG);
+  log := TLogger.Create(LLINFO);
   log.debug ('DisplayEvents');
 
   scrollX := Scroller^.GetXOrg;

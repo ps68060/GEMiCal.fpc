@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$B+,D-,I-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
 
 unit Cal;
@@ -19,7 +19,7 @@ const
 type
   TCal = class
     version   : String;
-    eventList : array [0..MAXEVENTS] of PEvent;
+    eventList : array [0..MAXEVENTS] of TEvent;
     entries   : Integer;
 
     constructor Create;
@@ -46,8 +46,7 @@ implementation
 
     for i := 0 to MAXEVENTS do
     begin
-      new (eventList[i]);
-      eventList[i]^.init;
+      eventList[i] := TEvent.create;
     end;
   end;
 
@@ -58,7 +57,7 @@ implementation
   begin
     for i := 0 to MAXEVENTS do
     begin
-      dispose(eventList[i], Done);
+      eventList[i].free;
     end;
     
     inherited Destroy;
@@ -136,11 +135,10 @@ implementation
       if ( pos (checkStart, currentLn) = 1 )
       then
       begin
-        new (eventList[entries]);
-        eventList[entries]^.init;
+        eventList[entries] := TEvent.create;
       
-        eventList[entries]^.getEvent(calFile);
-        eventList[entries]^.filename := calName;
+        eventList[entries].getEvent(calFile);
+        eventList[entries].filename := calName;
 
         inc (entries);
       end;
@@ -156,7 +154,7 @@ implementation
   var
     log     : TLogger;
     i, j    : Integer;
-    swapper : PEvent;
+    swapper : TEvent;
 
   begin
     log := TLogger.Create(LLINFO);
@@ -171,8 +169,8 @@ implementation
       do
       begin
 
-        if (eventList[i]^.startDate^.epoch  >
-            eventList[j]^.startDate^.epoch )
+        if (eventList[i].startDate^.epoch  >
+            eventList[j].startDate^.epoch )
         then
         begin
           (*

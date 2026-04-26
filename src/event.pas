@@ -1,3 +1,6 @@
+{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$mode objfpc}
+
 unit Event;
 
 (* AUTHOR  : P Slegg
@@ -13,8 +16,7 @@ interface
 
 
 type
-  PEvent = ^TEvent;
-  TEvent = object(TObject)
+  TEvent = class
     filename    : String;
     created     : String;
     summary     : String;
@@ -32,8 +34,8 @@ type
     alarmTrigger     : String;
     alarmDescription : String;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor create;
+    destructor  destroy; override;
 
     Function GetEvent (VAR calFile : Text)
             : Boolean;
@@ -70,7 +72,7 @@ implementation
     alarmDescTk   = 'DESCRIPTION:';
     alarmActionTk = 'ACTION:';
 
-  constructor TEvent.init;
+  constructor TEvent.create;
   begin
     filename    := '';
     created     := '';
@@ -93,10 +95,12 @@ implementation
     endDate^.init;
   end;
 
-  destructor TEvent.done;
+  destructor TEvent.destroy;
   begin
     dispose(startDate, Done);
     dispose(endDate, Done);
+
+    inherited destroy;
   end;
 
 
