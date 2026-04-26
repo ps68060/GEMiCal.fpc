@@ -227,8 +227,8 @@ uses
   (* Purpose : Calculate the row and column of the calendar day
    * inputs  : firstDay = the day number of the 1st of the month
    *           day      = the date in the month
-   * returns:  row 0 to 6
-   *           col 0 to 5
+   * returns:  row 0 to 5
+   *           col 0 to 6
    *)
 
   var

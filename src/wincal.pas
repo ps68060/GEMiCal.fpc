@@ -293,7 +293,7 @@ begin
   writeln('TITLE DATE = ', displayDate^.getYYYYFromIso,
                       '-', displayDate^.getMMFromIso);
 
-  log := TLogger.Create(LLDEBUG);
+  log := TLogger.Create(LLINFO);
 
   (* Display the year and month *)
   str(displayDate^.getYYYYFromIso, title);
@@ -401,7 +401,7 @@ var
   scrollY   : integer;
 
 begin
-  log := TLogger.Create(LLDEBUG);
+  log := TLogger.Create(LLINFO);
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -502,7 +502,7 @@ begin
   begin
     CalcCellGrid (displayDate^.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
-    writeln ('row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+    writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
@@ -533,22 +533,23 @@ procedure TWinCal.DisplayEvents(newX,
 (* Purpose : Display Events for a month  *)
 
 var
- log         : TLogger;
+  log         : TLogger;
+
+  pixX,
+  pixY        : SmallInt;
 
   row,
   col         : LongInt;
 
-  x,
-  y           : SmallInt;
+  scrollX,
+  scrollY     : Integer;
 
   wchar,
-  hchar       : SmallInt;
-
+  hchar,
   wCell,
   hCell       : SmallInt;
 
-  offset,
-  lineSpace   : LongInt;
+  offset      : LongInt;
 
   summ,
   time,
@@ -561,23 +562,24 @@ var
 
 begin
 
-  log := TLogger.Create(LLINFO);
-
+  log := TLogger.Create(LLDEBUG);
   log.debug ('DisplayEvents');
+
+  scrollX := Scroller^.GetXOrg;
+  scrollY := Scroller^.GetYOrg;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   offset    := hCell + hcell div 2;
 
   vst_point(vdiHandle, 7, wchar, hchar, wCell, hCell);
-  lineSpace := cellHeight div 3;
 
   for j := 1 to 31 do
   begin
     CalcCellGrid (displayDate^.day, j, row, col);
-    CalcPos(row, col, x, y);
+    CalcPos(row, col, pixX, pixY);
 
-    log.debug ('row ', row);
-    log.debug ('col ', col);
+    log.debug ('events: row ', row);
+    log.debug ('events: col ', col);
 
     for i := 0 to cellGr.cell[j].counter - 1 do
     begin
@@ -592,13 +594,13 @@ begin
       log.debug('counter ', i);
 
       v_gtext(vdiHandle,
-              x + Attr.boxWidth,
-              y + (i * (cellHeight div 3)),
+              scrollX + pixX + Attr.boxWidth div 2,
+              scrollY + pixY + offset,        // (i * lineSpace),
               summ );
 
       v_gtext(vdiHandle,
-              x + Attr.boxWidth,
-              y + (i + 1) * lineSpace,
+              scrollX + pixX + Attr.boxWidth div 2,
+              scrollY + pixY + offset + Attr.boxHeight div 2,    //  (i + 1) * lineSpace,
               timePlace );
     end;
 
