@@ -14,7 +14,7 @@ interface
     Event;
 
 const
-  MAXEVENTS = 999;
+  MAXEVENTS = 9999;
 
 type
   TCal = class
@@ -171,8 +171,8 @@ implementation
       do
       begin
 
-        if (eventList[i]^.startDate.epoch  >
-            eventList[j]^.startDate.epoch )
+        if (eventList[i]^.startDate^.epoch  >
+            eventList[j]^.startDate^.epoch )
         then
         begin
           (*

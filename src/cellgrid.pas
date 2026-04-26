@@ -22,8 +22,8 @@ interface
       constructor Create;
       destructor  Destroy; override;
 
-      procedure FilterEvents(cal       : PCal;
-                             calDate   : TDateTime);
+      procedure FilterEvents(cal       : TCal;
+                             calDate   : PDateTime);
 
       procedure FilterEvent(cal       : TCal;
                             calDate   : PDateTime;
