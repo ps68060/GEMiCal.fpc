@@ -11,15 +11,13 @@ interface
 
   type
     TCellEvent = class
-    public
       summary   : String;
       location  : String;
-      timeStart : TDateTime;
-      timeEnd   : TDateTime;
+      timeStart : PDateTime;
+      timeEnd   : PDateTime;
 
       constructor Create;
       destructor  Destroy; override;
-
     end;
 
 
@@ -30,17 +28,19 @@ implementation
     summary   := '';
     location  := '';
 
-    timeStart := TDateTime.create;
-    timeEnd   := TDateTime.create;    
+    new (timeStart);
+    timeStart^.init;
+
+    new (timeEnd);
+    timeEnd^.init;
 
   end;
 
 
   destructor TCellEvent.Destroy;
   begin
-    timeStart.Free;
-    timeEnd.Free;
-    inherited destroy;
+    dispose (timeStart, Done);
+    dispose (timeEnd,   Done);
   end;
 
 end.

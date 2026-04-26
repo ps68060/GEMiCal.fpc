@@ -16,7 +16,7 @@ begin
   MyApplication.INIT(dAppName);
   MyApplication.Run;
 
-  Dispose(myApplication.iCal, done);
+  myApplication.iCal.Free;
 
   MyApplication.Done;
 

@@ -1,5 +1,3 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
-{$mode objfpc}
 unit Event;
 
 (* AUTHOR  : P Slegg
@@ -27,8 +25,8 @@ type
     dtEndTz     : String;
     location    : String;
 
-    startDate   : TDateTime;
-    endDate     : TDateTime;
+    startDate   : PDateTime;
+    endDate     : PDateTime;
 
     alarmAction      : String;
     alarmTrigger     : String;
@@ -88,14 +86,17 @@ implementation
     alarmTrigger     := '';
     alarmDescription := '';
 
-    startDate := TDateTime.create;
-    endDate   := TDateTime.create;
+    new (startDate);
+    startDate^.init;
+
+    new (endDate);
+    endDate^.init;
   end;
 
   destructor TEvent.done;
   begin
-    startDate.Free;
-    endDate.Free;
+    dispose(startDate, Done);
+    dispose(endDate, Done);
   end;
 
 
@@ -118,7 +119,7 @@ implementation
     tokens       : TToken;
 
   begin
-    log := TLogger.Create(LLDEBUG);
+    log := TLogger.Create(LLINFO);
 
     endEvent     := FALSE;
     alarm        := FALSE;
@@ -140,19 +141,12 @@ implementation
 
       else
       begin
-        tokens := TToken.Create;
-
-        log.debug ('Tokenise ' + currentLn);
+        tokens.Create;
         tokens.tokeniseIcal(currentLn);
 
         if ( pos(createdTk, tokens.part[0]) = 1 )
         then
-        begin
-          log.debug('token 2 = ' + tokens.part[2]);
           created := tokens.part[2];
-        end;
-
-        log.debug('Created = ' + created);
 
         if ( pos(dtStartTk, tokens.part[0]) = 1 )
         then
@@ -193,6 +187,7 @@ implementation
           alarm := FALSE;
 
         tokens.Free;
+
       end;  (* if *)
 
     end;  (* while *)
@@ -201,19 +196,24 @@ implementation
     if (length(dtStart) > 0)
     then
     begin
-      startDate.dtStr2Obj(dtStart);
+      startDate^.dtStr2Obj(dtStart);
     end;
 
     if (length(dtEnd) > 0)
     then
-      endDate.dtStr2Obj(dtEnd)
+    begin
+      endDate^.dtStr2Obj(dtEnd);
+    end
     else
-      endDate.dtStr2Obj(dtStart);
+    begin
+      endDate^.dtStr2Obj(dtStart);
+    end;
+
+    log.Free;
 
     GetEvent := TRUE;
     (*writeEvent;*)
 
-    log.Free;
   end;
 
 
@@ -277,7 +277,7 @@ implementation
 
   begin
     write('Event on     : ');
-    startDate.writeDT;
+    startDate^.writeDT;
 
     WriteNN (summary);
     WriteNN (description);
@@ -288,7 +288,7 @@ implementation
     WriteNN (alarmTrigger);
 
     write('Event ends   : ');
-    endDate.writeDT;
+    endDate^.writeDT;
   end;
 
 
@@ -309,42 +309,45 @@ implementation
 
   var
     pStart,
-    pEnd   : TDateTime;
+    pEnd   : PDateTime;
 
     daysInMon : Integer;
 
   begin
     isMonthEvent := FALSE;
 
-    pStart := TDateTime.create;
-    pStart.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
+    new(pStart);
+    pStart^.init;
+    pStart^.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
 
     daysInMon := daysMon[m];
     if (m = 2) and (isLeapDay(y))
     then
       daysInMon := 29;
 
-    pEnd := TDateTime.create;
-    pEnd.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
+    new(pEnd);
+    pEnd^.init;
+    pEnd^.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
 
     (* Does the event start/end overlap with the period start/end ? *)
 
-    if      (startDate.epoch > pStart.epoch)
-        and (startDate.epoch < pEnd.epoch)
+    if      (startDate^.epoch > pStart^.epoch)
+        and (startDate^.epoch < pEnd^.epoch)
       or
-            (endDate.epoch > pStart.epoch)
-        and (endDate.epoch < pEnd.epoch)
+            (endDate^.epoch > pStart^.epoch)
+        and (endDate^.epoch < pEnd^.epoch)
       or
-            (startDate.epoch < pStart.epoch)
-        and (endDate.epoch   > pEnd.epoch)
+            (startDate^.epoch < pStart^.epoch)
+        and (endDate^.epoch   > pEnd^.epoch)
     then
     begin
       isMonthEvent := TRUE;
       writeln ('Current event');
     end;
 
-    pStart.Free;
-    pEnd.Free;
+    dispose (pStart, Done);
+    dispose (pEnd,   Done);
+
   end;
 
 

@@ -11,7 +11,6 @@ uses
   DlgAbout,
   DlgConv,
   Cal,
-  DateTime,
   WinCal,
   Tos, aes, vdi;
 
@@ -19,6 +18,7 @@ uses
 
 const
   dAppName = 'GEMiCal';
+
 
 type
   (* Each object has variables and methods associated with it. *)
@@ -60,8 +60,7 @@ type
                 end;
 
   TMyApplication = OBJECT(TApplication)
-                   public
-                     iCal       : PCal;
+                     iCal       : TCal;
                      winCal     : PWinCal;
 
                      destructor done; virtual;
@@ -75,7 +74,7 @@ type
 
 var
   myApplication : TMyApplication;
-//  conf          : TConfig;
+
 
 implementation
 
@@ -83,6 +82,7 @@ implementation
     Dos,
     gem,
     Logger,
+    DateTime,
     CellGrid;
 
 
@@ -94,13 +94,11 @@ var
   myPath        : String;
 
   directory     : String;
-//  displayDate   : DateTime.TDateTime;
 
+  destructor TMyApplication.done;
+  begin
 
-destructor TMyApplication.done;
-begin
-
-end;
+  end;
 
 
 procedure TMyApplication.INITInstance;
@@ -123,32 +121,29 @@ begin
   (* Get current path *)
   GetDir (0, directory);
 
-//  conf := TConfig.Create;
-
   LoadResource ('GEMICAL.RSC','');
 
   (* Load and set-up the menu *)
   LoadMenu (TREE000);
 
-  appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));
+  appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));       (* Info *)
 
   (* File Menu *)
-  apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));
+  apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));       (* Load *)
 
   appDialogMenu := new (PDialogMenu, Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
-  appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));
+  appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));    (* Display calendar *)
 
   (* Navigation menu *)
-  appNavPrevMon := new (PNavPrevMon,   Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
-  appNavNextMon := new (PNavNextMon,   Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
+  appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
+  appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
 
-  appNavPrevYear := new (PNavPrevYear,  Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
-  appNavNextYear := new (PNavNextYear,  Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
+  appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
+  appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
-
-//  conf.Free;
+  
   log.Free;
 
 end;
@@ -174,21 +169,20 @@ begin
   begin
 
     myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
-    myApplication.winCal^.displayDate := TDateTime.Create;
 
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
-    log.debug('displayDate = ', myApplication.winCal^.displayDate.isoDate);
+    new (displayDate);
+    displayDate^.init;
+    displayDate^.dtStr2Obj(dtStr);
 
     LoadCal;
 
-    if (myApplication.iCal^.entries > 0)
+    if (myApplication.iCal.entries > 0)
     then
     begin
-      MyApplication.iCal^.sort;
-      log.debug('INITMainWindow: call FilterCal');
+      MyApplication.iCal.sort;
       FilterCal(dtStr);
     end;
 
@@ -198,7 +192,6 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  myApplication.winCal^.displayDate.Free;
   log.Free;
 
 end;
@@ -225,27 +218,26 @@ begin
   begin
     BusyMouse;
 
-    Dispose(myApplication.iCal, Done);
+    myApplication.iCal.Free;
+
+    // todo - is cellGr needed ?
     if (cellGr <> NIL)
     then
-      Dispose(cellGr, Done);
+      cellGr.Free;
 
-    new (cellGr);
-    cellGr^.init;
+    cellGr := TCellGrid.Create;
 
     directory := myPath;
 
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
-    myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
     LoadCal;
    
-    if (myApplication.iCal^.entries > 0)
+    if (myApplication.iCal.entries > 0)
     then
     begin
-      myApplication.iCal^.sort;
-      log.debug('LoadMenu.Work: call FilterCal');
+      myApplication.iCal.sort;
       FilterCal(dtStr);
     end;
 
@@ -302,8 +294,8 @@ begin
   log.debug('Prev Month Work');
 
 
-  month := myApplication.winCal^.displayDate.getMMFromIso;
-  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
+  month := displayDate^.getMMFromIso;
+  year  := displayDate^.getYYYYFromIso;
 
   dec (month);
 
@@ -315,9 +307,7 @@ begin
   end;
 
   dtStr := date2str(year, month, 1, FALSE);
-  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
-  log.debug('PrevMon.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -339,8 +329,8 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Month Work');
 
-  month := myApplication.winCal^.displayDate.getMMFromIso;
-  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
+  month := displayDate^.getMMFromIso;
+  year  := displayDate^.getYYYYFromIso;
 
   inc (month);
 
@@ -352,9 +342,7 @@ begin
   end;
 
   dtStr := date2str(year, month, 1, FALSE);
-  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
 
-  log.debug('NextMon.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -375,14 +363,12 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Prev Year Work');
 
-  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
+  year  := displayDate^.getYYYYFromIso;
 
   dec (year);
 
-  dtStr := date2str(year, myApplication.winCal^.displayDate.getMMFromIso, 1, FALSE);
-  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
+  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
 
-  log.debug('PrevYear.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -403,14 +389,12 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Year Work');
 
-  year  := myApplication.winCal^.displayDate.getYYYYFromIso;
+  year  := displayDate^.getYYYYFromIso;
 
   inc (year);
 
-  dtStr := date2str(year, myApplication.winCal^.displayDate.getMMFromIso, 1, FALSE);
-  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
+  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
 
-  log.debug('NextYear.Work: call FilterCal');
   FilterCal(dtStr);
 
   MyApplication.WinCal^.ForceRedraw;
@@ -427,15 +411,14 @@ var
 begin
   log := TLogger.Create(LLINFO);
 
-  new(myApplication.iCal);
-  myApplication.iCal^.init;
+  myApplication.iCal := TCal.Create;
 
   log.debug('Load ICS files from ' + directory);
 
   (* Load iCal events *)
-  myApplication.iCal^.loadICS(directory);
+  myApplication.iCal.loadICS(directory);
   
-  log.debug('loaded ', myApplication.iCal^.entries );
+  log.debug('loaded ', myApplication.iCal.entries );
 
   log.Free;
 
@@ -447,27 +430,28 @@ var
   log       : TLogger;
 
 begin
-  log := TLogger.Create(LLDEBUG);
-  log.debug('FilterCal ' + dtStr);
+  log := TLogger.Create(LLINFO);
+  log.debug('FilterCal ' );
 
-//  if (displayDate = NIL)
-//  then
-//    displayDate := TDateTime.create;
+  if (displayDate <> NIL)
+  then
+    dispose (displayDate, done);
 
-//  displayDate.dtStr2Obj(dtStr);
-  myApplication.winCal^.displayDate.dtStr2Obj(dtStr);
+  new (displayDate);
+  displayDate^.init;
+  displayDate^.dtStr2Obj(dtStr);
+
+  log.debug('Filter ' + dtStr );
 
   if (cellGr <> NIL)
   then
-    dispose (cellGr, done);
+    cellGr.Free;
 
-  new (cellGr);
-  cellGr^.init;
-  cellGr^.FilterEvents(myApplication.iCal,
-                       myApplication.winCal^.displayDate);
+  cellGr := TCellGrid.Create;
+  cellGr.FilterEvents(myApplication.iCal,
+                      displayDate);
   log.debug('Cal displayed');
-
-//  displayDate.Free;
+  
   log.Free;
 
 end;

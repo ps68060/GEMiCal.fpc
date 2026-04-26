@@ -29,10 +29,10 @@ uses
   Token;
 
   const
-    nameTk       = 'name';
-    latTk        = 'lat';
-    lngTk        = 'long';
-    UTCoffsetTk  = 'UTCoffset';
+    NAME_TK        = 'name';
+    LAT_TK         = 'lat';
+    LNG_TK         = 'long';
+    UTC_OFFSET_TK  = 'UTCoffset';
 
   constructor TConfig.create;
   begin
@@ -48,6 +48,34 @@ uses
   destructor TConfig.destroy;
   begin
     inherited Destroy;
+  end;
+
+
+  function getValue(keyValue : TToken; value : real; limit: real) : real;
+  var
+    log          : TLogger;
+
+    code         : Integer;
+    valReal      : Real;
+
+  begin
+    log := TLogger.Create(LLINFO);
+
+    getValue := value;
+    val(keyValue.part[1], valReal, code);
+
+    if (code <> 0)
+    then
+      log.error ('Real conversion error of ' + keyValue.part[0] + '=', keyValue.part[1]);
+
+    if (abs(valReal) > limit)
+    then
+      log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
+    else
+      getValue := valReal;
+
+    log.Free;
+
   end;
 
 
@@ -74,70 +102,28 @@ uses
     begin
       readln (cnfFile, currentLn );
 
-      keyValue.Create;
-
+      keyValue := TToken.Create;
       keyValue.tokeniseInf(currentLn);
 
       (* Get the name *)
-      if ( pos(nameTk, currentLn) = 1 )
+      if ( pos(NAME_TK, currentLn) = 1 )
       then
         name := keyValue.part[1];
 
-
       (* Get the latitude, if it is invalid, keep default *)
-      if ( pos(latTk, currentLn) = 1 )
+      if ( pos(LAT_TK, currentLn) = 1 )
       then
-      begin
-        val(keyValue.part[1], valReal, code);
-
-        if (code <> 0)
-        then
-          writeln ('Real conversion error of lat: ', keyValue.part[1]);
-
-        if (abs(valReal) > 90.0)
-        then
-          log.info('lat invalid, check gemical.cnf')
-        else
-          lat := valReal;
-
-      end;
-
+        lat := getValue(keyValue, lat, 90.0);
 
       (* Get the longitude, if it is invalid, keep default *)
-      if ( pos(lngTk, currentLn) = 1 )
+      if ( pos(LNG_TK, currentLn) = 1 )
       then
-      begin
-        val(keyValue.part[1], valReal, code);
-
-        if (code <> 0)
-        then
-          writeln ('Real conversion error of lng: ', keyValue.part[1]);
-
-        if (abs(valReal) > 180.0)
-        then
-          log.info('long invalid, check gemical.cnf')
-        else
-          lng := valReal;
-
-      end;
+        lng := getValue(keyValue, lng, 180.0);
 
       (* Get the UTC offset, if it is invalid, keep default *)
-      if ( pos(UTCoffsetTk, currentLn) = 1 )
+      if ( pos(UTC_OFFSET_TK, currentLn) = 1 )
       then
-      begin
-        val(keyValue.part[1], valReal, code);
-
-        if (code <> 0)
-        then
-          writeln ('Real conversion error of UTCoffset: ', keyValue.part[1]);
-
-        if (abs(valReal) > 12.0)
-        then
-          log.info('UTCoffset invalid, check gemical.cnf')
-        else
-          UTCoffset := valReal;
-
-      end;
+        UTCoffset := getValue(keyValue, UTCoffset, 12.0);
 
       keyValue.Free;
     end;  (* while *)

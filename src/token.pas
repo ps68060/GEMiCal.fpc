@@ -16,7 +16,6 @@ interface
 type
 
   TToken = class
-  public
     part : array [0..3] of String;
 
     constructor Create;
@@ -31,7 +30,6 @@ type
 implementation
 
 uses
-  StrUtils,
   Logger;
 
   constructor TToken.Create;
@@ -45,7 +43,7 @@ uses
 
   destructor TToken.Destroy;
   begin
-    inherited destroy;
+    inherited Destroy;
   end;
 
 
@@ -81,12 +79,12 @@ uses
     posn         : Integer;
 
   begin
-//    log := TLogger.Create(LLDEBUG);
+    log := TLogger.Create(LLINFO);
 
+    (* Token before colon *)
     splitAt (':', line, part[0], part[2]);
-    // Token before colon
 
-    // Split part 0 at semi-colon
+    (* Split part 0 at semi-colon *)
     splitAt (';', part[0], part[0], part[1]);
 
 //    log.debug('tag    = ' + part[0]);
@@ -94,7 +92,7 @@ uses
  
 //    log.debug('value  = ' + part[2]);
 
-//    log.Free;
+    log.Free;
   end;
 
 

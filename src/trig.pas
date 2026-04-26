@@ -4,6 +4,10 @@ unit trig;
 
 interface
 
+  uses
+    math;
+
+
 function deg2rad(angle : Real)
         : Real;
 
@@ -98,24 +102,17 @@ begin
 end;
 
 
-function acosd(angle : Real)
-        : Real;
-var
-  ac : Real;
+function acosd(angle : Real): Real;
 begin
-
-  if (angle = 0)
+  if angle > 1
   then
-    ac := Pi / 2
-  else
-  begin
-    angle := deg2rad(angle);
-    ac := arctan(sqrt(1 - sqr(angle)) / angle);
+    angle := 1;
 
-  end;
+  if angle < -1
+    then
+      angle := -1;
 
-  acosd := rad2deg(ac);
-
+  acosd := ArcCos(angle) * 180 / PI;
 end;
 
 

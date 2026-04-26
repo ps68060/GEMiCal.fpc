@@ -11,19 +11,18 @@ interface
 
   type
     TCalCell  = class
-    public
       cellEvents : array [0..9] of TCellEvent;
       eventNum   : Integer;
       counter    : Integer;
 
-      constructor create;
-      destructor  destroy; override;
+      constructor Create;
+      destructor  Destroy; override;
     end;
 
 
 implementation
 
-  constructor TCalCell.create;
+  constructor TCalCell.Create;
   var
     i : Integer;
 
@@ -34,12 +33,13 @@ implementation
     for i := 0 to 9
     do
     begin
-      cellEvents[i] := TCellEvent.create;
+      cellEvents[i] := TCellEvent.Create;
     end;
 
   end;
 
-  destructor TCalCell.destroy;
+
+  destructor TCalCell.Destroy;
   var
     i : Integer;
 
@@ -50,9 +50,6 @@ implementation
     begin
       cellEvents[i].Free;
     end;
-
-    inherited destroy;
   end;
-
 
 end.
