@@ -85,11 +85,6 @@ begin
     writeln(msgLevel, ': ', message);
   end;
 
-//    if (msgLevel = LLDEBUG)
-//    then
-//      readln;
-  end;
-
 end;
 
 // ----- INFO
