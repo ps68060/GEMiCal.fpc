@@ -1,6 +1,3 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
-{$mode objfpc}
-
 unit datetime;
 
 
@@ -36,8 +33,8 @@ const
          = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
 
 type
-  TDateTime = class
-  public
+  PDateTime = ^TDateTime;
+  TDateTime = object(TObject)
     tz      : String;
 
     isoDate : String;
@@ -47,8 +44,8 @@ type
 
     day     : Integer;
 
-    constructor Create;
-    destructor  Destroy; override;
+    constructor init;
+    destructor  done; virtual;
 
     procedure dtStr2Obj(dtString : String);
 
@@ -106,7 +103,7 @@ type
   function isLeapDay(y : Integer)
           : Boolean;
 
-  function daysInMonth(myDate : TDateTime)
+  function daysInMonth(myDate : PDateTime)
           :Integer;
 
 
@@ -116,89 +113,65 @@ uses
     Logger,
     StrSubs;
 
-  constructor TDateTime.Create;
+  constructor TDateTime.init;
   begin
     isoDate := '19700101';
 
     isoTime := '000000';
-    tz   := 'UTC';
+    tz   := '';
 
     epoch  := 0;
     julian := 2440587.5;
     day    := 4;
   end;
 
-  destructor TDateTime.Destroy;
+  destructor TDateTime.done;
   begin
-    inherited destroy;
+
   end;
 
 
   procedure TDateTime.dtStr2Obj(dtString : String);
-  (* Purpose : Converts an ISO style date/time string into
-   *           the internal TDateTime fields (isoDate, isoTime, tz),
-   *           then calculates the Julian date and epoch values.
-   *
-   * Expected input formats include:
-   *  YYYYMMDD
-   *  YYYYMMDDThhmmss
-   *  YYYYMMDDThhmmss+TZ
-   *  YYYYMMDDThhmmssZ
-   *
-   * If the string is shorter than 8 characters,
-   * it exits early because a valid YYYYMMDD date cannot be extracted.
-   *)
-
   var
-   timestampLen : Integer;
-   date2        : Double;
+   code : Integer;
+   date1, date2 : Double;
    log          : TLogger;
 
   begin
-    log := TLogger.Create(LLDEBUG);
+    log := TLogger.Create(LLINFO);
 
     log.debug('converting date-time  ' + dtString);
-    isoTime := '000000';
 
-    timestampLen := Length(dtString);
-    log.debug('B: timestampLen=' + IntToStr(timestampLen));
+    isoDate := SubStr(dtString, 1, 8);
+    isoTime := COPY(dtString, 10, 6);
+(*
+    val ( COPY (dtString, 10, 2), hh24, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of hh24 at ', code, ' in ', dtString);
 
-    if (timestampLen < 8) then
-    begin
-      log.debug('C: too short, exiting');
-      log.Free;
-      Exit;
-    end;
+    val ( COPY (dtString, 12, 2), mi, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of mi at ', code, ' in ', dtString);
 
-    log.debug('C: before isoDate');
-    isoDate := Copy(dtString, 1, 8);
-    log.debug('D: isoDate=' + isoDate);
+    val ( COPY (dtString, 14, 2), ss, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of ss at ', code, ' in ', dtString);
+*)
+    if (length(dtString) >= 16 )
+    then
+      tz := COPY (dtString, 16, length(dtString) );
 
-    if (timestampLen > 10) and (dtString[9] = 'T') then
-    begin
-      log.debug('E: before isoTime');
-      if (timestampLen > 15) then
-        isoTime := Copy(dtString, 10, 6)
-      else
-        isoTime := '0000';
-    end;
+    log.debug('dtStr2Obj date ' + isoDate);
+  (*  logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);*)
 
-    log.debug('F: isoTime=' + isoTime);
-
-    if (timestampLen > 15) then
-    begin
-      log.debug('G: before tz');
-      tz := Copy(dtString, 16, MaxInt);
-    end;
-
-    log.debug('H: tz=' + tz);
-
-    log.debug('I: before julianDate');
     date2 := julianDate;
-    log.debug('J: after julianDate');
+    (*writeln('JDN      ', date2:12:2 ); *)
 
     calcEpoch;
-    (* log.debug('epoch = ', epoch); *)
+    (*writeln('epoch = ', epoch); *)
 
     dayOfWeek;
 
@@ -215,13 +188,10 @@ uses
 
   begin
     year4 := 1970;
-    if (Length(isoDate) >= 4)
+    val ( COPY (isoDate, 1, 4), year4, code );
+    if (code <> 0)
     then
-    begin
-      val ( COPY (isoDate, 1, 4), year4, code );
-    end
-    else
-      writeln ('Integer conversion error of year at ', code, ' in ', isoDate, '"');
+      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
 
     getYYYYFromIso := year4;
 
@@ -230,24 +200,16 @@ uses
 
   function TDateTime.getMMFromIso
           : Integer;
-  (* Purpose : Get the Month as an integer from an ISO formatted date
-   *  input  : ISO formatted date 'YYYY-MM-DD'
-   *  return : month number 1-12
-   *)
   var
     code   : Integer;
     month2 : Integer;
 
   begin
     month2 := 1;
-
-    if (Length(isoDate) >= 6)
+    val ( COPY (isoDate, 5, 2), month2, code );
+    if (code <> 0)
     then
-    begin
-      val ( COPY (isoDate, 5, 2), month2, code );
-    end
-    else
-      writeln ('Integer conversion error of month at ', code, ' in ', isoDate, '"');
+      writeln ('Integer conversion error of month at ', code, ' in ', isoDate);
 
     getMMFromIso := month2;
 
@@ -262,14 +224,10 @@ uses
 
   begin
     day2 := 1;
-
-    if (Length(isoDate) >= 8)
+    val ( COPY (isoDate, 7, 2), day2, code );
+    if (code <> 0)
     then
-    begin
-      val ( COPY (isoDate, 7, 2), day2, code );
-    end
-    else
-      writeln ('Integer conversion error of day in "', isoDate, '"');
+      writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate);
 
     getDDFromIso := day2;
 
@@ -284,14 +242,10 @@ uses
 
   begin
     hr2 := 0;
-
-    if (Length(isoTime) >= 2)
+    val ( COPY (isoTime, 1, 2), hr2, code );
+    if (code <> 0)
     then
-    begin
-      val ( COPY (isoTime, 1, 2), hr2, code );
-    end
-    else
-      writeln ('Integer conversion error of hh in "', isoTime, '"');
+      writeln ('Integer conversion error of hour at ', code, ' in ', isoTime);
 
     getHrFromIso := hr2;
 
@@ -306,14 +260,10 @@ uses
 
   begin
     min2 := 0;
-
-    if (Length(isoTime) >= 4)
+    val ( COPY (isoTime, 3, 2), min2, code );
+    if (code <> 0)
     then
-    begin
-      val ( COPY (isoTime, 3, 2), min2, code );
-    end
-    else
-      writeln ('Integer conversion error of mi in "', isoTime, '"');
+      writeln ('Integer conversion error of mi at ', code, ' in ', isoTime);
 
     getMinFromIso := min2;
 
@@ -328,14 +278,10 @@ uses
 
   begin
     sec2 := 0;
-
-    if (Length(isoTime) >= 6)
+    val ( COPY (isoTime, 5, 2), sec2, code );
+    if (code <> 0)
     then
-    begin
-      val ( COPY (isoTime, 5, 2), sec2, code );
-    end
-    else
-      writeln ('Integer conversion error of ss in "', isoTime, '"');
+      writeln ('Integer conversion error of ss at ', code, ' in ', isoTime);
 
     getSecFromIso := sec2;
 
@@ -355,8 +301,11 @@ uses
     (*writeln (yyyy, '/', mm, '/', dd, ' ', hh24, ':', mi, ':', ss); *)
 
     epoch := trunc( julianDate - epochJD ) * daySec;
+
     epoch := epoch + trunc(getHrFromIso) * hourSec;
+
     epoch := epoch + getMinFromIso   * 60;
+
     epoch := epoch + getSecFromIso;
 
   end;
@@ -390,10 +339,12 @@ uses
     part3 := (3 * ((lyyyy + 4900 + (lmm - 14) div 12) div 100)) div 4 ;
     part4 := ldd - 32075 ;
 
-//    writeln('part1 : ', part1:20:10);
-//    writeln('part2 : ', part2:20:10);
-//    writeln('part3 : ', part3:20:10);
-//    writeln('part4 : ', part4:20:10);
+    (*
+    writeln('part1 : ', part1:20:10);
+    writeln('part2 : ', part2:20:10);
+    writeln('part3 : ', part3:20:10);
+    writeln('part4 : ', part4:20:10);
+    *)
 
     julian := part1 + part2 - part3 + part4;
 
@@ -607,13 +558,13 @@ uses
   end;
 
 
-  function daysInMonth(myDate : TDateTime)
+  function daysInMonth(myDate : PDateTime)
           :Integer;
   (* Purpose : Calculate date of end of month *)
   begin
-    daysInMonth := daysMon[myDate.getMMFromIso];
+    daysInMonth := daysMon[myDate^.getMMFromIso];
 
-    if (myDate.getMMFromIso = 2) and (isLeapDay(myDate.getYYYYFromIso))
+    if (myDate^.getMMFromIso = 2) and (isLeapDay(myDate^.getYYYYFromIso))
     then
       daysInMonth := 29;
   end;
