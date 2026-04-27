@@ -3,6 +3,9 @@
 
 unit CellGrid;
 
+(* PURPOSE: Cell-Grid - array of days of the month holding events (TCalCell). 
+ *)
+
 interface
 
   uses

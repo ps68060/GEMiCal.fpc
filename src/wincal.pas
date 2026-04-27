@@ -46,8 +46,7 @@ type
 
                    procedure DrawGridHeading;
 
-                   procedure DisplayEvents(newX,
-                                           newY    : LongInt);
+                   procedure DisplayEvents;
 
                    procedure CalcPos(row,
                                      col   : Integer;
@@ -182,7 +181,7 @@ begin
 
   WriteDates;
 
-  DisplayEvents(new_X, new_Y);
+  DisplayEvents;
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
@@ -259,9 +258,7 @@ begin
   xVar := Curr.X + (col * cellWidth);
   yVar := Curr.Y + titleHeight + row * cellHeight;
 
-//  if (row > 0)
-//  then
-    yVar := yVar + headerHeight;
+//  yVar := yVar + headerHeight;
 
   if row <= 1 then
     writeln('CalcPos: row=', row,' ', Curr.Y, ' ', titleHeight, ':', headerHeight, ':', cellHeight, ' result=', yvar);
@@ -539,8 +536,7 @@ begin
 end;
 
 
-procedure TWinCal.DisplayEvents(newX,
-                                newY   : LongInt);
+procedure TWinCal.DisplayEvents;
 (* Purpose : Display Events for a month
  *)
 
@@ -569,7 +565,7 @@ var
 
   daysBetween : Real;
 
-  j,
+  day,
   i           : Integer;
 
 begin
@@ -584,22 +580,22 @@ begin
 
   vst_point(vdiHandle, 7, wchar, hchar, wCell, hCell);
 
-  for j := 1 to 31 do
+  for day := 1 to 31 do
   begin
-    CalcCellGrid (displayDate^.day, j, row, col);
+    CalcCellGrid (displayDate^.day, day, row, col);
     CalcPos(row, col, pixX, pixY);
 
     log.debug ('events: row ', row);
     log.debug ('events: col ', col);
 
-    for i := 0 to cellGr.cell[j].counter - 1 do
+    for i := 0 to cellGr.cell[day].counter - 1 do
     begin
-      summ      := SubStr (cellGr.cell[j].cellEvents[i].summary, 1, 16 );
-      time      := SubStr (cellGr.cell[j].cellEvents[i].timeStart^.humanDateTime, 11, 5 );
+      summ      := SubStr (cellGr.cell[day].cellEvents[i].summary, 1, 16 );
+      time      := SubStr (cellGr.cell[day].cellEvents[i].timeStart^.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
-                                  cellGr.cell[j].cellEvents[i].location), 1, 16 );
+                                  cellGr.cell[day].cellEvents[i].location), 1, 16 );
 
       log.debug('Summary  ' + summ );
       log.debug('counter ', i);

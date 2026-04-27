@@ -3,6 +3,9 @@
 
 unit CalCell;
 
+(* PURPOSE: Calendar-Cell - array of calendar events (TCEllEvent) in a day.
+ *)
+
 interface
 
   uses

@@ -426,6 +426,10 @@ end;
 
 
 procedure FilterCal(dtStr : String);
+(*
+ * PURPOSE: Get the events for the date.
+ *)
+
 var
   log       : TLogger;
 

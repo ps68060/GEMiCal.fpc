@@ -4,10 +4,10 @@
 unit Event;
 
 (* AUTHOR  : P Slegg
-   DATE    : 2020-05-16    Version 0
-             2026-02-23    Version 1
-   PURPOSE : TEvent object for iCal Events.
-*)
+ * DATE    : 2020-05-16    Version 0
+ *           2026-02-23    Version 1
+ * PURPOSE : TEvent object for iCal Events.
+ *)
 
 interface
   uses
