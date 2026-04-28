@@ -114,7 +114,7 @@ implementation
     i           : Integer;
 
   begin
-    log := TLogger.Create(LLDEBUG);
+    log := TLogger.Create(LLINFO);
     log.debug('DivideIcs: ');
 
     checkStart := 'BEGIN:VEVENT';

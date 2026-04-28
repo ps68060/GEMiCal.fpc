@@ -219,8 +219,8 @@ begin
   ss_mm   := trunc((sset * 24 - ss_hh) * 60);
   sunset  := time2str(ss_hh, ss_mm, 0, true);  
 
-  log.log(LLDEBUG, 'Sunrise : ' + sunrise);
-  log.log(LLDEBUG, 'Sunset  : ' + sunset);
+  log.debug('Sunrise : ' + sunrise);
+  log.debug('Sunset  : ' + sunset);
 
   log.Free;
 

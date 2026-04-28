@@ -207,8 +207,8 @@ uses
 
       cell[j].cellEvents[cell[j].counter].timeStart^.dtStr2Obj(cal.eventList[e].dtStart);
 
-      log.log(LLDEBUG, 'Summary ' +
-                  cell[j].cellEvents[cell[j].counter].summary );
+      log.debug( 'Summary ' +
+                 cell[j].cellEvents[cell[j].counter].summary );
 
       cell[j].eventNum := e;
 

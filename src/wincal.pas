@@ -258,10 +258,8 @@ begin
   xVar := Curr.X + (col * cellWidth);
   yVar := Curr.Y + titleHeight + row * cellHeight;
 
-//  yVar := yVar + headerHeight;
-
-  if row <= 1 then
-    writeln('CalcPos: row=', row,' ', Curr.Y, ' ', titleHeight, ':', headerHeight, ':', cellHeight, ' result=', yvar);
+//  if row <= 1 then
+//    writeln('CalcPos: row=', row,' ', Curr.Y, ' ', titleHeight, ':', headerHeight, ':', cellHeight, ' result=', yvar);
 
 end;
 
@@ -420,7 +418,7 @@ begin
   pxy[2] := Curr.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
-  writeln ('Draw horizontal grid ', work.Y, ':', curr.Y);
+  //writeln ('Draw horizontal grid ', work.Y, ':', curr.Y);
   for r := 0 to rows do
   begin
     (* create a list of co-ords, declaration order above is the important bit *)
@@ -430,7 +428,7 @@ begin
     pxy[2] := pxy[2] + cellWidth;
     pxy[1] := pxy[1] + scrollY;
     pxy[3] := pxy[3] + scrollY;
-    writeln('DrawGrid : ', rows, '-', pxy[0], ':', pxy[1], ' - ', pxy[2], ':', pxy[3]);
+    //writeln('DrawGrid : ', rows, '-', pxy[0], ':', pxy[1], ' - ', pxy[2], ':', pxy[3]);
 
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
 
@@ -511,7 +509,7 @@ begin
   begin
     CalcCellGrid (displayDate^.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
-    writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+    //writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
