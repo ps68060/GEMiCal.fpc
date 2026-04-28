@@ -161,7 +161,7 @@ var
   dtStr     : String;
 
 begin
-  log := TLogger.Create(LLDEBUG);
+  log := TLogger.Create(LLINFO);
   log.info('INIT Main Window');
 
   if MyApplication.winCal = NIL
@@ -173,9 +173,10 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    new (displayDate);
-    displayDate^.init;
-    displayDate^.dtStr2Obj(dtStr);
+    new (myApplication.winCal^.calDate);
+    myApplication.winCal^.calDate^.init;
+    myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
+    log.DEBUG('calDate = ', myApplication.winCal^.calDate^.getYYYYFromIso);
 
     LoadCal;
 
@@ -293,9 +294,8 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Prev Month Work');
 
-
-  month := displayDate^.getMMFromIso;
-  year  := displayDate^.getYYYYFromIso;
+  month := myApplication.winCal^.calDate^.getMMFromIso;
+  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
 
   dec (month);
 
@@ -321,16 +321,16 @@ procedure TNavNextMon.Work;
 var
   log        : TLogger;
   month,
-  year        : Word;
+  year       : Word;
 
-  dtStr       : String;
+  dtStr      : String;
 
 begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Month Work');
 
-  month := displayDate^.getMMFromIso;
-  year  := displayDate^.getYYYYFromIso;
+  month := myApplication.winCal^.calDate^.getMMFromIso;
+  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
 
   inc (month);
 
@@ -355,6 +355,7 @@ end;
 procedure TNavPrevYear.Work;
 var
   log       : TLogger;
+  month,
   year      : Word;
 
   dtStr     : String;
@@ -363,11 +364,13 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Prev Year Work');
 
-  year  := displayDate^.getYYYYFromIso;
+  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
+  month := myApplication.winCal^.calDate^.getMMFromIso;
 
   dec (year);
 
-  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
+  dtStr := date2str(year, month, 1, FALSE);
+  log.DEBUG('PrevYear: calDate = ' + dtStr);
 
   FilterCal(dtStr);
 
@@ -381,7 +384,8 @@ end;
 procedure TNavNextYear.Work;
 var
   log       : TLogger;
-  year        : Word;
+  year      : Word;
+  month     : Word;
 
   dtStr     : String;
 
@@ -389,11 +393,13 @@ begin
   log := TLogger.Create(LLINFO);
   log.debug('Next Year Work');
 
-  year  := displayDate^.getYYYYFromIso;
+  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
+  month := myApplication.winCal^.calDate^.getMMFromIso;
 
   inc (year);
 
-  dtStr := date2str(year, displayDate^.getMMFromIso, 1, FALSE);
+  dtStr := date2str(year, month, 1, FALSE);
+  log.DEBUG('NextYear: calDate = ' + dtStr);
 
   FilterCal(dtStr);
 
@@ -434,16 +440,16 @@ var
   log       : TLogger;
 
 begin
-  log := TLogger.Create(LLINFO);
-  log.debug('FilterCal ' );
+  log := TLogger.Create(LLDEBUG);
+  log.debug('FilterCal ' + dtStr);
 
-  if (displayDate <> NIL)
+  if (myApplication.winCal^.calDate <> NIL)
   then
-    dispose (displayDate, done);
+    dispose (myApplication.winCal^.calDate, done);
 
-  new (displayDate);
-  displayDate^.init;
-  displayDate^.dtStr2Obj(dtStr);
+  new (myApplication.winCal^.calDate);
+  myApplication.winCal^.calDate^.init;
+  myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
 
   log.debug('Filter ' + dtStr );
 
@@ -453,7 +459,7 @@ begin
 
   cellGr := TCellGrid.Create;
   cellGr.FilterEvents(myApplication.iCal,
-                      displayDate);
+                      myApplication.winCal^.calDate);
   log.debug('Cal displayed');
   
   log.Free;

@@ -30,6 +30,8 @@ type
                     cellHeight : integer;
 
                 public
+                   calDate : PDateTime;
+
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
                    function  GetStyle        : SmallInt;               VIRTUAL;
@@ -58,7 +60,6 @@ type
 
 var
   conf            : TConfig;
-  displayDate     : PDateTime;  (* 1st of the month *)
   cellGr          : TCellGrid;
 
 
@@ -296,14 +297,14 @@ var
   sunset     : String;
 
 begin
-  writeln('TITLE DATE = ', displayDate^.getYYYYFromIso,
-                      '-', displayDate^.getMMFromIso);
+  writeln('TITLE DATE = ', calDate^.getYYYYFromIso,
+                      '-', calDate^.getMMFromIso);
 
   log := TLogger.Create(LLINFO);
 
   (* Display the year and month *)
-  str(displayDate^.getYYYYFromIso, title);
-  title := title + ' ' + mon1[displayDate^.getMMFromIso];
+  str(calDate^.getYYYYFromIso, title);
+  title := title + ' ' + mon1[calDate^.getMMFromIso];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -484,22 +485,22 @@ begin
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.debug ('year ', displayDate^.getYYYYFromIso );
-  log.debug (mon1[displayDate^.getMMFromIso] );
+  log.debug ('year ', calDate^.getYYYYFromIso );
+  log.debug (mon1[calDate^.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek);
 
-  CalcCellGrid (displayDate^.day, day, row, col);
+  CalcCellGrid (calDate^.day, day, row, col);
 
   currentMonth := FALSE;
-  if     (displayDate^.getYYYYFromIso = year)
-     and (displayDate^.getMMFromIso   = month)
+  if     (calDate^.getYYYYFromIso = year)
+     and (calDate^.getMMFromIso   = month)
   then
     currentMonth := TRUE;
 
   (* Calculate date of end of month *)
-  daysInMon := daysInMonth(displayDate);
+  daysInMon := daysInMonth(calDate);
 
   (* Set the font to get the dimensions *)
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
@@ -507,7 +508,7 @@ begin
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon do
   begin
-    CalcCellGrid (displayDate^.day, i, row, col);
+    CalcCellGrid (calDate^.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
     //writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
@@ -520,7 +521,7 @@ begin
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(displayDate^.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(calDate^.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -580,7 +581,7 @@ begin
 
   for day := 1 to 31 do
   begin
-    CalcCellGrid (displayDate^.day, day, row, col);
+    CalcCellGrid (calDate^.day, day, row, col);
     CalcPos(row, col, pixX, pixY);
 
     log.debug ('events: row ', row);

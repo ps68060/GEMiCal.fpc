@@ -144,34 +144,19 @@ uses
 
     isoDate := SubStr(dtString, 1, 8);
     isoTime := COPY(dtString, 10, 6);
-(*
-    val ( COPY (dtString, 10, 2), hh24, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of hh24 at ', code, ' in ', dtString);
 
-    val ( COPY (dtString, 12, 2), mi, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of mi at ', code, ' in ', dtString);
-
-    val ( COPY (dtString, 14, 2), ss, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of ss at ', code, ' in ', dtString);
-*)
     if (length(dtString) >= 16 )
     then
       tz := COPY (dtString, 16, length(dtString) );
 
     log.debug('dtStr2Obj date ' + isoDate);
-  (*  logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);*)
+    //logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);
 
     date2 := julianDate;
-    (*writeln('JDN      ', date2:12:2 ); *)
+    //writeln('JDN      ', date2:12:2 );
 
     calcEpoch;
-    (*writeln('epoch = ', epoch); *)
+    //writeln('epoch = ', epoch);
 
     dayOfWeek;
 
