@@ -73,13 +73,6 @@ uses
   end;
 
 
-  function SubStr(myStr : String)
-          : String;
-  begin
-    SubStr := Copy(myStr, 1, 30);
-  end;
-
-
   procedure TCellGrid.FilterEvents(cal       : TCal;
                                    calDate   : PDateTime);
 
@@ -87,9 +80,8 @@ uses
    *           cal     = iCal calendar
    *           calDate = date of 1st of month
    *)
-  var
-    log          : TLogger;
 
+  var
     endMonthDate : PDateTime;
     daysInMon    : Integer;
 
@@ -98,9 +90,6 @@ uses
     dtStr        : String;
 
   begin
-
-    log := TLogger.Create(LLINFO);
-
     log.debug ('FilterEvents');
 
     (* Calculate date of end of month *)
@@ -132,7 +121,6 @@ uses
     end;  (* for *)
 
     dispose (endMonthDate, Done);
-    log.Free;
   end;
 
 
@@ -143,9 +131,10 @@ uses
 
   (* Purpose : Store a single event in the cellGrid *)
 
-  var
-    log         : TLogger;
+  const
+    SUMMARY_LEN = 30;
 
+  var
     summ,
     locat       : String;
 
@@ -158,8 +147,6 @@ uses
     eDate       : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
-
     log.debug ('end date = ' , cal.eventList[e].endDate^.getDDFromIso);
 
     daysBetween :=  (cal.eventList[e].endDate^.epoch -
@@ -199,10 +186,10 @@ uses
       log.debug ('slot ', cell[j].counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
-      summ := SubStr (cal.eventList[e].summary);
+      summ := Copy (cal.eventList[e].summary, 1, SUMMARY_LEN);
       cell[j].cellEvents[cell[j].counter].summary   := summ;
 
-      locat := SubStr (cal.eventList[e].location);
+      locat := Copy (cal.eventList[e].location, 1, SUMMARY_LEN);
       cell[j].cellEvents[cell[j].counter].location  := locat;
 
       cell[j].cellEvents[cell[j].counter].timeStart^.dtStr2Obj(cal.eventList[e].dtStart);
@@ -214,8 +201,6 @@ uses
 
       inc (cell[j].counter );
     end;
-
-    log.Free;
 
   end;
 
@@ -231,13 +216,7 @@ uses
    *           col 0 to 6
    *)
 
-  var
-    log       : TLogger;
-
   begin
-
-    log := TLogger.Create(LLINFO);
-
     row := (day - 1 + firstDay) div 7;
     col := (day - 1 + firstDay) mod 7;
 
@@ -245,7 +224,6 @@ uses
     log.debug ('row ', row);
     log.debug ('col ', col);
 
-    log.Free;
   end;
 
 end.

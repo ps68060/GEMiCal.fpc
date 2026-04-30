@@ -47,6 +47,8 @@ type
     procedure error(const message : ShortString; const value : string); overload;
   end;
 
+var
+    LOGGER : TLogger;   // Global LOGGER like slf4p
 
 implementation
 uses
@@ -65,6 +67,11 @@ begin
   inherited Destroy;
 end;
 
+initialization
+  LOG := TLogger.Create(LLINFO);
+
+finalization
+  LOG.Free;
 
 procedure TLogger.log(msgLevel : TLogLevel;
                       message  : String);
