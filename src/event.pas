@@ -148,16 +148,25 @@ implementation
         tokens.Create;
         tokens.tokeniseIcal(currentLn);
 
-        if ( pos(createdTk, tokens.part[0]) = 1 )
+        if (tokens.startsWith(createdTk))
         then
           created := tokens.part[2];
+///        if ( pos(createdTk, tokens.part[0]) = 1 )
+///        then
+///          created := tokens.part[2];
 
-        if ( pos(dtStartTk, tokens.part[0]) = 1 )
+        if (tokens.startsWith(dtStartTk))
         then
         begin
           dtStart   := tokens.part[2];
           dtStartTz := tokens.part[1];
         end;
+//        if ( pos(dtStartTk, tokens.part[0]) = 1 )
+//        then
+//        begin
+//          dtStart   := tokens.part[2];
+//          dtStartTz := tokens.part[1];
+//        end;
 
         if ( pos(dtEndTk, tokens.part[0]) = 1 )
         then

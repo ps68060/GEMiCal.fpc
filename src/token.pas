@@ -113,4 +113,10 @@ uses
     log.Free;
   end;
 
+  function startsWith (const token : String)
+          : Boolean;
+  begin
+    containsToken := pos(token, part[0]) = 1;
+  end;
+
 end.
