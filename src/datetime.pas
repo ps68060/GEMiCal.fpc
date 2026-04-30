@@ -9,6 +9,7 @@ unit datetime;
 interface
   uses
     Objects;
+    SysUtils;
 
 const
   daySec  = 86400;
@@ -118,7 +119,7 @@ uses
     isoDate := '19700101';
 
     isoTime := '000000';
-    tz   := '';
+    tz   := 'UTC';
 
     epoch  := 0;
     julian := 2440587.5;
@@ -127,19 +128,52 @@ uses
 
   destructor TDateTime.done;
   begin
+    inherited done;
+  end;
 
+
+  procedure TDateTime.initFromISO(dtString : String);
+  var
+   date2     : Double;
+
+  begin
+    log.level := LLDEBUG;
+    // ISO format YYYY-MM-DDTHH:MM:SS
+    log.debug('INIT from ISO date-time  ' + dtString);
+
+    isoDate := Copy(dtString, 1, 8);
+    isoTime := Copy(dtString, 10, 6);
+
+    if (length(dtString) >= 16 )
+    then
+      tz := Copy (dtString, 16, length(dtString) );
+
+    date2 := julianDate;
+    calcEpoch;
+    dayOfWeek;
+
+  end;
+
+
+  procedure TDateTime.initFromWords(year, month, day,
+                                    hour, minute, second : Word);
+  var
+    ISODate : String;
+
+  begin
+    isoDate := date2Str(year, month, day, FALSE);
+    isoTime := time2Str(hour, minute, second, FALSE);
+    
+    ISODateTime := concat(isoDate, 'T', isoTime);
+    initFromISO(ISODateTime);
   end;
 
 
   procedure TDateTime.dtStr2Obj(dtString : String);
   var
-   code : Integer;
    date1, date2 : Double;
-   log          : TLogger;
 
   begin
-    log := TLogger.Create(LLINFO);
-
     log.debug('converting date-time  ' + dtString);
 
     isoDate := SubStr(dtString, 1, 8);
@@ -150,7 +184,7 @@ uses
       tz := COPY (dtString, 16, length(dtString) );
 
     log.debug('dtStr2Obj date ' + isoDate);
-    //logger^.log(DEBUG, 'dtStr2Obj time ' + isoTime);
+    //log.debug('dtStr2Obj time ' + isoTime);
 
     date2 := julianDate;
     //writeln('JDN      ', date2:12:2 );
@@ -160,9 +194,7 @@ uses
 
     dayOfWeek;
 
-    log.Free;
   end;
-
 
 
   function TDateTime.getYYYYFromIso
@@ -179,8 +211,12 @@ uses
       writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
 
     getYYYYFromIso := year4;
-
   end;
+
+    function TDateTime.getYYYYFromIso: Integer;
+    begin
+      getYYYYFromIso := StrToIntDef(Copy(isoDate, 1, 4), 1970);
+    end;
 
 
   function TDateTime.getMMFromIso
@@ -197,7 +233,6 @@ uses
       writeln ('Integer conversion error of month at ', code, ' in ', isoDate);
 
     getMMFromIso := month2;
-
   end;
 
 
@@ -205,17 +240,16 @@ uses
           : Integer;
   var
     code   : Integer;
-    day2   : Integer;
+    dd     : Integer;
 
   begin
-    day2 := 1;
-    val ( COPY (isoDate, 7, 2), day2, code );
+    dd := 1;
+    val ( COPY (isoDate, 7, 2), dd, code );
     if (code <> 0)
     then
       writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate);
 
-    getDDFromIso := day2;
-
+    getDDFromIso := dd;
   end;
 
 
@@ -233,7 +267,6 @@ uses
       writeln ('Integer conversion error of hour at ', code, ' in ', isoTime);
 
     getHrFromIso := hr2;
-
   end;
 
 
@@ -251,7 +284,6 @@ uses
       writeln ('Integer conversion error of mi at ', code, ' in ', isoTime);
 
     getMinFromIso := min2;
-
   end;
 
 
@@ -269,7 +301,6 @@ uses
       writeln ('Integer conversion error of ss at ', code, ' in ', isoTime);
 
     getSecFromIso := sec2;
-
   end;
 
 
@@ -286,13 +317,9 @@ uses
     (*writeln (yyyy, '/', mm, '/', dd, ' ', hh24, ':', mi, ':', ss); *)
 
     epoch := trunc( julianDate - epochJD ) * daySec;
-
     epoch := epoch + trunc(getHrFromIso) * hourSec;
-
     epoch := epoch + getMinFromIso   * 60;
-
     epoch := epoch + getSecFromIso;
-
   end;
 
 
@@ -310,11 +337,7 @@ uses
     part3,
     part4    : double;
 
-    log      : TLogger;
-
   begin
-    log := TLogger.Create(LLINFO);
-    
     lyyyy := getYYYYFromIso;
     lmm   := getMMFromIso;
     ldd   := getDDFromIso;
@@ -339,9 +362,8 @@ uses
       julian := julian - 0.5;
 
     log.debug('Julian date is ', julian);
-    log.Free;
-
     julianDate := julian;
+
   end;
 
 
@@ -440,12 +462,9 @@ uses
                     human : Boolean)
           : String;
   var
-    log     : TLogger;
     tmStr   : String;
 
   begin
-    log := TLogger.Create(LLINFO);
-
     (*writeln('Time is ', hour, ':', minute, ':', second ); *)
 
     if (human)
@@ -465,15 +484,109 @@ uses
     end;
 
     (*writeln(tmStr); *)
-
-    log.Free;
-
     time2Str := tmStr;
 
   end;
 
 
-  procedure timeBetween(epoch1, epoch2:LongInt;
+  procedure EpochToYMD(epoch: LongInt;
+                       var yy, mm, dd : Integer);
+  (* Purpose : Convert epoch seconds to year, month, day 
+   * Standard Gregorian calendar conversion.
+   * This uses March as the first month of the year to simplify leap year calculations.
+   * epoch zero is 1970-01-01 and 719468 days before that is 0000-03-01.
+    * Algorithm from https://howardhinnant.github.io/date_algorithms.html#civil_from_days
+   *)
+  const
+    SECS_PER_DAY = 86400;
+    DAY_OFFSET   = 719468;  // days from 0000-03-01 to 1970-01-01
+
+  var
+    zz,
+    era,
+    doe,
+    yoe,
+    doy, mp: LongInt;
+ 
+  begin
+    // Convert seconds to days
+    zz := epoch div SECS_PER_DAY + DAY_OFFSET;  // days since 0000-03-01
+
+    era := zz div 146097;
+    doe := zz - era * 146097;          // day of era (number of days in 400 years)
+    yoe := (doe - doe div 1460
+            + doe div 36524            // days in 100 years
+            - doe div 146096)
+           div 365;
+
+    yy := yoe + era * 400;
+    
+    doy := doe - (365 * yoe + yoe div 4 - yoe div 100);
+    mp := (5 * doy + 2) div 153;
+    
+    dd := doy - (153 * mp + 2) div 5 + 1;
+    mm := mp + 3;
+
+    if mm > 12 then
+    begin
+      mm := mm - 12;
+      inc(yy);
+    end;
+
+  end;
+
+
+  procedure EpochToHMS(epoch : LongInt;
+                       var hh,
+                           nn,
+                           ss : Integer);
+  (* Purpose : Convert epoch seconds to hour, minute, second
+   *)
+  var
+    tt: LongInt;
+
+  begin
+    tt := epoch mod 86400;
+    if tt < 0
+      then tt := tt + 86400;
+
+    hh := tt div 3600;
+    nn := (tt div 60) mod 60;
+    ss := tt mod 60;
+  end;
+
+
+  function IsoDateFromEpoch(epoch : LongInt)
+          : String;
+  (* Purpose : Convert epoch seconds to ISO date string YYYY-MM-DD
+   *)
+  var
+    yy, mm, dd : Integer;
+    hh, nn, ss : Integer;
+
+  begin
+    EpochToYMD(epoch, yy, mm, dd);
+    EpochToHMS(epoch, hh, nn, ss);
+
+    result := Format('%04d-%02d-%02dT%02d:%02d:%02d',
+                      [yy,  mm,  dd,  hh,  nn, ss]);
+
+//    Str(y:4, result);
+//    result := result + '-';
+
+//    if mm < 10
+//      then result := result + '0';
+//    result := result + IntToStr(mm);
+
+//    result := result + '-';
+//    if dd < 10
+//      then result := result + '0';
+
+//    result := result + IntToStr(dd);
+  end;
+
+
+  procedure timeBetween(epoch1, epoch2 : LongInt;
                         var dd,
                             hh,
                             mi,
@@ -483,11 +596,7 @@ uses
     diffSec,
     remSec  : LongInt;
 
-    log     : TLogger;
-
   begin
-    log := TLogger.Create(LLINFO);
-
     log.debug('epoch1 ', epoch1);
     log.debug('epoch2 ', epoch2);
 
@@ -514,7 +623,6 @@ uses
 
     ss     := remSec mod minSec;
 
-    log.Free;
   end;
 
 
@@ -559,12 +667,7 @@ uses
           : Boolean;
   (* Purpose : Is this an all day event ? *)
 
-  var
-    log          : TLogger;
-
   begin
-    log := TLogger.Create(LLINFO);
-
     if     (getHrFromIso  = 0)
        and (getMinFromIso = 0)
        and (getSecFromIso = 0)
@@ -580,8 +683,6 @@ uses
     begin
       isAllDay := true;
     end;
-
-    log.Free;
 
   end;
 
