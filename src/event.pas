@@ -1,5 +1,6 @@
 {$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
 {$mode objfpc}
+{$H+}          // enable AnsiString
 
 unit Event;
 
@@ -72,7 +73,7 @@ implementation
     alarmDescTk   = 'DESCRIPTION:';
     alarmActionTk = 'ACTION:';
 
-  constructor TEvent.create;
+constructor TEvent.create;
   begin
     filename    := '';
     created     := '';
@@ -95,7 +96,7 @@ implementation
     endDate^.init;
   end;
 
-  destructor TEvent.destroy;
+destructor TEvent.destroy;
   begin
     dispose(startDate, Done);
     dispose(endDate, Done);
@@ -104,8 +105,8 @@ implementation
   end;
 
 
-  Function TEvent.GetEvent (VAR calFile : Text)
-          : Boolean;
+function TEvent.GetEvent (VAR calFile : Text)
+        : Boolean;
 
   (*
    * Purpose : Get one iCS event.
@@ -215,8 +216,8 @@ implementation
   end;
 
 
-  Function TEvent.GetAlarm (var calFile : Text)
-          : Boolean;
+function TEvent.GetAlarm (var calFile : Text)
+        : Boolean;
   var
     currentLn    : String;
 
@@ -263,7 +264,7 @@ implementation
   end;
 
 
-  Procedure WriteNN(myString : String);
+procedure WriteNN(myString : String);
   begin
     if (length(myString) > 0 )
     then
@@ -271,7 +272,7 @@ implementation
   end;
 
 
-  Procedure TEvent.WriteEvent;
+procedure TEvent.WriteEvent;
 
   begin
     write('Event on     : ');
@@ -290,8 +291,8 @@ implementation
   end;
 
 
-  Function TEvent.isMonthEvent (y, m : Word)
-          : Boolean;
+function TEvent.isMonthEvent (y, m : Word)
+        : Boolean;
 
   (* Purpose : Determine if thisEvent falls within the period (month)
    *           There are 4 cases in the period:
@@ -347,6 +348,5 @@ implementation
     dispose (pEnd,   Done);
 
   end;
-
 
 end.

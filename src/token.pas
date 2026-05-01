@@ -13,10 +13,10 @@ interface
     Objects;
 
 
-type
+  type
 
-  TToken = class
-    part : array [0..3] of String;
+    TToken = class
+      part : array [0..3] of String;
 
     constructor Create;
     destructor  Destroy; override;
@@ -32,10 +32,11 @@ type
 
 implementation
 
-uses
-  Logger;
+  uses
+    StrUtils,
+    Logger;
 
-  constructor TToken.Create;
+constructor TToken.Create;
   var
     i : Integer;
   begin
@@ -44,13 +45,13 @@ uses
 //      part[i] := '';
   end;
 
-  destructor TToken.Destroy;
+destructor TToken.Destroy;
   begin
     inherited Destroy;
   end;
 
 
-  procedure splitAt(divider     : Char;
+procedure splitAt(divider     : Char;
                     line        : String;
                     var  before,
                          after       : String
@@ -76,8 +77,8 @@ uses
   end;
 
 
-  function TToken.StartsWith (const token : String)
-          : Boolean;
+function TToken.StartsWith (const token : String)
+        : Boolean;
   begin
     startsWith := pos(token, part[0]) = 1;
   end;
@@ -85,7 +86,6 @@ uses
 
 procedure TToken.TokeniseIcal (line : String);
   var
-    log          : TLogger;
     posn         : Integer;
 
   begin
@@ -119,6 +119,5 @@ procedure TToken.TokeniseInf (line : String);
     log.debug('value  = ' + part[1]);
  
   end;
-
 
 end.
