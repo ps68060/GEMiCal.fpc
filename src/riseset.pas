@@ -103,7 +103,7 @@ var
   ss_mm  : Word;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
 
   log.debug ('lat = ', lat);
   log.debug ('lng = ', lng);
@@ -221,8 +221,6 @@ begin
 
   log.debug('Sunrise : ' + sunrise);
   log.debug('Sunset  : ' + sunset);
-
-  log.Free;
 
 end;
 

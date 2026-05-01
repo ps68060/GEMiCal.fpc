@@ -24,6 +24,9 @@ type
     procedure TokeniseIcal (line : String);
 
     procedure TokeniseInf  (line : String);
+
+    function StartsWith (const token : String) : Boolean;
+
   end;
 
 
@@ -73,13 +76,20 @@ uses
   end;
 
 
-  procedure TToken.TokeniseIcal (line : String);
+  function TToken.StartsWith (const token : String)
+          : Boolean;
+  begin
+    startsWith := pos(token, part[0]) = 1;
+  end;
+
+
+procedure TToken.TokeniseIcal (line : String);
   var
     log          : TLogger;
     posn         : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
 
     (* Token before colon *)
     splitAt (':', line, part[0], part[2]);
@@ -92,17 +102,15 @@ uses
  
 //    log.debug('value  = ' + part[2]);
 
-    log.Free;
   end;
 
 
-  procedure TToken.TokeniseInf (line : String);
+procedure TToken.TokeniseInf (line : String);
   var
-    log          : TLogger;
     posn         : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
 
     (* Token before equals *)
     splitAt ('=', line, part[0], part[1]);
@@ -110,13 +118,7 @@ uses
     log.debug('key    = ' + part[0]);
     log.debug('value  = ' + part[1]);
  
-    log.Free;
   end;
 
-  function startsWith (const token : String)
-          : Boolean;
-  begin
-    containsToken := pos(token, part[0]) = 1;
-  end;
 
 end.

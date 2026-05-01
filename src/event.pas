@@ -112,8 +112,6 @@ implementation
    *)
 
   var
-    log          : TLogger;
-
     convStr      : String;
     currentLn    : String;
 
@@ -123,8 +121,6 @@ implementation
     tokens       : TToken;
 
   begin
-    log := TLogger.Create(LLINFO);
-
     endEvent     := FALSE;
     alarm        := FALSE;
 
@@ -151,9 +147,6 @@ implementation
         if (tokens.startsWith(createdTk))
         then
           created := tokens.part[2];
-///        if ( pos(createdTk, tokens.part[0]) = 1 )
-///        then
-///          created := tokens.part[2];
 
         if (tokens.startsWith(dtStartTk))
         then
@@ -161,41 +154,35 @@ implementation
           dtStart   := tokens.part[2];
           dtStartTz := tokens.part[1];
         end;
-//        if ( pos(dtStartTk, tokens.part[0]) = 1 )
-//        then
-//        begin
-//          dtStart   := tokens.part[2];
-//          dtStartTz := tokens.part[1];
-//        end;
 
-        if ( pos(dtEndTk, tokens.part[0]) = 1 )
+        if ( tokens.startsWith(dtEndTk))
         then
         begin
           dtEnd   := tokens.part[2];
           dtEndTz := tokens.part[1];
         end;
 
-        if ( pos(SummaryTk, tokens.part[0]) = 1 )
+        if ( tokens.startsWith(SummaryTk))
            and (NOT alarm)
         then
           summary := tokens.part[2];
 
-        if ( pos(descrTk, tokens.part[0]) = 1 )
+        if ( tokens.startsWith(descrTk))
            and (NOT alarm)
         then
           description := tokens.part[2];
 
-        if ( pos(locationTk, tokens.part[0]) = 1 )
+        if ( tokens.startsWith(locationTk))
            and (NOT alarm)
         then
           location := tokens.part[2];
 
-        if (NOT alarm)
-            and (pos(beginAlarmTk, tokens.part[0]) = 1 )
+        if (NOT alarm )
+            and (tokens.startsWith(beginAlarmTk))
         then
           alarm := GetAlarm(calFile);
 
-        if (pos(endAlarmTk, tokens.part[0]) = 1 )
+        if (tokens.startsWith(endAlarmTk))
         then
           alarm := FALSE;
 
@@ -221,8 +208,6 @@ implementation
     begin
       endDate^.dtStr2Obj(dtStart);
     end;
-
-    log.Free;
 
     GetEvent := TRUE;
     (*writeEvent;*)

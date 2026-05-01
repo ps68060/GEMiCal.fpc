@@ -306,7 +306,7 @@ var
   dtStr      : String;
 
 begin
-  log.level := LLINFO);
+  log.level := LLINFO;
   log.debug('Next Month Work');
 
   month := myApplication.winCal^.calDate^.getMMFromIso;

@@ -8,7 +8,7 @@ unit datetime;
 
 interface
   uses
-    Objects;
+    Objects,
     SysUtils;
 
 const
@@ -47,6 +47,12 @@ type
 
     constructor init;
     destructor  done; virtual;
+
+    constructor initFromISO(dtString : String);
+
+    constructor initFromWords(yyyy, mm, dd,
+                              hh, nn, ss : Word);
+
 
     procedure dtStr2Obj(dtString : String);
 
@@ -132,7 +138,7 @@ uses
   end;
 
 
-  procedure TDateTime.initFromISO(dtString : String);
+  constructor TDateTime.initFromISO(dtString : String);
   var
    date2     : Double;
 
@@ -155,17 +161,19 @@ uses
   end;
 
 
-  procedure TDateTime.initFromWords(year, month, day,
-                                    hour, minute, second : Word);
+  constructor TDateTime.initFromWords(yyyy, mm, dd,
+                                      hh, nn, ss : Word);
   var
-    ISODate : String;
+    lIsoDate : String;
+    lIsoTime : String;
+    lIsoDateTime : String;
 
   begin
-    isoDate := date2Str(year, month, day, FALSE);
-    isoTime := time2Str(hour, minute, second, FALSE);
+    lIsoDate := date2Str(yyyy, mm, dd, FALSE);
+    lIsoTime := time2Str(hh, nn, ss, FALSE);
     
-    ISODateTime := concat(isoDate, 'T', isoTime);
-    initFromISO(ISODateTime);
+    lIsoDateTime := concat(isoDate, 'T', isoTime);
+    initFromISO(lIsoDateTime);
   end;
 
 
@@ -199,24 +207,9 @@ uses
 
   function TDateTime.getYYYYFromIso
           : Integer;
-  var
-    code  : Integer;
-    year4 : Integer;
-
   begin
-    year4 := 1970;
-    val ( COPY (isoDate, 1, 4), year4, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
-
-    getYYYYFromIso := year4;
+    getYYYYFromIso := StrToIntDef(Copy(isoDate, 1, 4), 1970);
   end;
-
-    function TDateTime.getYYYYFromIso: Integer;
-    begin
-      getYYYYFromIso := StrToIntDef(Copy(isoDate, 1, 4), 1970);
-    end;
 
 
   function TDateTime.getMMFromIso
@@ -568,21 +561,8 @@ uses
     EpochToYMD(epoch, yy, mm, dd);
     EpochToHMS(epoch, hh, nn, ss);
 
-    result := Format('%04d-%02d-%02dT%02d:%02d:%02d',
-                      [yy,  mm,  dd,  hh,  nn, ss]);
-
-//    Str(y:4, result);
-//    result := result + '-';
-
-//    if mm < 10
-//      then result := result + '0';
-//    result := result + IntToStr(mm);
-
-//    result := result + '-';
-//    if dd < 10
-//      then result := result + '0';
-
-//    result := result + IntToStr(dd);
+    IsoDateFromEpoch := Format('%04d-%02d-%02dT%02d:%02d:%02d',
+                                [yy,  mm,  dd,  hh,  nn, ss]);
   end;
 
 
