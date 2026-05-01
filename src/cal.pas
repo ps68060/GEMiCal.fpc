@@ -70,13 +70,12 @@ implementation
    *)
 
   var
-    log     : TLogger;
     attr    : Word;
     fileRec : TRawbyteSearchRec;
     calName : String;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
 
     entries := 0;
     if (findFirst(directory + '/*.ics', FAANYFILE, fileRec) = 0) then
@@ -91,8 +90,6 @@ implementation
       FindClose(fileRec);
     end;
 
-    log.Free;
-
   end;
 
 
@@ -105,7 +102,6 @@ implementation
    *)
 
   var
-    log      : TLogger;
     calFile  : Text;
 
     checkStart  : String;
@@ -114,7 +110,7 @@ implementation
     i           : Integer;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
     log.debug('DivideIcs: ');
 
     checkStart := 'BEGIN:VEVENT';
@@ -146,18 +142,17 @@ implementation
     end;
 
     log.debug('loaded ', entries );
-    log.Free;
+
   end;
 
 
   Procedure TCal.Sort;
   var
-    log     : TLogger;
     i, j    : Integer;
     swapper : TEvent;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
 
     log.debug ('Starting sort of ', entries);
 
@@ -198,9 +193,6 @@ implementation
 
     log.debug('Sorted');
 
-    log.Free;
-
   end;
-
 
 end.

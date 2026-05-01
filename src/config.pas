@@ -53,13 +53,11 @@ uses
 
   function getValue(keyValue : TToken; value : real; limit: real) : real;
   var
-    log          : TLogger;
-
     code         : Integer;
     valReal      : Real;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
 
     getValue := value;
     val(keyValue.part[1], valReal, code);
@@ -74,24 +72,21 @@ uses
     else
       getValue := valReal;
 
-    log.Free;
-
   end;
 
 
   procedure TConfig.readConfig;
   var
-    log          : TLogger;
     cnfFile      : Text;
 
     currentLn    : String;
-    keyValue     : TToken;
+    tokens       : TToken;
     code         : Integer;
 
     valReal      : Real;
 
   begin
-    log := TLogger.Create(LLINFO);
+    log.level := LLINFO;
 
     (* Open the config file for reading *)
     assign (cnfFile, 'GEMICAL.CNF');
@@ -102,30 +97,30 @@ uses
     begin
       readln (cnfFile, currentLn );
 
-      keyValue := TToken.Create;
-      keyValue.tokeniseInf(currentLn);
+      tokens := TToken.Create;
+      tokens.tokeniseInf(currentLn);
 
       (* Get the name *)
-      if ( pos(NAME_TK, currentLn) = 1 )
+      if ( tokens.startsWith(NAME_TK) )
       then
-        name := keyValue.part[1];
+        name := tokens.part[1];
 
       (* Get the latitude, if it is invalid, keep default *)
-      if ( pos(LAT_TK, currentLn) = 1 )
+      if ( tokens.startsWith(LAT_TK) )
       then
-        lat := getValue(keyValue, lat, 90.0);
+        lat := getValue(tokens, lat, 90.0);
 
       (* Get the longitude, if it is invalid, keep default *)
-      if ( pos(LNG_TK, currentLn) = 1 )
+      if ( tokens.startsWith(LNG_TK) )
       then
-        lng := getValue(keyValue, lng, 180.0);
+        lng := getValue(tokens, lng, 180.0);
 
       (* Get the UTC offset, if it is invalid, keep default *)
-      if ( pos(UTC_OFFSET_TK, currentLn) = 1 )
+      if ( tokens.startsWith(UTC_OFFSET_TK) )
       then
-        UTCoffset := getValue(keyValue, UTCoffset, 12.0);
+        UTCoffset := getValue(tokens, UTCoffset, 12.0);
 
-      keyValue.Free;
+      tokens.Free;
     end;  (* while *)
 
     log.debug ('location = ' + name);
@@ -134,7 +129,6 @@ uses
     log.debug ('UTC = ', UTCoffset);
 
     close(cnfFile);
-    log.Free;
 
   end;
 

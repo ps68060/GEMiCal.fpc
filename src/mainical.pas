@@ -103,8 +103,6 @@ var
 
 procedure TMyApplication.INITInstance;
 var
-  log            : TLogger;
-
   appDeskMenu    : PDeskMenu;
   appLoadMenu    : PLoadMenu;
   appDialogMenu  : PDialogMenu;
@@ -116,7 +114,7 @@ var
   appNavNextYear : PNavNextYear;
                      
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
 
   (* Get current path *)
   GetDir (0, directory);
@@ -143,8 +141,6 @@ begin
 
   INHERITED INITInstance;
   SetQuit (M_END, M_DESK2);
-  
-  log.Free;
 
 end;
 
@@ -152,7 +148,6 @@ end;
 procedure TMyApplication.INITMainWindow;
 
 var
-  log       : TLogger;
   year,
   month,
   day,
@@ -161,7 +156,7 @@ var
   dtStr     : String;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
   log.info('INIT Main Window');
 
   if MyApplication.winCal = NIL
@@ -193,15 +188,12 @@ begin
   then
     MyApplication.winCal^.MakeWindow;
 
-  log.Free;
-
 end;
 
 
 procedure TLoadMenu.Work;
 
 var
-  log       : TLogger;
   year,
   month,
   day,
@@ -210,8 +202,7 @@ var
   dtStr     : String;
 
 begin
-  log := TLogger.Create(LLINFO);
-
+  log.level := LLINFO;
   log.info('Load Menu Work');
 
   if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
@@ -248,17 +239,12 @@ begin
     log.debug('Loaded');
   end;
 
-  log.Free;
-
 end;
 
 
 procedure TCalMenu.Work;
-var
-  log       : TLogger;
-
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
   log.debug('CalMenu Work');
 
   if aDialog <> NIL
@@ -277,21 +263,18 @@ begin
   then
     MyApplication.WinCal^.MakeWindow;
 
-  log.Free;
-
 end;
 
 
 procedure TNavPrevMon.Work;
 var
-  log        : TLogger;
   month,
   year        : Word;
 
   dtStr       : String;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
   log.debug('Prev Month Work');
 
   month := myApplication.winCal^.calDate^.getMMFromIso;
@@ -312,21 +295,18 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
-  log.Free;
-
 end;
 
 
 procedure TNavNextMon.Work;
 var
-  log        : TLogger;
   month,
   year       : Word;
 
   dtStr      : String;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO);
   log.debug('Next Month Work');
 
   month := myApplication.winCal^.calDate^.getMMFromIso;
@@ -347,21 +327,18 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
-  log.Free;
-
 end;
 
 
 procedure TNavPrevYear.Work;
 var
-  log       : TLogger;
   month,
   year      : Word;
 
   dtStr     : String;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
   log.debug('Prev Year Work');
 
   year  := myApplication.winCal^.calDate^.getYYYYFromIso;
@@ -376,21 +353,18 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
-  log.Free;
-
 end;
 
 
 procedure TNavNextYear.Work;
 var
-  log       : TLogger;
   year      : Word;
   month     : Word;
 
   dtStr     : String;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
   log.debug('Next Year Work');
 
   year  := myApplication.winCal^.calDate^.getYYYYFromIso;
@@ -405,17 +379,12 @@ begin
 
   MyApplication.WinCal^.ForceRedraw;
 
-  log.Free;
-
 end;
 
 
 procedure LoadCal;
-var
-  log       : TLogger;
-
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
 
   myApplication.iCal := TCal.Create;
 
@@ -426,8 +395,6 @@ begin
   
   log.debug('loaded ', myApplication.iCal.entries );
 
-  log.Free;
-
 end;
 
 
@@ -435,12 +402,8 @@ procedure FilterCal(dtStr : String);
 (*
  * PURPOSE: Get the events for the date.
  *)
-
-var
-  log       : TLogger;
-
 begin
-  log := TLogger.Create(LLDEBUG);
+  log.level := LLDEBUG;
   log.debug('FilterCal ' + dtStr);
 
   if (myApplication.winCal^.calDate <> NIL)
@@ -461,8 +424,6 @@ begin
   cellGr.FilterEvents(myApplication.iCal,
                       myApplication.winCal^.calDate);
   log.debug('Cal displayed');
-  
-  log.Free;
 
 end;
 

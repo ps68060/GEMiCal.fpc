@@ -187,7 +187,6 @@ begin
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
   conf.Free;
-  log.Free;
 
 end;
 
@@ -268,7 +267,6 @@ end;
 procedure TWinCal.DrawTitle;
 
 var
-  log       : TLogger;
   title      : String;
 
   wchar,
@@ -300,7 +298,7 @@ begin
   writeln('TITLE DATE = ', calDate^.getYYYYFromIso,
                       '-', calDate^.getMMFromIso);
 
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
 
   (* Display the year and month *)
   str(calDate^.getYYYYFromIso, title);
@@ -400,7 +398,6 @@ end;
 
 procedure TWinCal.DrawGrid(rows  : Integer);
 var
-  log       : TLogger;
   r, c      : Integer;
   pxy       : array[0..3] of SmallInt;  (* Declare in correct order for passing to v_pline *)
 
@@ -408,7 +405,7 @@ var
   scrollY   : integer;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -449,15 +446,11 @@ begin
     v_pline(vdiHandle, 2, @pxy);  (* @pxy passes the list of co-ords *)
   end;
 
-  log.Free;
-
 end;
 
 
 procedure TWinCal.WriteDates;
 var
-  log          : TLogger;
-
   pixX,
   pixY         : SmallInt;
 
@@ -480,7 +473,7 @@ var
   hCell        : SmallInt;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
@@ -531,7 +524,6 @@ begin
               IntToStr(i) );
   end;
 
-  log.Free;
 end;
 
 
@@ -540,8 +532,6 @@ procedure TWinCal.DisplayEvents;
  *)
 
 var
-  log         : TLogger;
-
   pixX,
   pixY        : SmallInt;
 
@@ -568,7 +558,7 @@ var
   i           : Integer;
 
 begin
-  log := TLogger.Create(LLINFO);
+  log.level := LLINFO;
   log.debug ('DisplayEvents');
 
   scrollX := Scroller^.GetXOrg;
@@ -614,9 +604,6 @@ begin
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wcell, hcell);
 
-  log.Free;
-
 end;
-
 
 end.
