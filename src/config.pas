@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
 
 unit Config;

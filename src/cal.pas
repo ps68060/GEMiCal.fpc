@@ -1,4 +1,4 @@
-{$B+,D-,I-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
 
 unit Cal;
@@ -12,6 +12,7 @@ interface
   uses
     Objects,
     Event;
+
 
 const
   MAXEVENTS = 9999;

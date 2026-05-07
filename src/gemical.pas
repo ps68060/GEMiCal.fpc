@@ -1,5 +1,4 @@
-{$B+,D+,G-,I-,P-,Q-,R+,S-,T-,V-,X+,Z-}
-{$X+}
+{$I projopts.i}
 {$APPTYPE GUI}
 {$M 32768}
 
