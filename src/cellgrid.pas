@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
 
 unit CellGrid;
@@ -26,10 +26,10 @@ interface
       destructor  Destroy; override;
 
       procedure FilterEvents(cal       : TCal;
-                             calDate   : PDateTime);
+                             calDate   : TDateTime);
 
       procedure FilterEvent(cal       : TCal;
-                            calDate   : PDateTime;
+                            calDate   : TDateTime;
                             daysInMon : Integer;
                             e         : Integer);
     end;
@@ -45,7 +45,7 @@ implementation
 uses
   Logger;
 
-  constructor TCellGrid.Create;
+constructor TCellGrid.Create;
   var
     i : Integer;
 
@@ -58,7 +58,7 @@ uses
 
   end;
 
-  destructor TCellGrid.Destroy;
+destructor TCellGrid.Destroy;
   var
     i : Integer;
 
@@ -73,8 +73,8 @@ uses
   end;
 
 
-  procedure TCellGrid.FilterEvents(cal       : TCal;
-                                   calDate   : PDateTime);
+procedure TCellGrid.FilterEvents(cal       : TCal;
+                                 calDate   : TDateTime);
 
   (* Purpose : Decide which Events should be displayed in the month
    *           cal     = iCal calendar
@@ -82,7 +82,7 @@ uses
    *)
 
   var
-    endMonthDate : PDateTime;
+    endMonthDate : TDateTime;
     daysInMon    : Integer;
 
     i            : Integer;
@@ -90,44 +90,45 @@ uses
     dtStr        : String;
 
   begin
-    log.debug ('FilterEvents');
+    log.level := LLDEBUG;
+    log.debug ('CELLGRID.FilterEvents');
 
     (* Calculate date of end of month *)
     daysInMon := daysInMonth(calDate);
 
-    dtStr := date2Str(calDate^.getYYYYFromIso, calDate^.getMMFromIso, daysInMon, FALSE);
+    dtStr := date2Str(calDate.getYYYYFromIso, calDate.getMMFromIso, daysInMon, FALSE);
+    log.debug('CELLGRID.FilterEvents dtStr ', dtStr);
 
-    new(endMonthDate);
-    endMonthDate^.init;
-    endMonthDate^.dtStr2Obj(dtStr);
+    endMonthDate := TDateTime.create;
+    endMonthDate.dtStr2Obj(dtStr);
 
-    log.debug(' 1st epoch ', calDate^.epoch);
-    log.debug('last epoch ', endMonthDate^.epoch);
+    log.debug('CELLGRID.FilterEvents  1st epoch ', calDate.epoch);
+    log.debug('CELLGRID.FilterEvents last epoch ', endMonthDate.epoch);
 
     for i := 0 to cal.entries do
     begin
 
       (*  calDate is 1st of month *)
-      if      (cal.eventList[i].startDate^.epoch < endMonthDate^.epoch)
-          and (    (cal.eventList[i].endDate^.epoch   > calDate^.epoch)
-                or (cal.eventList[i].endDate^.epoch = 0) )
+      if      (cal.eventList[i].startDate.epoch < endMonthDate.epoch)
+          and (    (cal.eventList[i].endDate.epoch   > calDate.epoch)
+                or (cal.eventList[i].endDate.epoch = 0) )
       then
       begin
-        log.debug ('IN Scope', i );
+        log.debug ('CELLGRID: IN Scope', i );
 
         FilterEvent(cal, calDate, daysInMon, i);
       end;
 
     end;  (* for *)
 
-    dispose (endMonthDate, Done);
+    endMonthDate.free;
   end;
 
 
-  procedure TCellGrid.FilterEvent(cal       : TCal;
-                                  calDate   : PDateTime;
-                                  daysInMon : Integer;
-                                  e         : Integer);
+procedure TCellGrid.FilterEvent(cal       : TCal;
+                                calDate   : TDateTime;
+                                daysInMon : Integer;
+                                e         : Integer);
 
   (* Purpose : Store a single event in the cellGrid *)
 
@@ -147,25 +148,26 @@ uses
     eDate       : Integer;
 
   begin
-    log.debug ('end date = ' , cal.eventList[e].endDate^.getDDFromIso);
+    log.level := LLDEBUG;
+    log.debug ('FilterEvent: end date = ' , cal.eventList[e].endDate.getDDFromIso);
+    log.debug ('FilterEvent: epoch', cal.eventList[e].endDate.epoch);
 
-    daysBetween :=  (cal.eventList[e].endDate^.epoch -
-                     cal.eventList[e].startDate^.epoch) / daySec;
+    daysBetween :=  (cal.eventList[e].endDate.epoch -
+                     cal.eventList[e].startDate.epoch) / daySec;
 
-    log.debug ('event lasts ', daysBetween);
+    log.debug ('FilterEvent: event lasts ', daysBetween);
 
     (* Does the event Start in the displayed month ? *)
-
-    if (cal.eventList[e].startDate^.getMMFromIso = calDate^.getMMFromIso)
+    if (cal.eventList[e].startDate.getMMFromIso = calDate.getMMFromIso)
     then
-      sDate := cal.eventList[e].startDate^.getDDFromIso
+      sDate := cal.eventList[e].startDate.getDDFromIso
     else
       sDate := 1;
 
-    allDay := cal.eventList[e].endDate^.isAllDay;
+    allDay := cal.eventList[e].endDate.isAllDay;
 
     (* Does the event End after the displayed month ? *)
-    if (cal.eventList[e].endDate^.getMMFromIso > calDate^.getMMFromIso)
+    if (cal.eventList[e].endDate.getMMFromIso > calDate.getMMFromIso)
     then
       eDate := daysInMon
 
@@ -175,26 +177,30 @@ uses
       then
         eDate := sDate
       else
-        eDate := cal.eventList[e].endDate^.getDDFromIso;
+        eDate := cal.eventList[e].endDate.getDDFromIso;
 
 
     (* Iterate days and put info into cells. *)
     for j := sDate to eDate
     do
     begin
-      log.debug ('event date ',  + j);
-      log.debug ('slot ', cell[j].counter);
+      log.debug ('FilterEvent: event date ',  + j);
+      log.debug ('FilterEvent: slot ', cell[j].counter);
 
       (* Abbreviate the Event summary and place it in a slot in the Cell *)
-      summ := Copy (cal.eventList[e].summary, 1, SUMMARY_LEN);
-      cell[j].cellEvents[cell[j].counter].summary   := summ;
-
+      summ  := Copy (cal.eventList[e].summary,  1, SUMMARY_LEN);
       locat := Copy (cal.eventList[e].location, 1, SUMMARY_LEN);
-      cell[j].cellEvents[cell[j].counter].location  := locat;
 
-      cell[j].cellEvents[cell[j].counter].timeStart^.dtStr2Obj(cal.eventList[e].dtStart);
+      cell[j].cellEvents[cell[j].counter]
+                  .summary   := summ;
 
-      log.debug( 'Summary ' +
+      cell[j].cellEvents[cell[j].counter]
+                  .location  := locat;
+
+      cell[j].cellEvents[cell[j].counter]
+                  .timeStart.dtStr2Obj(cal.eventList[e].dtStart);
+
+      log.debug( 'FilterEvent: Summary ' +
                  cell[j].cellEvents[cell[j].counter].summary );
 
       cell[j].eventNum := e;
@@ -205,10 +211,10 @@ uses
   end;
 
 
-  procedure CalcCellGrid(day,
-                         firstDay : Integer;
-                         var row,
-                             col : Integer);
+procedure CalcCellGrid(day,
+                       firstDay : Integer;
+                       var row,
+                           col : Integer);
   (* Purpose : Calculate the row and column of the calendar day
    * inputs  : firstDay = the day number of the 1st of the month
    *           day      = the date in the month
@@ -217,12 +223,13 @@ uses
    *)
 
   begin
+    log.level := LLINFO;
     row := (day - 1 + firstDay) div 7;
     col := (day - 1 + firstDay) mod 7;
 
-    log.debug ('day ', day);
-    log.debug ('row ', row);
-    log.debug ('col ', col);
+    log.debug ('CELLGRID: day ', day);
+    log.debug ('CELLGRID: row ', row);
+    log.debug ('CELLGRID: col ', col);
 
   end;
 

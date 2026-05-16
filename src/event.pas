@@ -1,6 +1,5 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
-{$H+}          // enable AnsiString
 
 unit Event;
 
@@ -28,8 +27,8 @@ type
     dtEndTz     : String;
     location    : String;
 
-    startDate   : PDateTime;
-    endDate     : PDateTime;
+    startDate   : TDateTime;
+    endDate     : TDateTime;
 
     alarmAction      : String;
     alarmTrigger     : String;
@@ -89,17 +88,14 @@ constructor TEvent.create;
     alarmTrigger     := '';
     alarmDescription := '';
 
-    new (startDate);
-    startDate^.init;
-
-    new (endDate);
-    endDate^.init;
+    startDate := TDateTime.create;
+    endDate   := TDateTime.create;
   end;
 
 destructor TEvent.destroy;
   begin
-    dispose(startDate, Done);
-    dispose(endDate, Done);
+    startDate.free;
+    endDate.free;
 
     inherited destroy;
   end;
@@ -122,6 +118,8 @@ function TEvent.GetEvent (VAR calFile : Text)
     tokens       : TToken;
 
   begin
+    log.level := LLINFO;
+
     endEvent     := FALSE;
     alarm        := FALSE;
 
@@ -142,48 +140,48 @@ function TEvent.GetEvent (VAR calFile : Text)
 
       else
       begin
-        tokens.Create;
+        tokens := TToken.Create;
         tokens.tokeniseIcal(currentLn);
 
-        if (tokens.startsWith(createdTk))
+        if (tokens.StartsWith(createdTk))
         then
           created := tokens.part[2];
 
-        if (tokens.startsWith(dtStartTk))
+        if (tokens.StartsWith(dtStartTk))
         then
         begin
           dtStart   := tokens.part[2];
           dtStartTz := tokens.part[1];
         end;
 
-        if ( tokens.startsWith(dtEndTk))
+        if ( tokens.StartsWith(dtEndTk))
         then
         begin
           dtEnd   := tokens.part[2];
           dtEndTz := tokens.part[1];
         end;
 
-        if ( tokens.startsWith(SummaryTk))
+        if ( tokens.StartsWith(SummaryTk))
            and (NOT alarm)
         then
           summary := tokens.part[2];
 
-        if ( tokens.startsWith(descrTk))
+        if ( tokens.StartsWith(descrTk))
            and (NOT alarm)
         then
           description := tokens.part[2];
 
-        if ( tokens.startsWith(locationTk))
+        if ( tokens.StartsWith(locationTk))
            and (NOT alarm)
         then
           location := tokens.part[2];
 
         if (NOT alarm )
-            and (tokens.startsWith(beginAlarmTk))
+            and (tokens.StartsWith(beginAlarmTk))
         then
           alarm := GetAlarm(calFile);
 
-        if (tokens.startsWith(endAlarmTk))
+        if (tokens.StartsWith(endAlarmTk))
         then
           alarm := FALSE;
 
@@ -197,17 +195,17 @@ function TEvent.GetEvent (VAR calFile : Text)
     if (length(dtStart) > 0)
     then
     begin
-      startDate^.dtStr2Obj(dtStart);
+      startDate.dtStr2Obj(dtStart);
     end;
 
     if (length(dtEnd) > 0)
     then
     begin
-      endDate^.dtStr2Obj(dtEnd);
+      endDate.dtStr2Obj(dtEnd);
     end
     else
     begin
-      endDate^.dtStr2Obj(dtStart);
+      endDate.dtStr2Obj(dtStart);
     end;
 
     GetEvent := TRUE;
@@ -276,7 +274,7 @@ procedure TEvent.WriteEvent;
 
   begin
     write('Event on     : ');
-    startDate^.writeDT;
+    startDate.writeDT;
 
     WriteNN (summary);
     WriteNN (description);
@@ -287,7 +285,7 @@ procedure TEvent.WriteEvent;
     WriteNN (alarmTrigger);
 
     write('Event ends   : ');
-    endDate^.writeDT;
+    endDate.writeDT;
   end;
 
 
@@ -308,44 +306,42 @@ function TEvent.isMonthEvent (y, m : Word)
 
   var
     pStart,
-    pEnd   : PDateTime;
+    pEnd   : TDateTime;
 
     daysInMon : Integer;
 
   begin
     isMonthEvent := FALSE;
 
-    new(pStart);
-    pStart^.init;
-    pStart^.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
+    pStart := TDateTime.create;
+    pStart.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
 
     daysInMon := daysMon[m];
     if (m = 2) and (isLeapDay(y))
     then
       daysInMon := 29;
 
-    new(pEnd);
-    pEnd^.init;
-    pEnd^.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
+    pEnd := TDateTime.create;
+    pEnd.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
 
     (* Does the event start/end overlap with the period start/end ? *)
 
-    if      (startDate^.epoch > pStart^.epoch)
-        and (startDate^.epoch < pEnd^.epoch)
+    if      (startDate.epoch > pStart.epoch)
+        and (startDate.epoch < pEnd.epoch)
       or
-            (endDate^.epoch > pStart^.epoch)
-        and (endDate^.epoch < pEnd^.epoch)
+            (endDate.epoch > pStart.epoch)
+        and (endDate.epoch < pEnd.epoch)
       or
-            (startDate^.epoch < pStart^.epoch)
-        and (endDate^.epoch   > pEnd^.epoch)
+            (startDate.epoch < pStart.epoch)
+        and (endDate.epoch   > pEnd.epoch)
     then
     begin
       isMonthEvent := TRUE;
       writeln ('Current event');
     end;
 
-    dispose (pStart, Done);
-    dispose (pEnd,   Done);
+    pStart.free;
+    pEnd.free;
 
   end;
 

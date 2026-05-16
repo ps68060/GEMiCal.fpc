@@ -13,7 +13,6 @@ interface
     Objects,
     Event;
 
-
 const
   MAXEVENTS = 9999;
 
@@ -76,7 +75,7 @@ implementation
     calName : String;
 
   begin
-    log.level := LLINFO;
+    log.level := LLDEBUG;
 
     entries := 0;
     if (findFirst(directory + '/*.ics', FAANYFILE, fileRec) = 0) then
@@ -111,7 +110,7 @@ implementation
     i           : Integer;
 
   begin
-    log.level := LLINFO;
+    log.level := LLDEBUG;
     log.debug('DivideIcs: ');
 
     checkStart := 'BEGIN:VEVENT';
@@ -153,7 +152,7 @@ implementation
     swapper : TEvent;
 
   begin
-    log.level := LLINFO;
+    log.level := LLDEBUG;
 
     log.debug ('Starting sort of ', entries);
 
@@ -165,14 +164,14 @@ implementation
       do
       begin
 
-        if (eventList[i].startDate^.epoch  >
-            eventList[j].startDate^.epoch )
+        if (eventList[i].startDate.epoch  >
+            eventList[j].startDate.epoch )
         then
         begin
           (*
           writeln('Before swap ', i, ' ', j);
-          eventList[i]^.writeEvent;
-          eventList[j]^.writeEvent;
+          eventList[i].writeEvent;
+          eventList[j].writeEvent;
           *)
 
           swapper            := eventList[i];
@@ -182,8 +181,8 @@ implementation
           (*
           writeln;
           writeln('After swap');
-          eventList[i]^.writeEvent;
-          eventList[j]^.writeEvent;
+          eventList[i].writeEvent;
+          eventList[j].writeEvent;
           writeln;
           writeln;
           *)
@@ -192,7 +191,7 @@ implementation
       end;
     end;
 
-    log.debug('Sorted');
+    log.debug('Sorted ', entries);
 
   end;
 

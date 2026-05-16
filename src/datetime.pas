@@ -1,5 +1,7 @@
-unit datetime;
+{$I projopts.i}
+{$mode objfpc}
 
+unit datetime;
 
 (* AUTHOR  : P SLEGG
    DATE    : 17th May 2020 Version 1
@@ -34,8 +36,7 @@ const
          = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
 
 type
-  PDateTime = ^TDateTime;
-  TDateTime = object(TObject)
+  TDateTime = class
     tz      : String;
 
     isoDate : String;
@@ -45,8 +46,8 @@ type
 
     day     : Integer;
 
-    constructor init;
-    destructor  done; virtual;
+    constructor create;
+    destructor  destroy; override;
 
     constructor initFromISO(dtString : String);
 
@@ -110,7 +111,7 @@ type
   function isLeapDay(y : Integer)
           : Boolean;
 
-  function daysInMonth(myDate : PDateTime)
+  function daysInMonth(myDate : TDateTime)
           :Integer;
 
 
@@ -120,7 +121,7 @@ uses
     Logger,
     StrSubs;
 
-  constructor TDateTime.init;
+constructor TDateTime.create;
   begin
     isoDate := '19700101';
 
@@ -132,18 +133,19 @@ uses
     day    := 4;
   end;
 
-  destructor TDateTime.done;
+destructor TDateTime.destroy;
   begin
-    inherited done;
+    inherited destroy;
   end;
 
 
-  constructor TDateTime.initFromISO(dtString : String);
+constructor TDateTime.initFromISO(dtString : String);
   var
    date2     : Double;
 
   begin
-    log.level := LLDEBUG;
+    log.level := LLINFO;
+
     // ISO format YYYY-MM-DDTHH:MM:SS
     log.debug('INIT from ISO date-time  ' + dtString);
 
@@ -161,7 +163,7 @@ uses
   end;
 
 
-  constructor TDateTime.initFromWords(yyyy, mm, dd,
+constructor TDateTime.initFromWords(yyyy, mm, dd,
                                       hh, nn, ss : Word);
   var
     lIsoDate : String;
@@ -177,19 +179,20 @@ uses
   end;
 
 
-  procedure TDateTime.dtStr2Obj(dtString : String);
+procedure TDateTime.dtStr2Obj(dtString : String);
   var
-   date1, date2 : Double;
+   date2 : Double;
 
   begin
+    log.level := LLDEBUG;
     log.debug('converting date-time  ' + dtString);
 
-    isoDate := SubStr(dtString, 1, 8);
-    isoTime := COPY(dtString, 10, 6);
+    isoDate := Copy(dtString, 1, 8);
+    isoTime := Copy(dtString, 10, 6);
 
     if (length(dtString) >= 16 )
     then
-      tz := COPY (dtString, 16, length(dtString) );
+      tz := Copy (dtString, 16, length(dtString) );
 
     log.debug('dtStr2Obj date ' + isoDate);
     //log.debug('dtStr2Obj time ' + isoTime);
@@ -205,15 +208,27 @@ uses
   end;
 
 
-  function TDateTime.getYYYYFromIso
-          : Integer;
+function TDateTime.getYYYYFromIso
+        : Integer;
+  var
+    code  : Integer;
+    year4 : Integer;
+
   begin
-    getYYYYFromIso := StrToIntDef(Copy(isoDate, 1, 4), 1970);
+    year4 := 1970;
+    val ( COPY (isoDate, 1, 4), year4, code );
+    if (code <> 0)
+    then
+      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
+
+    getYYYYFromIso := year4;
+
+///    getYYYYFromIso := StrToIntDef(Copy(isoDate, 1, 4), 1970);
   end;
 
 
-  function TDateTime.getMMFromIso
-          : Integer;
+function TDateTime.getMMFromIso
+        : Integer;
   var
     code   : Integer;
     month2 : Integer;
@@ -229,8 +244,8 @@ uses
   end;
 
 
-  function TDateTime.getDDFromIso
-          : Integer;
+function TDateTime.getDDFromIso
+        : Integer;
   var
     code   : Integer;
     dd     : Integer;
@@ -246,8 +261,8 @@ uses
   end;
 
 
-  function TDateTime.getHrFromIso
-          : Integer;
+function TDateTime.getHrFromIso
+        : Integer;
   var
     code   : Integer;
     hr2    : Integer;
@@ -263,8 +278,8 @@ uses
   end;
 
 
-  function TDateTime.getMinFromIso
-          : Integer;
+function TDateTime.getMinFromIso
+        : Integer;
   var
     code   : Integer;
     min2   : Integer;
@@ -280,8 +295,8 @@ uses
   end;
 
 
-  function TDateTime.getSecFromIso
-          : Integer;
+function TDateTime.getSecFromIso
+        : Integer;
   var
     code   : Integer;
     sec2   : Integer;
@@ -298,7 +313,7 @@ uses
 
 
 
-  procedure TDateTime.calcEpoch;
+procedure TDateTime.calcEpoch;
   const
     epochJD = 2440587.50;  (*  1970/01/01 00:00:00 *)
 
@@ -316,8 +331,8 @@ uses
   end;
 
 
-  function TDateTime.julianDate
-          : Double;
+function TDateTime.julianDate
+        : Double;
   var
     y, m, d  : double;
 
@@ -331,6 +346,8 @@ uses
     part4    : double;
 
   begin
+    log.level := LLINFO;
+
     lyyyy := getYYYYFromIso;
     lmm   := getMMFromIso;
     ldd   := getDDFromIso;
@@ -360,7 +377,7 @@ uses
   end;
 
 
-  procedure TDateTime.dayOfWeek;
+procedure TDateTime.dayOfWeek;
   var
     t : array [0..11] of Integer;
     lyyyy,
@@ -400,7 +417,7 @@ uses
   end;
 
 
-  procedure TDateTime.writeDT;
+procedure TDateTime.writeDT;
   begin
     writeln(isoDate, ' ',
             isoTime,
@@ -409,8 +426,8 @@ uses
   end;
 
 
-  function TDateTime.humanDateTime
-          : String;
+function TDateTime.humanDateTime
+        : String;
   var
     thisDate,
     thisTime : String;
@@ -424,9 +441,9 @@ uses
   end;
 
 
-  function date2Str(year, month, day : Word;
-                    human : Boolean)
-          : String;
+function date2Str(year, month, day : Word;
+                  human : Boolean)
+        : String;
   var
     dtStr : String;
   begin
@@ -451,13 +468,15 @@ uses
   end;
 
 
-  function time2Str(hour, minute, second : Word;
-                    human : Boolean)
-          : String;
+function time2Str(hour, minute, second : Word;
+                  human : Boolean)
+        : String;
   var
     tmStr   : String;
 
   begin
+    log.level := LLINFO;
+
     (*writeln('Time is ', hour, ':', minute, ':', second ); *)
 
     if (human)
@@ -482,8 +501,8 @@ uses
   end;
 
 
-  procedure EpochToYMD(epoch: LongInt;
-                       var yy, mm, dd : Integer);
+procedure EpochToYMD(epoch: LongInt;
+                     var yy, mm, dd : Integer);
   (* Purpose : Convert epoch seconds to year, month, day 
    * Standard Gregorian calendar conversion.
    * This uses March as the first month of the year to simplify leap year calculations.
@@ -529,10 +548,10 @@ uses
   end;
 
 
-  procedure EpochToHMS(epoch : LongInt;
-                       var hh,
-                           nn,
-                           ss : Integer);
+procedure EpochToHMS(epoch : LongInt;
+                     var hh,
+                         nn,
+                         ss : Integer);
   (* Purpose : Convert epoch seconds to hour, minute, second
    *)
   var
@@ -549,8 +568,8 @@ uses
   end;
 
 
-  function IsoDateFromEpoch(epoch : LongInt)
-          : String;
+function IsoDateFromEpoch(epoch : LongInt)
+        : String;
   (* Purpose : Convert epoch seconds to ISO date string YYYY-MM-DD
    *)
   var
@@ -566,17 +585,19 @@ uses
   end;
 
 
-  procedure timeBetween(epoch1, epoch2 : LongInt;
-                        var dd,
-                            hh,
-                            mi,
-                            ss : Integer;
-                        var future : Boolean);
+procedure timeBetween(epoch1, epoch2 : LongInt;
+                      var dd,
+                          hh,
+                          mi,
+                          ss : Integer;
+                      var future : Boolean);
   var
     diffSec,
     remSec  : LongInt;
 
   begin
+    log.level := LLINFO;
+
     log.debug('epoch1 ', epoch1);
     log.debug('epoch2 ', epoch2);
 
@@ -606,8 +627,8 @@ uses
   end;
 
 
-  function isLeapDay(y : Integer)
-          : Boolean;
+function isLeapDay(y : Integer)
+        : Boolean;
   begin
 
     if (y mod 4) = 0
@@ -631,20 +652,21 @@ uses
   end;
 
 
-  function daysInMonth(myDate : PDateTime)
-          :Integer;
+function daysInMonth(myDate : TDateTime)
+        :Integer;
   (* Purpose : Calculate date of end of month *)
-  begin
-    daysInMonth := daysMon[myDate^.getMMFromIso];
 
-    if (myDate^.getMMFromIso = 2) and (isLeapDay(myDate^.getYYYYFromIso))
+  begin
+    daysInMonth := daysMon[myDate.getMMFromIso];
+
+    if (myDate.getMMFromIso = 2) and (isLeapDay(myDate.getYYYYFromIso))
     then
       daysInMonth := 29;
   end;
 
 
-  function TDateTime.isAllDay
-          : Boolean;
+function TDateTime.isAllDay
+        : Boolean;
   (* Purpose : Is this an all day event ? *)
 
   begin

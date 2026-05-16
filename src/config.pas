@@ -101,22 +101,22 @@ uses
       tokens.tokeniseInf(currentLn);
 
       (* Get the name *)
-      if ( tokens.startsWith(NAME_TK) )
+      if ( tokens.StartsWith(NAME_TK) )
       then
         name := tokens.part[1];
 
       (* Get the latitude, if it is invalid, keep default *)
-      if ( tokens.startsWith(LAT_TK) )
+      if ( tokens.StartsWith(LAT_TK) )
       then
         lat := getValue(tokens, lat, 90.0);
 
       (* Get the longitude, if it is invalid, keep default *)
-      if ( tokens.startsWith(LNG_TK) )
+      if ( tokens.StartsWith(LNG_TK) )
       then
         lng := getValue(tokens, lng, 180.0);
 
       (* Get the UTC offset, if it is invalid, keep default *)
-      if ( tokens.startsWith(UTC_OFFSET_TK) )
+      if ( tokens.StartsWith(UTC_OFFSET_TK) )
       then
         UTCoffset := getValue(tokens, UTCoffset, 12.0);
 

@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
 
 unit MainIcal;
@@ -95,9 +95,9 @@ var
 
   directory     : String;
 
-  destructor TMyApplication.done;
+destructor TMyApplication.done;
   begin
-
+    
   end;
 
 
@@ -120,7 +120,7 @@ begin
   GetDir (0, directory);
 
   LoadResource ('GEMICAL.RSC','');
-
+  
   (* Load and set-up the menu *)
   LoadMenu (TREE000);
 
@@ -156,8 +156,8 @@ var
   dtStr     : String;
 
 begin
-  log.level := LLINFO;
-  log.info('INIT Main Window');
+  log.level := LLDEBUG;
+  log.debug('INIT Main Window');
 
   if MyApplication.winCal = NIL
   then
@@ -168,10 +168,9 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    new (myApplication.winCal^.calDate);
-    myApplication.winCal^.calDate^.init;
-    myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
-    log.DEBUG('calDate = ', myApplication.winCal^.calDate^.getYYYYFromIso);
+    myApplication.winCal^.calDate := TDateTime.create;
+    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
+    log.DEBUG('calDate = ', myApplication.winCal^.calDate.getYYYYFromIso);
 
     LoadCal;
 
@@ -179,6 +178,7 @@ begin
     then
     begin
       MyApplication.iCal.sort;
+      log.debug('next step: FilterCal dtStr', dtStr);
       FilterCal(dtStr);
     end;
 
@@ -187,6 +187,8 @@ begin
   if MyApplication.winCal <> NIL
   then
     MyApplication.winCal^.MakeWindow;
+
+  //myApplication.winCal^.calDate.free //todo ???;
 
 end;
 
@@ -255,7 +257,7 @@ begin
   if MyApplication.WinCal = NIL
   then
   begin
-    MyApplication.WinCal := NEW(PWinCal, Init(NIL, dAppName));
+    MyApplication.WinCal := new(PWinCal, Init(NIL, dAppName));
     MyApplication.WinCal^.SetSubTitle('Calendar Month');
   end;
 
@@ -277,8 +279,8 @@ begin
   log.level := LLINFO;
   log.debug('Prev Month Work');
 
-  month := myApplication.winCal^.calDate^.getMMFromIso;
-  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
+  month := myApplication.winCal^.calDate.getMMFromIso;
+  year  := myApplication.winCal^.calDate.getYYYYFromIso;
 
   dec (month);
 
@@ -309,8 +311,8 @@ begin
   log.level := LLINFO;
   log.debug('Next Month Work');
 
-  month := myApplication.winCal^.calDate^.getMMFromIso;
-  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
+  month := myApplication.winCal^.calDate.getMMFromIso;
+  year  := myApplication.winCal^.calDate.getYYYYFromIso;
 
   inc (month);
 
@@ -341,8 +343,8 @@ begin
   log.level := LLINFO;
   log.debug('Prev Year Work');
 
-  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
-  month := myApplication.winCal^.calDate^.getMMFromIso;
+  year  := myApplication.winCal^.calDate.getYYYYFromIso;
+  month := myApplication.winCal^.calDate.getMMFromIso;
 
   dec (year);
 
@@ -367,8 +369,8 @@ begin
   log.level := LLINFO;
   log.debug('Next Year Work');
 
-  year  := myApplication.winCal^.calDate^.getYYYYFromIso;
-  month := myApplication.winCal^.calDate^.getMMFromIso;
+  year  := myApplication.winCal^.calDate.getYYYYFromIso;
+  month := myApplication.winCal^.calDate.getMMFromIso;
 
   inc (year);
 
@@ -383,6 +385,9 @@ end;
 
 
 procedure LoadCal;
+(*
+ * PURPOSE: Load all the *.ics files in directory.
+ *)
 begin
   log.level := LLINFO;
 
@@ -404,17 +409,16 @@ procedure FilterCal(dtStr : String);
  *)
 begin
   log.level := LLDEBUG;
-  log.debug('FilterCal ' + dtStr);
+  log.debug('FilterCal: dtStr ' + dtStr);
 
-  if (myApplication.winCal^.calDate <> NIL)
-  then
-    dispose (myApplication.winCal^.calDate, done);
+//  if (myApplication.winCal^.calDate <> NIL)
+//  then
+//    myApplication.winCal^.calDate.free;
 
-  new (myApplication.winCal^.calDate);
-  myApplication.winCal^.calDate^.init;
-  myApplication.winCal^.calDate^.dtStr2Obj(dtStr);
+//  myApplication.winCal^.calDate := TDateTime.create;
+//  myApplication.winCal^.calDate.dtStr2Obj(dtStr);
 
-  log.debug('Filter ' + dtStr );
+  log.debug('FilterCal: dtStr ', myApplication.winCal^.calDate.getYYYYFromIso );
 
   if (cellGr <> NIL)
   then
@@ -423,7 +427,7 @@ begin
   cellGr := TCellGrid.Create;
   cellGr.FilterEvents(myApplication.iCal,
                       myApplication.winCal^.calDate);
-  log.debug('Cal displayed');
+  log.debug('FilterCal: done');
 
 end;
 

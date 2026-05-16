@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R+,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
 
 unit riseset;
@@ -11,7 +11,7 @@ interface
 
 
   procedure sunRiseSet (lat, lng, UTCoff : Real;
-                        date : PDateTime;
+                        date : TDateTime;
                       var sunrise,
                           sunset  : String);
 
@@ -19,7 +19,7 @@ implementation
 
 
 procedure sunRiseSet (lat, lng, UTCoff : Real;
-                      date : PDateTime;
+                      date : TDateTime;
                       var sunrise,
                           sunset  : String);
 
@@ -111,8 +111,8 @@ begin
 
   E := 0;
 
-  F := date^.julianDate - UTCoff / 24;      (* Julian day *)
-  log.debug ('JD = ', date^.julianDate);
+  F := date.julianDate - UTCoff / 24;      (* Julian day *)
+  log.debug ('JD = ', date.julianDate);
   log.debug ('f = ', F);
 
   G := (F - 2451545) / 36525;               (* Julian century *)

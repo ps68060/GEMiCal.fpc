@@ -1,4 +1,4 @@
-{$B+,D-,I-,L-,N-,P-,Q-,R-,S-,T-,V-,X+,Z-}
+{$I projopts.i}
 {$mode objfpc}
 
 unit CellEvnt;
@@ -13,8 +13,8 @@ interface
     TCellEvent = class
       summary   : String;
       location  : String;
-      timeStart : PDateTime;
-      timeEnd   : PDateTime;
+      timeStart : TDateTime;
+      timeEnd   : TDateTime;
 
       constructor Create;
       destructor  Destroy; override;
@@ -28,19 +28,16 @@ implementation
     summary   := '';
     location  := '';
 
-    new (timeStart);
-    timeStart^.init;
-
-    new (timeEnd);
-    timeEnd^.init;
+    timeStart := TDateTime.create;
+    timeEnd   := TDateTime.create;
 
   end;
 
 
   destructor TCellEvent.Destroy;
   begin
-    dispose (timeStart, Done);
-    dispose (timeEnd,   Done);
+    timeStart.free;
+    timeEnd.free;
   end;
 
 end.

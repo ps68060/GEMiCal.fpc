@@ -1,3 +1,6 @@
+{$I projopts.i}
+{$mode objfpc}
+
 unit WinCal;
 
 interface
@@ -30,7 +33,8 @@ type
                     cellHeight : integer;
 
                 public
-                   calDate : PDateTime;
+                   calDate : TDateTime;
+                   conf    : TConfig;
 
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
                    function  GetIconTitle    : String;                 VIRTUAL;
@@ -59,7 +63,6 @@ type
                  END;
 
 var
-  conf            : TConfig;
   cellGr          : TCellGrid;
 
 
@@ -83,17 +86,17 @@ var
 
 (*
 constructor TWinCal.Init(AParent: PWindow;  ATitle: string);
-begin
-  inherited init(AParent, ATitle);
-  displayDate := TDateTime.Create;
-end;
+  begin
+    inherited init(AParent, ATitle);
+    conf := TConfig.create;
+  end;
 
 
 destructor TWinCal.Done;
-begin
-  displayDate.Free;
-  inherited Done;
-end;
+  begin
+    conf.free;
+    inherited Done;
+  end;
 *)
 
 
@@ -125,6 +128,8 @@ var
 begin
   INHERITED SetupSize;
 
+  conf := TConfig.create;
+  
   (* Work contains the window work area *)
   with Work do
   begin
@@ -163,9 +168,7 @@ var
   hcell       : SmallInt;
 
 begin
-  log := TLogger.Create(LLINFO);
-
-  conf := TConfig.Create;;
+  log.level := LLDEBUG;
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
@@ -183,10 +186,13 @@ begin
   WriteDates;
 
   DisplayEvents;
+log.debug('Paint: DisplayEvents');
 
   (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
 
-  conf.Free;
+log.debug('conf lat', conf.lat);
+
+log.debug('Paint: exit');
 
 end;
 
@@ -255,8 +261,14 @@ procedure TWinCal.CalcPos(row,
  *)
 
 begin
+  log.level := LLDEBUG;
+  log.debug('CalcPos: 1');
   xVar := Curr.X + (col * cellWidth);
   yVar := Curr.Y + titleHeight + row * cellHeight;
+
+  log.debug('xVar= ', xVar);
+  log.debug('yVar= ', yVar);
+  log.debug('CalcPos: exit');
 
 //  if row <= 1 then
 //    writeln('CalcPos: row=', row,' ', Curr.Y, ' ', titleHeight, ':', headerHeight, ':', cellHeight, ' result=', yvar);
@@ -278,7 +290,7 @@ var
   hAlign,
   vAlign     : SmallInt;
 
-  todayDate  : PDateTime;
+  todayDate  : TDateTime;
 
   year,
   month,
@@ -295,14 +307,14 @@ var
   sunset     : String;
 
 begin
-  writeln('TITLE DATE = ', calDate^.getYYYYFromIso,
-                      '-', calDate^.getMMFromIso);
-
   log.level := LLINFO;
 
+  writeln('TITLE DATE = ', calDate.getYYYYFromIso,
+                      '-', calDate.getMMFromIso);
+
   (* Display the year and month *)
-  str(calDate^.getYYYYFromIso, title);
-  title := title + ' ' + mon1[calDate^.getMMFromIso];
+  str(calDate.getYYYYFromIso, title);
+  title := title + ' ' + mon1[calDate.getMMFromIso];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -320,7 +332,6 @@ begin
   GetTime(hour, minute, second, sec100);
 
   dtStr := date2str(year, month, day, FALSE);
-
   v_gtext(vdiHandle,
           Work.X + Attr.charWidth,
           Work.Y + (headerHeight div 2),
@@ -332,13 +343,18 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   (* Sunrise and Sunset *)
-  new (todayDate);
-  todayDate^.init;
-  todayDate^.dtStr2Obj(dtStr);
+  todayDate := TDateTime.create;
+  todayDate.dtStr2Obj(dtStr);
+log.debug('DrawTitle: date 8', dtStr);
 
-  sunRiseSet(conf.lat, conf.lng, conf.UTCoffset
+  sunRiseSet(conf.lat
+            ,conf.lng
+            ,conf.UTCoffset
             ,todayDate,  sunrise, sunset);
-  dispose(todayDate);
+log.debug('DrawTitle: date 9');
+
+  todayDate.free;
+log.debug('DrawTitle: date 10');
 
   log.debug ('sunrise ' + sunrise);
   log.debug ('sunset '  + sunset);
@@ -376,6 +392,8 @@ var
   hcell       : SmallInt;
 
 begin
+  log.level := LLDEBUG;
+
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
@@ -384,6 +402,7 @@ begin
   DrawGrid (1);
 
   (* Write Day labels *)
+  LOG.DEBUG('DrawGridHeading: 1');
   for c := 0 to 6 do
   begin
     CalcPos(0, c, pixX, pixY);
@@ -393,6 +412,7 @@ begin
             day1[c] );
   end;
 
+  LOG.DEBUG('DrawGridHeading: exit');
 end;
 
 
@@ -409,7 +429,7 @@ begin
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
-  log.debug('scroll X ', scrollX);
+  log.debug('DrawGrid: scroll X ', scrollX);
 
   (* Draw heading line *)
   pxy[0] := Curr.X;  // todo - fudged to the right
@@ -473,27 +493,31 @@ var
   hCell        : SmallInt;
 
 begin
-  log.level := LLINFO;
+  log.level := LLDEBUG;
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.debug ('year ', calDate^.getYYYYFromIso );
-  log.debug (mon1[calDate^.getMMFromIso] );
+  log.debug ('year ', calDate.getYYYYFromIso );
+  log.debug (mon1[calDate.getMMFromIso] );
 
   (* Get today's date and check if displaying current month *)
   GetDate (year, month, day, dayOfWeek);
 
-  CalcCellGrid (calDate^.day, day, row, col);
+log.debug('WriteDates: 1');
+  CalcCellGrid (calDate.day, day, row, col);
+log.debug('WriteDates: 2');
 
   currentMonth := FALSE;
-  if     (calDate^.getYYYYFromIso = year)
-     and (calDate^.getMMFromIso   = month)
+  if     (calDate.getYYYYFromIso = year)
+     and (calDate.getMMFromIso   = month)
   then
     currentMonth := TRUE;
+log.debug('WriteDates: 3');
 
   (* Calculate date of end of month *)
   daysInMon := daysInMonth(calDate);
+log.debug('WriteDates: 4');
 
   (* Set the font to get the dimensions *)
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
@@ -501,9 +525,9 @@ begin
   (* Display the dates, highlighting today *)
   for i := 1 to daysInMon do
   begin
-    CalcCellGrid (calDate^.day, i, row, col);
+    CalcCellGrid (calDate.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
-    //writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
+writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
        and (i = day)
@@ -514,7 +538,7 @@ begin
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(calDate^.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(calDate.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
@@ -524,6 +548,7 @@ begin
               IntToStr(i) );
   end;
 
+log.debug('WriteDates: exit');
 end;
 
 
@@ -552,26 +577,30 @@ var
   time,
   timePlace   : String;
 
-  daysBetween : Real;
-
   day,
   i           : Integer;
 
 begin
-  log.level := LLINFO;
-  log.debug ('DisplayEvents');
+  log.level := LLDEBUG;
+  log.debug ('DisplayEvents: start');
 
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
+log.debug('DisplayEvents: 1');
 
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   offset    := hCell + hcell div 2;
 
+log.debug('DisplayEvents: 2');
+
   vst_point(vdiHandle, 7, wchar, hchar, wCell, hCell);
+log.debug('DisplayEvents: 3');
 
   for day := 1 to 31 do
   begin
-    CalcCellGrid (calDate^.day, day, row, col);
+    CalcCellGrid (calDate.day, day, row, col);
+log.debug('DisplayEvents: day ', day);
+
     CalcPos(row, col, pixX, pixY);
 
     log.debug ('events: row ', row);
@@ -579,8 +608,12 @@ begin
 
     for i := 0 to cellGr.cell[day].counter - 1 do
     begin
+log.debug('DisplayEvents: i ', i);
+log.debug('Summary ', cellGr.cell[day].cellEvents[i].summary);
+log.debug('start ', cellGr.cell[day].cellEvents[i].timeStart.humanDateTime);
+
       summ      := SubStr (cellGr.cell[day].cellEvents[i].summary, 1, 16 );
-      time      := SubStr (cellGr.cell[day].cellEvents[i].timeStart^.humanDateTime, 11, 5 );
+      time      := SubStr (cellGr.cell[day].cellEvents[i].timeStart.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
