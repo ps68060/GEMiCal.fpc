@@ -144,7 +144,7 @@ begin
   then
     log(LLDEBUG, message + ': TRUE')
   else
-    log(LLDEBUG, message + ': FALSE')
+    log(LLDEBUG, message + ': FALSE');
 end;
 
 procedure TLogger.debug(const message: ShortString; value : real);
