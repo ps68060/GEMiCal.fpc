@@ -13,7 +13,7 @@ interface
 
     Config,
     CellGrid,
-    DateStruct;
+    DateStrc;
 
 {$I gemical.i}
 

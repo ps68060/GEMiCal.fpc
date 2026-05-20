@@ -6,7 +6,7 @@ unit riseset;
 interface
   uses
     Trig,
-    DateTime,
+    DateStrc,
     Logger;
 
 

@@ -12,7 +12,7 @@ unit Event;
 interface
   uses
     Objects,
-    DateStruct;
+    DateStrc;
 
 
 type

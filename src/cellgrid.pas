@@ -12,7 +12,7 @@ interface
     Objects,
 
     Cal,
-    DateStruct,
+    DateStrc,
     CalCell;
 
   const

@@ -2,7 +2,7 @@
 {$mode objfpc}
 
 unit
-  DateStruct;
+  DateStrc;
 
 (* AUTHOR  : P SLEGG
    DATE    : 17th May 2020 Version 1
@@ -12,7 +12,8 @@ unit
 interface
   uses
     Objects,
-    SysUtils;
+    SysUtils,
+    DateUtils;
 
 const
   daySec  = 86400;
@@ -79,8 +80,7 @@ type
 
     procedure calcEpoch;
 
-    function CalcJulianDate
-            : Double;
+    procedure CalcJulianDate;
 
     procedure dayOfWeek;
 
@@ -131,17 +131,16 @@ constructor TDateStruct.Create;
     isoDate := '19700101';
 
     isoTime := '000000';
-    tz      := 'UTC';
+    tz      := '+0000';
 
     epoch  := 0;
-    julian := 2440587.5;
+    julianDate := 2440587.5;
     day    := 4;
     
-    iso8601 := concat(isoDate, 'T', isoTime, tz);
-    log.debug('TDateStruct: ISO date-time= ', iso8601);
-    TryISO8601ToDateTime(iso8601, fpDateTime, false);
-    log.debug('TDateStruct: fpDateTime= ', fpDateTime);
+    iso8601 := concat(isoDate, 'T', isoTime);
+    fpDateTime := ISO8601ToDate(iso8601, false);
   end;
+
 
 destructor TDateStruct.Destroy;
   begin
@@ -170,7 +169,7 @@ constructor TDateStruct.CreateFromISO(dtString : String);
     then
       tz := Copy (dtString, 16, length(dtString) );
 
-    fpDateTime := ISO8601ToDateTime(dtString, false);
+    fpDateTime := ISO8601ToDate(dtString, false);
 
     julianDate := DateTimeToJulianDate(fpDateTime);
     epoch      := DateTimeToUnix(fpDateTime);
@@ -194,7 +193,7 @@ constructor TDateStruct.CreateFromWords(yyyy, mm, dd,
     lIsoTime := time2Str(hh, nn, ss, FALSE);
     
     lIsoDateTime := concat(isoDate, 'T', isoTime);
-    initFromISO(lIsoDateTime);
+    CreateFromISO(lIsoDateTime);
   end;
 
 
@@ -216,7 +215,7 @@ procedure TDateStruct.dtStr2Obj(dtString : String);
     log.debug('dtStr2Obj date ' + isoDate);
     //log.debug('dtStr2Obj time ' + isoTime);
 
-    jd := CalcJulianDate;
+    CalcJulianDate;
     calcEpoch;
 
     dayOfWeek;
@@ -347,8 +346,7 @@ procedure TDateStruct.calcEpoch;
   end;
 
 
-function TDateStruct.CalcJulianDate
-        : Double;
+procedure TDateStruct.CalcJulianDate;
   var
     y, m, d  : double;
 
@@ -380,16 +378,14 @@ function TDateStruct.CalcJulianDate
     writeln('part4 : ', part4:20:10);
     *)
 
-    julian := part1 + part2 - part3 + part4;
+    julianDate := part1 + part2 - part3 + part4;
 
     (* Julian day is based on midday so if the hour is less than 12 it is the previous day. *)
     if (getHrFromIso < 12)
     then
-      julian := julian - 0.5;
+      julianDate := julianDate - 0.5;
 
-    log.debug('Julian date is ', julian);
-    julianDate := julian;
-
+    log.debug('Julian date is ', julianDate);
   end;
 
 

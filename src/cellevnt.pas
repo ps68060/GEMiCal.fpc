@@ -7,7 +7,7 @@ interface
 
   uses
     Objects,
-    DateStruct;
+    DateStrc;
 
   type
     TCellEvent = class
