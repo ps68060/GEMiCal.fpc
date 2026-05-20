@@ -151,9 +151,9 @@ destructor TDateStruct.Destroy;
 
 constructor TDateStruct.CreateFromISO(dtString : String);
   (* Purpose : Initialise the TDateStruct from an ISO8601 date-time string
-   * dtString : ISO8601 format used in ical/ics
-   *            YYYYMMDDThhnnss
-   *            where the date and time are separated by a 'T' and the time is in 24 hour format.
+   *   dtString : ISO8601 format used in ical/ics
+   *              YYYYMMDDThhnnss
+   *              where the date and time are separated by a 'T' and the time is in 24 hour format.
    *)
   var
    jd     : Double;
@@ -161,7 +161,7 @@ constructor TDateStruct.CreateFromISO(dtString : String);
   begin
     log.level := LLINFO;
 
-    log.debug('INIT from ISO date-time  ' + dtString);
+    log.debug('CREATE from ISO date-time  ' + dtString);
 
     isoDate := Copy(dtString, 1, 8);
     isoTime := Copy(dtString, 10, 6);
@@ -170,10 +170,15 @@ constructor TDateStruct.CreateFromISO(dtString : String);
     then
       tz := Copy (dtString, 16, length(dtString) );
 
-    jd := CalcJulianDate;
-    calcEpoch;
-    dayOfWeek;
+    fpDateTime := ISO8601ToDateTime(dtString, false);
 
+    julianDate := DateTimeToJulianDate(fpDateTime);
+    epoch      := DateTimeToUnix(fpDateTime);
+    day        := DayOfTheWeek(fpDateTime);
+
+    log.debug('TDateStruct: epoch= ', epoch);
+    log.debug('TDateStruct: julianDate= ', julianDate);
+    log.debug('TDateStruct: day= ', day);
   end;
 
 
