@@ -386,7 +386,7 @@ end;
 
 procedure LoadCal;
 (*
- * PURPOSE: Load all the *.ics files in directory.
+ * Purpose: Load all the *.ics files in directory.
  *)
 begin
   log.level := LLINFO;
@@ -405,7 +405,7 @@ end;
 
 procedure FilterCal(dtStr : String);
 (*
- * PURPOSE: Get the events for the date.
+ * Purpose: Get the events for the date.
  *)
 begin
   log.level := LLDEBUG;

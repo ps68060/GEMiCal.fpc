@@ -57,7 +57,7 @@ function INTEGER_TO_CHAR (     Value      : INTEGER;
                            var Conversion : CHAR )
         : Boolean;
 
-(* PURPOSE : Converts a single integer into a character representation
+(* Purpose : Converts a single integer into a character representation
  *)
 
 begin
@@ -78,7 +78,7 @@ function CHAR_TO_INTEGER (     Character  : CHAR;
                            var Conversion : INTEGER )
         : Boolean;
 
-(* PURPOSE : Converts a single character into an integer representation
+(* Purpose : Converts a single character into an integer representation
  *)
 
 begin
