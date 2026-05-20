@@ -12,7 +12,7 @@ interface
     Objects,
 
     Cal,
-    DateTime,
+    DateStruct,
     CalCell;
 
   const
@@ -26,10 +26,10 @@ interface
       destructor  Destroy; override;
 
       procedure FilterEvents(cal       : TCal;
-                             calDate   : TDateTime);
+                             calDate   : TDateStruct);
 
       procedure FilterEvent(cal       : TCal;
-                            calDate   : TDateTime;
+                            calDate   : TDateStruct;
                             daysInMon : Integer;
                             e         : Integer);
     end;
@@ -74,7 +74,7 @@ destructor TCellGrid.Destroy;
 
 
 procedure TCellGrid.FilterEvents(cal       : TCal;
-                                 calDate   : TDateTime);
+                                 calDate   : TDateStruct);
 
   (* Purpose : Decide which Events should be displayed in the month
    *           cal     = iCal calendar
@@ -82,7 +82,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
    *)
 
   var
-    endMonthDate : TDateTime;
+    endMonthDate : TDateStruct;
     daysInMon    : Integer;
 
     i            : Integer;
@@ -99,7 +99,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
     dtStr := date2Str(calDate.getYYYYFromIso, calDate.getMMFromIso, daysInMon, FALSE);
     log.debug('CELLGRID.FilterEvents dtStr ', dtStr);
 
-    endMonthDate := TDateTime.create;
+    endMonthDate := TDateStruct.create;
     endMonthDate.dtStr2Obj(dtStr);
 
     log.debug('CELLGRID.FilterEvents  1st epoch ', calDate.epoch);
@@ -126,7 +126,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
 
 
 procedure TCellGrid.FilterEvent(cal       : TCal;
-                                calDate   : TDateTime;
+                                calDate   : TDateStruct;
                                 daysInMon : Integer;
                                 e         : Integer);
 

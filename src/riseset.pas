@@ -11,7 +11,7 @@ interface
 
 
   procedure sunRiseSet (lat, lng, UTCoff : Real;
-                        date : TDateTime;
+                        date : TDateStruct;
                       var sunrise,
                           sunset  : String);
 
@@ -19,7 +19,7 @@ implementation
 
 
 procedure sunRiseSet (lat, lng, UTCoff : Real;
-                      date : TDateTime;
+                      date : TDateStruct;
                       var sunrise,
                           sunset  : String);
 

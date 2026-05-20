@@ -168,7 +168,7 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    myApplication.winCal^.calDate := TDateTime.create;
+    myApplication.winCal^.calDate := TDateStruct.create;
     myApplication.winCal^.calDate.dtStr2Obj(dtStr);
     log.DEBUG('calDate = ', myApplication.winCal^.calDate.getYYYYFromIso);
 
@@ -415,7 +415,7 @@ begin
 //  then
 //    myApplication.winCal^.calDate.free;
 
-//  myApplication.winCal^.calDate := TDateTime.create;
+//  myApplication.winCal^.calDate := TDateStruct.create;
 //  myApplication.winCal^.calDate.dtStr2Obj(dtStr);
 
   log.debug('FilterCal: dtStr ', myApplication.winCal^.calDate.getYYYYFromIso );

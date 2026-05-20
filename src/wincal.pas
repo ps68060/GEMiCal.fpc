@@ -13,7 +13,7 @@ interface
 
     Config,
     CellGrid,
-    DateTime;
+    DateStruct;
 
 {$I gemical.i}
 
@@ -33,7 +33,7 @@ type
                     cellHeight : integer;
 
                 public
-                   calDate : TDateTime;
+                   calDate : TDateStruct;
                    conf    : TConfig;
 
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
@@ -82,7 +82,7 @@ const
 
 var
   daysInMon    : integer;
-  endMonthDate : TDateTime;
+  endMonthDate : TDateStruct;
 
 (*
 constructor TWinCal.Init(AParent: PWindow;  ATitle: string);
@@ -290,7 +290,7 @@ var
   hAlign,
   vAlign     : SmallInt;
 
-  todayDate  : TDateTime;
+  todayDate  : TDateStruct;
 
   year,
   month,
@@ -343,7 +343,7 @@ begin
           time2Str(hour, minute, second, TRUE) );
 
   (* Sunrise and Sunset *)
-  todayDate := TDateTime.create;
+  todayDate := TDateStruct.create;
   todayDate.dtStr2Obj(dtStr);
 log.debug('DrawTitle: date 8', dtStr);
 

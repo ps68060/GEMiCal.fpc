@@ -12,7 +12,7 @@ unit Event;
 interface
   uses
     Objects,
-    DateTime;
+    DateStruct;
 
 
 type
@@ -27,8 +27,8 @@ type
     dtEndTz     : String;
     location    : String;
 
-    startDate   : TDateTime;
-    endDate     : TDateTime;
+    startDate   : TDateStruct;
+    endDate     : TDateStruct;
 
     alarmAction      : String;
     alarmTrigger     : String;
@@ -88,8 +88,8 @@ constructor TEvent.create;
     alarmTrigger     := '';
     alarmDescription := '';
 
-    startDate := TDateTime.create;
-    endDate   := TDateTime.create;
+    startDate := TDateStruct.create;
+    endDate   := TDateStruct.create;
   end;
 
 destructor TEvent.destroy;
@@ -306,14 +306,14 @@ function TEvent.isMonthEvent (y, m : Word)
 
   var
     pStart,
-    pEnd   : TDateTime;
+    pEnd   : TDateStruct;
 
     daysInMon : Integer;
 
   begin
     isMonthEvent := FALSE;
 
-    pStart := TDateTime.create;
+    pStart := TDateStruct.create;
     pStart.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
 
     daysInMon := daysMon[m];
@@ -321,7 +321,7 @@ function TEvent.isMonthEvent (y, m : Word)
     then
       daysInMon := 29;
 
-    pEnd := TDateTime.create;
+    pEnd := TDateStruct.create;
     pEnd.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
 
     (* Does the event start/end overlap with the period start/end ? *)

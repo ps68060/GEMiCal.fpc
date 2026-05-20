@@ -7,14 +7,14 @@ interface
 
   uses
     Objects,
-    DateTime;
+    DateStruct;
 
   type
     TCellEvent = class
       summary   : String;
       location  : String;
-      timeStart : TDateTime;
-      timeEnd   : TDateTime;
+      timeStart : TDateStruct;
+      timeEnd   : TDateStruct;
 
       constructor Create;
       destructor  Destroy; override;
@@ -28,8 +28,8 @@ implementation
     summary   := '';
     location  := '';
 
-    timeStart := TDateTime.create;
-    timeEnd   := TDateTime.create;
+    timeStart := TDateStruct.create;
+    timeEnd   := TDateStruct.create;
 
   end;
 

@@ -11,7 +11,7 @@ unit IcsAlarm;
 interface
   uses
     Objects,
-    DateTime;
+    DateStruct;
 
 type
   TAlarm = class(TObject)

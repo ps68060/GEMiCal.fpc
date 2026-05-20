@@ -1,11 +1,12 @@
 {$I projopts.i}
 {$mode objfpc}
 
-unit datetime;
+unit
+  DateStruct;
 
 (* AUTHOR  : P SLEGG
    DATE    : 17th May 2020 Version 1
-   PURPOSE : TDateTime object for the parsed an converted ICS Event.
+   PURPOSE : TDateStruct object for the parsed an converted ICS Event.
 *)
 
 interface
@@ -36,22 +37,23 @@ const
          = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
 
 type
-  TDateTime = class
-    tz      : String;
+  TDateStruct = class
+    fpDateTime : TDateTime;
+    tz         : String;
 
-    isoDate : String;
-    isoTime : String;
-    epoch   : LongInt;
-    julian  : Double;
+    isoDate    : String;
+    isoTime    : String;
+    epoch      : LongInt;
+    julianDate : Double;
 
     day     : Integer;
 
-    constructor create;
-    destructor  destroy; override;
+    constructor Create;
+    destructor  Destroy; override;
 
-    constructor initFromISO(dtString : String);
+    constructor CreateFromISO(dtString : String);
 
-    constructor initFromWords(yyyy, mm, dd,
+    constructor CreateFromWords(yyyy, mm, dd,
                               hh, nn, ss : Word);
 
 
@@ -77,7 +79,7 @@ type
 
     procedure calcEpoch;
 
-    function julianDate
+    function CalcJulianDate
             : Double;
 
     procedure dayOfWeek;
@@ -111,7 +113,7 @@ type
   function isLeapDay(y : Integer)
           : Boolean;
 
-  function daysInMonth(myDate : TDateTime)
+  function daysInMonth(myDate : TDateStruct)
           :Integer;
 
 
@@ -121,32 +123,44 @@ uses
     Logger,
     StrSubs;
 
-constructor TDateTime.create;
+constructor TDateStruct.Create;
+  var
+    iso8601 : String;
+
   begin
     isoDate := '19700101';
 
     isoTime := '000000';
-    tz   := 'UTC';
+    tz      := 'UTC';
 
     epoch  := 0;
     julian := 2440587.5;
     day    := 4;
+    
+    iso8601 := concat(isoDate, 'T', isoTime, tz);
+    log.debug('TDateStruct: ISO date-time= ', iso8601);
+    TryISO8601ToDateTime(iso8601, fpDateTime, false);
+    log.debug('TDateStruct: fpDateTime= ', fpDateTime);
   end;
 
-destructor TDateTime.destroy;
+destructor TDateStruct.Destroy;
   begin
     inherited destroy;
   end;
 
 
-constructor TDateTime.initFromISO(dtString : String);
+constructor TDateStruct.CreateFromISO(dtString : String);
+  (* Purpose : Initialise the TDateStruct from an ISO8601 date-time string
+   * dtString : ISO8601 format used in ical/ics
+   *            YYYYMMDDThhnnss
+   *            where the date and time are separated by a 'T' and the time is in 24 hour format.
+   *)
   var
-   date2     : Double;
+   jd     : Double;
 
   begin
     log.level := LLINFO;
 
-    // ISO format YYYY-MM-DDTHH:MM:SS
     log.debug('INIT from ISO date-time  ' + dtString);
 
     isoDate := Copy(dtString, 1, 8);
@@ -156,14 +170,14 @@ constructor TDateTime.initFromISO(dtString : String);
     then
       tz := Copy (dtString, 16, length(dtString) );
 
-    date2 := julianDate;
+    jd := CalcJulianDate;
     calcEpoch;
     dayOfWeek;
 
   end;
 
 
-constructor TDateTime.initFromWords(yyyy, mm, dd,
+constructor TDateStruct.CreateFromWords(yyyy, mm, dd,
                                       hh, nn, ss : Word);
   var
     lIsoDate : String;
@@ -179,9 +193,9 @@ constructor TDateTime.initFromWords(yyyy, mm, dd,
   end;
 
 
-procedure TDateTime.dtStr2Obj(dtString : String);
+procedure TDateStruct.dtStr2Obj(dtString : String);
   var
-   date2 : Double;
+   jd : Double;
 
   begin
     log.level := LLDEBUG;
@@ -197,18 +211,15 @@ procedure TDateTime.dtStr2Obj(dtString : String);
     log.debug('dtStr2Obj date ' + isoDate);
     //log.debug('dtStr2Obj time ' + isoTime);
 
-    date2 := julianDate;
-    //writeln('JDN      ', date2:12:2 );
-
+    jd := CalcJulianDate;
     calcEpoch;
-    //writeln('epoch = ', epoch);
 
     dayOfWeek;
 
   end;
 
 
-function TDateTime.getYYYYFromIso
+function TDateStruct.getYYYYFromIso
         : Integer;
   var
     code  : Integer;
@@ -227,7 +238,7 @@ function TDateTime.getYYYYFromIso
   end;
 
 
-function TDateTime.getMMFromIso
+function TDateStruct.getMMFromIso
         : Integer;
   var
     code   : Integer;
@@ -244,7 +255,7 @@ function TDateTime.getMMFromIso
   end;
 
 
-function TDateTime.getDDFromIso
+function TDateStruct.getDDFromIso
         : Integer;
   var
     code   : Integer;
@@ -261,7 +272,7 @@ function TDateTime.getDDFromIso
   end;
 
 
-function TDateTime.getHrFromIso
+function TDateStruct.getHrFromIso
         : Integer;
   var
     code   : Integer;
@@ -278,7 +289,7 @@ function TDateTime.getHrFromIso
   end;
 
 
-function TDateTime.getMinFromIso
+function TDateStruct.getMinFromIso
         : Integer;
   var
     code   : Integer;
@@ -295,7 +306,7 @@ function TDateTime.getMinFromIso
   end;
 
 
-function TDateTime.getSecFromIso
+function TDateStruct.getSecFromIso
         : Integer;
   var
     code   : Integer;
@@ -313,7 +324,7 @@ function TDateTime.getSecFromIso
 
 
 
-procedure TDateTime.calcEpoch;
+procedure TDateStruct.calcEpoch;
   const
     epochJD = 2440587.50;  (*  1970/01/01 00:00:00 *)
 
@@ -331,7 +342,7 @@ procedure TDateTime.calcEpoch;
   end;
 
 
-function TDateTime.julianDate
+function TDateStruct.CalcJulianDate
         : Double;
   var
     y, m, d  : double;
@@ -377,7 +388,7 @@ function TDateTime.julianDate
   end;
 
 
-procedure TDateTime.dayOfWeek;
+procedure TDateStruct.dayOfWeek;
   var
     t : array [0..11] of Integer;
     lyyyy,
@@ -417,7 +428,7 @@ procedure TDateTime.dayOfWeek;
   end;
 
 
-procedure TDateTime.writeDT;
+procedure TDateStruct.writeDT;
   begin
     writeln(isoDate, ' ',
             isoTime,
@@ -426,7 +437,7 @@ procedure TDateTime.writeDT;
   end;
 
 
-function TDateTime.humanDateTime
+function TDateStruct.humanDateTime
         : String;
   var
     thisDate,
@@ -652,7 +663,7 @@ function isLeapDay(y : Integer)
   end;
 
 
-function daysInMonth(myDate : TDateTime)
+function daysInMonth(myDate : TDateStruct)
         :Integer;
   (* Purpose : Calculate date of end of month *)
 
@@ -665,7 +676,7 @@ function daysInMonth(myDate : TDateTime)
   end;
 
 
-function TDateTime.isAllDay
+function TDateStruct.isAllDay
         : Boolean;
   (* Purpose : Is this an all day event ? *)
 

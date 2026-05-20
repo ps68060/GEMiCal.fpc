@@ -3,7 +3,7 @@
 unit uatetime;
 
 uses
-  datetime;
+  DateStruct;
 
 implementation
 const
@@ -34,10 +34,10 @@ end;
 
 procedure Test_getYYFromIso;
 var
- dateTime : TDateTime;
+ dateTime : TDateStruct;
 
 begin
-  dateTime := TDateTime.create;
+  dateTime := TDateStruct.create;
 
   dateTime.isoDate := '2026-02-01';
   assertEqual (2026, dateTime.getYYFromISO, 'year 2026');
@@ -51,10 +51,10 @@ end;
 
 procedure Test_getMMFromIso;
 var
- dateTime : TDateTime;
+ dateTime : TDateStruct;
 
 begin
-  dateTime := TDateTime.create;
+  dateTime := TDateStruct.create;
 
   dateTime.isoDate := '2026-02-01';
   assertEqual (28, dateTime.getMMFromISO, '28 days in Feb 2026');
@@ -68,10 +68,10 @@ end;
 
 procedure Test_getDDFromIso;
 var
- dateTime : TDateTime;
+ dateTime : TDateStruct;
 
 begin
-  dateTime := TDateTime.create;
+  dateTime := TDateStruct.create;
 
   dateTime.isoDate := '2026-02-01';
   assertEqual (01, dateTime.getDDFromISO, '1st of Feb 2026');
@@ -85,10 +85,10 @@ end;
 
 procedure Test_getHrFromIso;
 var
- dateTime : TDateTime;
+ dateTime : TDateStruct;
 
 begin
-  dateTime := TDateTime.create;
+  dateTime := TDateStruct.create;
 
   dateTime.isoTime := '16:45:23';
   assertEqual (16, dateTime.getHrFromIso, 'Time = ' + dateTime.isoTime);
@@ -102,10 +102,10 @@ end;
 
 procedure Test_getMinFromIso;
 var
- dateTime : TDateTime;
+ dateTime : TDateStruct;
 
 begin
-  dateTime := TDateTime.create;
+  dateTime := TDateStruct.create;
 
   dateTime.isoTime := '16:45:23';
   assertEqual (45, dateTime.getMinFromIso, 'Time = ' + dateTime.isoTime);
@@ -119,10 +119,10 @@ end;
 
 procedure Test_getSecFromIso;
 var
- dateTime : TDateTime;
+ dateTime : TDateStruct;
 
 begin
-  dateTime := TDateTime.create;
+  dateTime := TDateStruct.create;
 
   dateTime.isoTime := '16:45:23';
   assertEqual (23, dateTime.getSecFromIso, 'Time = ' + dateTime.isoTime);
