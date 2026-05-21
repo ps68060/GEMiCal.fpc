@@ -168,9 +168,12 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
-    myApplication.winCal^.calDate := TDateStruct.create;
-    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
-    log.DEBUG('calDate = ', myApplication.winCal^.calDate.getYYYYFromIso);
+///    myApplication.winCal^.calDate := TDateStruct.create;
+///    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
+///    myApplication.winCal^.calDate := TDateStruct.CreateFromISO(dtStr);
+    myApplication.winCal^.calDate := TDateStruct.CreateFromWords(year, month, 1, 00, 00, 00);
+
+    myApplication.winCal^.calDate.WriteDateStrc;
 
     LoadCal;
 
@@ -404,31 +407,32 @@ end;
 
 
 procedure FilterCal(dtStr : String);
-(*
- * Purpose: Get the events for the date.
- *)
-begin
-  log.level := LLDEBUG;
-  log.debug('FilterCal: dtStr ' + dtStr);
+  (*
+   * Purpose: Get the events for the date.
+   *)
+  begin
+    log.level := LLDEBUG;
+    log.debug('FilterCal: start');
+    log.debug('FilterCal: dtStr ' + dtStr);
 
-//  if (myApplication.winCal^.calDate <> NIL)
-//  then
-//    myApplication.winCal^.calDate.free;
+    if (myApplication.winCal^.calDate <> NIL)
+    then
+      myApplication.winCal^.calDate.free;
 
-//  myApplication.winCal^.calDate := TDateStruct.create;
-//  myApplication.winCal^.calDate.dtStr2Obj(dtStr);
+    myApplication.winCal^.calDate := TDateStruct.create;
+    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
 
-  log.debug('FilterCal: dtStr ', myApplication.winCal^.calDate.getYYYYFromIso );
+    log.debug('FilterCal: date= ', myApplication.winCal^.calDate.humanDateTime);
 
-  if (cellGr <> NIL)
-  then
-    cellGr.Free;
+    if (cellGr <> NIL)
+    then
+      cellGr.Free;
 
-  cellGr := TCellGrid.Create;
-  cellGr.FilterEvents(myApplication.iCal,
+    cellGr := TCellGrid.Create;
+    cellGr.FilterEvents(myApplication.iCal,
                       myApplication.winCal^.calDate);
-  log.debug('FilterCal: done');
+    log.debug('FilterCal: done');
 
-end;
+  end;
 
 end.
