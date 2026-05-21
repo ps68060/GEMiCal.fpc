@@ -219,7 +219,7 @@ begin
 
     myApplication.iCal.Free;
 
-    // todo - is cellGr needed ?
+    //todo - is cellGr needed ?
     if (cellGr <> NIL)
     then
       cellGr.Free;

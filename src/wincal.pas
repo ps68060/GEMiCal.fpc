@@ -33,7 +33,7 @@ type
                     cellHeight : integer;
 
                 public
-                   calDate : TDateStruct;
+                   calDate : TDateTime;
                    conf    : TConfig;
 
                    procedure GetWindowClass(var AWndClass: TWndClass); VIRTUAL;
@@ -145,7 +145,7 @@ begin
     headerHeight := hCell * 2;
 
     cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
-    cellWidth    := (W - X*2) div 7;  // todo - improve calcs
+    cellWidth    := (W - X*2) div 7;  //todo - improve calcs
   end;
 
   Calc(WC_BORDER, Work, Curr)
@@ -309,12 +309,12 @@ var
 begin
   log.level := LLINFO;
 
-  writeln('TITLE DATE = ', calDate.getYYYYFromIso,
-                      '-', calDate.getMMFromIso);
+  writeln('TITLE DATE = ', YearOf(calDate),
+                      '-', MonthOf(calDate));
 
   (* Display the year and month *)
-  str(calDate.getYYYYFromIso, title);
-  title := title + ' ' + mon1[calDate.getMMFromIso];
+  str(YearOf(calDate), title);
+  title := title + ' ' + mon1[MonthOf(calDate)];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wcell, hcell);
   vst_Alignment(vdiHandle, 1, 0, hAlign, vAlign);
@@ -432,7 +432,7 @@ begin
   log.debug('DrawGrid: scroll X ', scrollX);
 
   (* Draw heading line *)
-  pxy[0] := Curr.X;  // todo - fudged to the right
+  pxy[0] := Curr.X;  //todo - fudged to the right
   pxy[2] := Curr.X + (7 * cellWidth);  (* constant X for horizontal line *)
 
   (* Draw horizontal lines for weeks by changing y co-ords *)
@@ -474,9 +474,9 @@ var
   pixX,
   pixY         : SmallInt;
 
-  year,
-  month,
-  day,
+  yearNow,
+  monthNow,
+  dateNow,
   dayOfWeek    : Word;
 
   currentMonth : Boolean;
@@ -498,39 +498,35 @@ begin
   scrollX := Scroller^.GetXOrg;
   scrollY := Scroller^.GetYOrg;
 
-  log.debug ('year ', calDate.getYYYYFromIso );
-  log.debug (mon1[calDate.getMMFromIso] );
+  log.debug ('year ', YearOf(calDate) );
+  log.debug (mon1[MonthOf(calDate)] );
 
   (* Get today's date and check if displaying current month *)
-  GetDate (year, month, day, dayOfWeek);
+  GetDate (yearNow, monthNow, dateNow, dayOfWeek);
 
 log.debug('WriteDates: 1');
-  CalcCellGrid (calDate.day, day, row, col);
+  CalcCellGrid (DayOf(calDate), dateNow, row, col);
 log.debug('WriteDates: 2');
 
   currentMonth := FALSE;
-  if     (calDate.getYYYYFromIso = year)
-     and (calDate.getMMFromIso   = month)
+  if     (YearOf(calDate)  = yearNow)
+     and (MonthOf(calDate) = monthNow)
   then
     currentMonth := TRUE;
 log.debug('WriteDates: 3');
-
-  (* Calculate date of end of month *)
-  daysInMon := daysInMonth(calDate);
-log.debug('WriteDates: 4');
 
   (* Set the font to get the dimensions *)
   vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
   (* Display the dates, highlighting today *)
-  for i := 1 to daysInMon do
+  for i := 1 to DaysInMonth(calDate) do
   begin
     CalcCellGrid (calDate.day, i, row, col);
     CalcPos  (row, col, pixX, pixY);
 writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
     if (currentMonth)
-       and (i = day)
+       and (i = dateNow)
     then
     begin
       (* Highlight today *)

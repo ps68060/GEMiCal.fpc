@@ -74,7 +74,7 @@ destructor TCellGrid.Destroy;
 
 
 procedure TCellGrid.FilterEvents(cal       : TCal;
-                                 calDate   : TDateStruct);
+                                 calDate   : TDateTime);
 
   (* Purpose : Decide which Events should be displayed in the month
    *           cal     = iCal calendar
@@ -83,10 +83,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
 
   var
     endMonthDate : TDateStruct;
-    daysInMon    : Integer;
-
     i            : Integer;
-
     dtStr        : String;
 
   begin
@@ -94,23 +91,21 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
     log.debug ('CELLGRID.FilterEvents');
 
     (* Calculate date of end of month *)
-    daysInMon := daysInMonth(calDate);
+    dtStr := date2Str(YearOf(calDate), MonthOf(calDate), DaysInMonth(calDate), FALSE);
+    log.debug('CELLGRID.FilterEvents end of Month ', dtStr);
 
-    dtStr := date2Str(calDate.getYYYYFromIso, calDate.getMMFromIso, daysInMon, FALSE);
-    log.debug('CELLGRID.FilterEvents dtStr ', dtStr);
+    endMonthDate := TDateStruct.createFromIso(dtStr);
+//    endMonthDate.dtStr2Obj(dtStr);
 
-    endMonthDate := TDateStruct.create;
-    endMonthDate.dtStr2Obj(dtStr);
-
-    log.debug('CELLGRID.FilterEvents  1st epoch ', calDate.epoch);
-    log.debug('CELLGRID.FilterEvents last epoch ', endMonthDate.epoch);
+    log.debug('CELLGRID.FilterEvents  1st epoch= ', DateTimeToUnix(calDate) );
+    log.debug('CELLGRID.FilterEvents last epoch= ', DateTimeToUnix(endMonthDate) );
 
     for i := 0 to cal.entries do
     begin
 
-      (*  calDate is 1st of month *)
-      if      (cal.eventList[i].startDate.epoch < endMonthDate.epoch)
-          and (    (cal.eventList[i].endDate.epoch   > calDate.epoch)
+      (*  calDate is date of month to be displayed *)
+      if      (cal.eventList[i].startDate.epoch < DateTimeToUnix(endMonthDate) )
+          and (    (cal.eventList[i].endDate.epoch   > DateTimeToUnix(calDate) )
                 or (cal.eventList[i].endDate.epoch = 0) )
       then
       begin
@@ -126,7 +121,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
 
 
 procedure TCellGrid.FilterEvent(cal       : TCal;
-                                calDate   : TDateStruct;
+                                calDate   : TDateTime;
                                 daysInMon : Integer;
                                 e         : Integer);
 
@@ -158,7 +153,7 @@ procedure TCellGrid.FilterEvent(cal       : TCal;
     log.debug ('FilterEvent: event lasts ', daysBetween);
 
     (* Does the event Start in the displayed month ? *)
-    if (cal.eventList[e].startDate.getMMFromIso = calDate.getMMFromIso)
+    if (cal.eventList[e].startDate.getMMFromIso = MonthOf(calDate) )
     then
       sDate := cal.eventList[e].startDate.getDDFromIso
     else
@@ -167,7 +162,7 @@ procedure TCellGrid.FilterEvent(cal       : TCal;
     allDay := cal.eventList[e].endDate.isAllDay;
 
     (* Does the event End after the displayed month ? *)
-    if (cal.eventList[e].endDate.getMMFromIso > calDate.getMMFromIso)
+    if (cal.eventList[e].endDate.getMMFromIso > MonthOf(calDate) )
     then
       eDate := daysInMon
 
