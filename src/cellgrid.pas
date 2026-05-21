@@ -20,7 +20,7 @@ interface
 
   type
     TCellGrid = class
-      cell    : array [1..NUMCELLS] of TCalCell;
+      calCell    : array [1..NUMCELLS] of TCalCell;
 
       constructor Create;
       destructor  Destroy; override;
@@ -53,7 +53,7 @@ constructor TCellGrid.Create;
     for i := 1 to NUMCELLS
     do
     begin
-      cell[i] := TCalCell.Create;
+      calCell[i] := TCalCell.Create;
     end;
 
   end;
@@ -66,7 +66,7 @@ destructor TCellGrid.Destroy;
     for i := 1 to NUMCELLS
     do
     begin
-      cell[i].Free;
+      calCell[i].Free;
     end;
 
     inherited Destroy;
@@ -185,27 +185,29 @@ procedure TCellGrid.FilterEvent(cal       : TCal;
     do
     begin
       log.debug ('FilterEvent: event date ',  + j);
-      log.debug ('FilterEvent: slot ', cell[j].counter);
+      log.debug ('FilterEvent: slot ', calCell[j].counter);
+      
+      cal.eventList[e].writeEvent;
 
-      (* Abbreviate the Event summary and place it in a slot in the Cell *)
+      (* Abbreviate the Event summary and place it in a slot in the calCell *)
       summ  := Copy (cal.eventList[e].summary,  1, SUMMARY_LEN);
       locat := Copy (cal.eventList[e].location, 1, SUMMARY_LEN);
 
-      cell[j].cellEvents[cell[j].counter]
+      calCell[j].cellEvents[calCell[j].counter]
                   .summary   := summ;
 
-      cell[j].cellEvents[cell[j].counter]
+      calCell[j].cellEvents[calCell[j].counter]
                   .location  := locat;
 
-      cell[j].cellEvents[cell[j].counter]
+      calCell[j].cellEvents[calCell[j].counter]
                   .timeStart.dtStr2Obj(cal.eventList[e].dtStart);
 
       log.debug( 'FilterEvent: Summary ' +
-                 cell[j].cellEvents[cell[j].counter].summary );
+                 calCell[j].cellEvents[calCell[j].counter].summary );
 
-      cell[j].eventNum := e;
+      calCell[j].eventNum := e;
 
-      inc (cell[j].counter );
+      inc (calCell[j].counter );
     end;
 
   end;
