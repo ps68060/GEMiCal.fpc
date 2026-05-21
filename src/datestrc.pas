@@ -468,16 +468,16 @@ function date2Str(year, month, day : Word;
     if (human)
     then
     begin
-      dtStr := Str(trunc(year ) ) + '.';
-      dtStr := dtStr + LPad( Str(trunc(month) ), 2, '0' ) + '.';
-      dtStr := dtStr + LPad( Str(trunc(day)   ), 2, '0' );
+      dtStr := IntToStr(trunc(year ) ) + '.';
+      dtStr := dtStr + LPad( IntToStr(trunc(month) ), 2, '0' ) + '.';
+      dtStr := dtStr + LPad( IntToStr(trunc(day)   ), 2, '0' );
     end
 
     else
     begin
-      dtStr := Str(trunc(year ) );
-      dtStr := dtStr + LPad( Str(trunc(month) ), 2, '0' );
-      dtStr := dtStr + LPad( Str(trunc(day)   ), 2, '0' );
+      dtStr := IntToStr(trunc(year ) );
+      dtStr := dtStr + LPad( IntToStr(trunc(month) ), 2, '0' );
+      dtStr := dtStr + LPad( IntToStr(trunc(day)   ), 2, '0' );
     end;
 
     date2Str := dtStr;
@@ -499,16 +499,16 @@ function time2Str(hour, minute, second : Word;
     then
     begin
       log.debug('human format');
-      tmStr :=         LPad( Str(trunc(hour  ) ), 2, '0' ) + ':';
-      tmStr := tmStr + LPad( Str(trunc(minute) ), 2, '0' ) + ':';
-      tmStr := tmStr + LPad( Str(trunc(second) ), 2, '0' );
+      tmStr :=         LPad( IntToStr(trunc(hour  ) ), 2, '0' ) + ':';
+      tmStr := tmStr + LPad( IntToStr(trunc(minute) ), 2, '0' ) + ':';
+      tmStr := tmStr + LPad( IntToStr(trunc(second) ), 2, '0' );
     end
 
     else
     begin
-      tmStr :=         LPad( Str(trunc(hour  ) ), 2, '0' );
-      tmStr := tmStr + LPad( Str(trunc(minute) ), 2, '0' );
-      tmStr := tmStr + LPad( Str(trunc(second) ), 2, '0' );
+      tmStr :=         LPad( IntToStr(trunc(hour  ) ), 2, '0' );
+      tmStr := tmStr + LPad( IntToStr(trunc(minute) ), 2, '0' );
+      tmStr := tmStr + LPad( IntToStr(trunc(second) ), 2, '0' );
     end;
 
     (*writeln(tmStr); *)

@@ -57,163 +57,174 @@ uses
     Dos;
 
 constructor TLogger.Create(msgLevel : TLogLevel);
-begin
-  inherited Create;
-  level := msgLevel;
-  (*writeln ('LOGGER ' + 'initiated'); *)
-end;
+  begin
+    inherited Create;
+    level := msgLevel;
+    (*writeln ('LOGGER ' + 'initiated'); *)
+  end;
 
 
 destructor TLogger.Destroy;
-begin
-  inherited Destroy;
-end;
+  begin
+    inherited Destroy;
+  end;
 
 
 procedure TLogger.log(msgLevel : TLogLevel;
                       message  : String);
-var
-  year,
-  month,
-  day,
-  dayOfWeek    : Word;
+  var
+    year,
+    month,
+    day,
+    dayOfWeek    : Word;
 
-begin
-  (*writeln (ord(level), ' ; ', ord(msgLevel) );*)
-
-  if (ord(level) >= ord(msgLevel) )
-  then
   begin
-    (* Get today's date *)
-    GetDate (year, month, day, dayOfWeek);
-    writeln(msgLevel, ': ', message);
-  end;
+    (*writeln (ord(level), ' ; ', ord(msgLevel) );*)
 
-end;
+    if (ord(level) >= ord(msgLevel) )
+    then
+    begin
+      (* Get today's date *)
+      GetDate (year, month, day, dayOfWeek);
+      writeln(msgLevel, ': ', message);
+    end;
+  end;
 
 // ----- INFO
 
 procedure TLogger.info(const message  : ShortString);
-begin
-  (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
-  log(LLINFO, message);
-end;
+  begin
+    (**  writeln (ord(level), ' ; ', ord(msgLevel) );**)
+    log(LLINFO, message);
+  end;
 
 procedure TLogger.info(const message  : ShortString; value : integer);
-begin
-  log(LLINFO, message + ': ' + Str(value));
-end;
+  var
+    s : Shortstring;
+  begin
+    str(value, s);
+    log(LLINFO, message + ': ' + s);
+  end;
 
 procedure TLogger.info(const message  : ShortString; value : boolean);
-begin
-  if value
-  then
-    log(LLINFO, message + ': TRUE')
-  else
-    log(LLINFO, message + ': FALSE');
-end;
+  begin
+    if value
+    then
+      log(LLINFO, message + ': TRUE')
+    else
+      log(LLINFO, message + ': FALSE');
+  end;
 
 procedure TLogger.info(const message  : ShortString; value : real);
-var
-  s : Shortstring;
-begin
-  str(value:0:6, s);
-  log(LLINFO, message + ': ' + s);
-end;
+  var
+    s : Shortstring;
+  begin
+    str(value:0:6, s);
+    log(LLINFO, message + ': ' + s);
+  end;
 
 procedure TLogger.info(const message : ShortString; const value : Shortstring);
-begin
-  log(LLINFO, message + ': ' + value);
-end;
+  begin
+    log(LLINFO, message + ': ' + value);
+  end;
 
 // ----- DEBUG
 
 procedure TLogger.debug(const message : ShortString);
-begin
-  log(LLDEBUG, message);
-end;
+  begin
+    log(LLDEBUG, message);
+  end;
 
 procedure TLogger.debug(const message  : ShortString; value : integer);
-begin
-  log(LLDEBUG, message + ': ' + Str(value));
-end;
+  var
+    s : Shortstring;
+  begin
+    str(value, s);
+    log(LLDEBUG, message + ': ' + s);
+  end;
 
 procedure TLogger.debug(const message : ShortString; value : boolean);
-begin
-  if value
-  then
-    log(LLDEBUG, message + ': TRUE')
-  else
-    log(LLDEBUG, message + ': FALSE');
-end;
+  begin
+    if value
+    then
+      log(LLDEBUG, message + ': TRUE')
+    else
+      log(LLDEBUG, message + ': FALSE');
+  end;
 
 procedure TLogger.debug(const message: ShortString; value : real);
-var
-  s : Shortstring;
-begin
-  str(value:0:6, s);
-  log(LLDEBUG, message + ': ' + s);
-end;
+  var
+    s : Shortstring;
+  begin
+    str(value:0:6, s);
+    log(LLDEBUG, message + ': ' + s);
+  end;
 
 procedure TLogger.debug(const message : ShortString; const value : ShortString);
-begin
-  log(LLDEBUG, message + ': ' + value);
-end;
+  begin
+    log(LLDEBUG, message + ': ' + value);
+  end;
 
 // ----- WARN
 
 procedure TLogger.warn(const message : ShortString);
-begin
-  log(LLWARN, message);
-end;
+  begin
+    log(LLWARN, message);
+  end;
 
 procedure TLogger.warn(const message : ShortString; value : integer);
-begin
-  log(LLWARN, message + ': ' + Str(value));
-end;
+  var
+    s : Shortstring;
+  begin
+    str(value, s);
+    log(LLWARN, message + ': ' + s);
+  end;
 
 procedure TLogger.warn(const message : ShortString; value : boolean);
-begin
-  if value
-  then
-    log(LLWARN, message + ': TRUE')
-  else
-    log(LLWARN, message + ': FALSE');
-end;
+  begin
+    if value
+    then
+      log(LLWARN, message + ': TRUE')
+    else
+      log(LLWARN, message + ': FALSE');
+  end;
 
 procedure TLogger.warn(const message : ShortString; value : real);
-var
-  s : ShortString;
-begin
-  str(value:0:6, s);
-  log(LLWARN, message + ': ' + s);
-end;
+  var
+    s : ShortString;
+  begin
+    str(value:0:6, s);
+    log(LLWARN, message + ': ' + s);
+  end;
 
 procedure TLogger.warn(const message : ShortString; const value: ShortString);
-begin
-  log(LLWARN, message + ': ' + value);
-end;
+  begin
+    log(LLWARN, message + ': ' + value);
+  end;
 
-
+// ----- ERROR
 
 procedure TLogger.error(const message : ShortString);
-begin
-  log(LLERROR, message);
-end;
+  begin
+    log(LLERROR, message);
+  end;
 
 procedure TLogger.error(const message : ShortString; value : integer);
-begin
-  log(LLERROR, message + ': ' + Str(value));
-end;
+  var
+    s : Shortstring;
+  begin
+    str(value, s);
+    log(LLERROR, message + ': ' + s);
+  end;
 
 procedure TLogger.error(const message : ShortString; value : boolean);
-begin
-  if value
-  then
-    log(LLERROR, message + ': TRUE')
-  else
-    log(LLERROR, message + ': FALSE');
-end;
+  begin
+    if value
+    then
+      log(LLERROR, message + ': TRUE')
+    else
+      log(LLERROR, message + ': FALSE');
+  end;
 
 procedure TLogger.error(const message : ShortString; value : real);
 var

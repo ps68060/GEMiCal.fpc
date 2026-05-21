@@ -13,7 +13,9 @@ interface
 
     Cal,
     DateStrc,
-    CalCell;
+    CalCell,
+    DateUtils,
+    SysUtils;
 
   const
     NUMCELLS  = 31;
@@ -26,10 +28,10 @@ interface
       destructor  Destroy; override;
 
       procedure FilterEvents(cal       : TCal;
-                             calDate   : TDateStruct);
+                             calDate   : TDateTime);
 
       procedure FilterEvent(cal       : TCal;
-                            calDate   : TDateStruct;
+                            calDate   : TDateTime;
                             daysInMon : Integer;
                             e         : Integer);
     end;
@@ -82,7 +84,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
    *)
 
   var
-    endMonthDate : TDateStruct;
+    endMonthDate : TDateTime;
     i            : Integer;
     dtStr        : String;
 
@@ -94,7 +96,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
     dtStr := date2Str(YearOf(calDate), MonthOf(calDate), DaysInMonth(calDate), FALSE);
     log.debug('CELLGRID.FilterEvents end of Month ', dtStr);
 
-    endMonthDate := TDateStruct.createFromIso(dtStr);
+    endMonthDate := ISO8601ToDate(dtStr);
 //    endMonthDate.dtStr2Obj(dtStr);
 
     log.debug('CELLGRID.FilterEvents  1st epoch= ', DateTimeToUnix(calDate) );
@@ -111,12 +113,10 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
       begin
         log.debug ('CELLGRID: IN Scope', i );
 
-        FilterEvent(cal, calDate, daysInMon, i);
+        FilterEvent(cal, calDate, DaysInMonth(calDate), i);
       end;
 
     end;  (* for *)
-
-    endMonthDate.free;
   end;
 
 

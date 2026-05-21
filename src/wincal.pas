@@ -13,7 +13,9 @@ interface
 
     Config,
     CellGrid,
-    DateStrc;
+    DateStrc,
+    DateUtils,
+    SysUtils;
 
 {$I gemical.i}
 
@@ -313,7 +315,7 @@ begin
                       '-', MonthOf(calDate));
 
   (* Display the year and month *)
-  str(YearOf(calDate), title);
+  Str(YearOf(calDate), title);
   title := title + ' ' + mon1[MonthOf(calDate)];
 
   vst_point(vdiHandle, TITLE_FONT_SIZE, wchar, hchar, wcell, hcell);
@@ -521,7 +523,7 @@ log.debug('WriteDates: 3');
   (* Display the dates, highlighting today *)
   for i := 1 to DaysInMonth(calDate) do
   begin
-    CalcCellGrid (calDate.day, i, row, col);
+    CalcCellGrid (DayOf(calDate), i, row, col);
     CalcPos  (row, col, pixX, pixY);
 writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
 
@@ -534,14 +536,14 @@ writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight,  (* Use char height and not the char cell height *)
-              Str(i) + ' ' + day2[(calDate.day + i - 1) mod 7]);
+              IntToStr(i) + ' ' + day2[(DayOf(calDate) + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight,
-              Str(i) );
+              IntToStr(i) );
   end;
 
 log.debug('WriteDates: exit');
@@ -594,7 +596,7 @@ log.debug('DisplayEvents: 3');
 
   for day := 1 to 31 do
   begin
-    CalcCellGrid (calDate.day, day, row, col);
+    CalcCellGrid (DayOf(calDate), day, row, col);
 log.debug('DisplayEvents: day ', day);
 
     CalcPos(row, col, pixX, pixY);
@@ -602,18 +604,18 @@ log.debug('DisplayEvents: day ', day);
     log.debug ('events: row ', row);
     log.debug ('events: col ', col);
 
-    for i := 0 to cellGr.cell[day].counter - 1 do
+    for i := 0 to cellGr.calCell[day].counter - 1 do
     begin
 log.debug('DisplayEvents: i ', i);
-log.debug('Summary ', cellGr.cell[day].cellEvents[i].summary);
-log.debug('start ', cellGr.cell[day].cellEvents[i].timeStart.humanDateTime);
+log.debug('Summary ', cellGr.calCell[day].cellEvents[i].summary);
+log.debug('start ', cellGr.calCell[day].cellEvents[i].timeStart.humanDateTime);
 
-      summ      := SubStr (cellGr.cell[day].cellEvents[i].summary, 1, 16 );
-      time      := SubStr (cellGr.cell[day].cellEvents[i].timeStart.humanDateTime, 11, 5 );
+      summ      := SubStr (cellGr.calCell[day].cellEvents[i].summary, 1, 16 );
+      time      := SubStr (cellGr.calCell[day].cellEvents[i].timeStart.humanDateTime, 11, 5 );
 
       timePlace := SubStr (Concat(time,
                                   ';',
-                                  cellGr.cell[day].cellEvents[i].location), 1, 16 );
+                                  cellGr.calCell[day].cellEvents[i].location), 1, 16 );
 
       log.debug('Summary  ' + summ );
       log.debug('counter ', i);
