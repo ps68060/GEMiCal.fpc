@@ -168,6 +168,8 @@ begin
     GetDate (year, month, day, dayOfWeek) ;
     dtStr := date2str(year, month, 1, FALSE);
 
+    // calDate holds the date for the displayed calendar month. It is used to filter the events for the month.
+    // Initially set to the current month. It is updated when the user navigates to a different month or year.
 ///    myApplication.winCal^.calDate := TDateStruct.create;
 ///    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
 ///    myApplication.winCal^.calDate := TDateStruct.CreateFromISO(dtStr);
@@ -419,8 +421,9 @@ procedure FilterCal(dtStr : String);
     then
       myApplication.winCal^.calDate.free;
 
-    myApplication.winCal^.calDate := TDateStruct.create;
-    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
+//    myApplication.winCal^.calDate := TDateStruct.create;
+//    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
+    myApplication.winCal^.calDate := TDateStruct.DateFromISO(dtStr);
 
     log.debug('FilterCal: date= ', myApplication.winCal^.calDate.humanDateTime);
 
