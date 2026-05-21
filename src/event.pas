@@ -274,7 +274,7 @@ procedure TEvent.WriteEvent;
 
   begin
     write('Event on     : ');
-    startDate.writeDT;
+    startDate.WriteDateStrc;
 
     WriteNN (summary);
     WriteNN (description);
@@ -285,7 +285,7 @@ procedure TEvent.WriteEvent;
     WriteNN (alarmTrigger);
 
     write('Event ends   : ');
-    endDate.writeDT;
+    endDate.WriteDateStrc;
   end;
 
 
