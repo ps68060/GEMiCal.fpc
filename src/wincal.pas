@@ -538,14 +538,14 @@ writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight,  (* Use char height and not the char cell height *)
-              IntToStr(i) + ' ' + day2[(calDate.day + i - 1) mod 7]);
+              Str(i) + ' ' + day2[(calDate.day + i - 1) mod 7]);
       vst_effects(vdiHandle, TF_NORMAL);
     end
     else
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight,
-              IntToStr(i) );
+              Str(i) );
   end;
 
 log.debug('WriteDates: exit');
