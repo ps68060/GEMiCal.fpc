@@ -101,7 +101,7 @@ end;
 
 procedure TLogger.info(const message  : ShortString; value : integer);
 begin
-  log(LLINFO, message + ': ' + IntToStr(value));
+  log(LLINFO, message + ': ' + Str(value));
 end;
 
 procedure TLogger.info(const message  : ShortString; value : boolean);
@@ -135,7 +135,7 @@ end;
 
 procedure TLogger.debug(const message  : ShortString; value : integer);
 begin
-  log(LLDEBUG, message + ': ' + IntToStr(value));
+  log(LLDEBUG, message + ': ' + Str(value));
 end;
 
 procedure TLogger.debug(const message : ShortString; value : boolean);
@@ -169,7 +169,7 @@ end;
 
 procedure TLogger.warn(const message : ShortString; value : integer);
 begin
-  log(LLWARN, message + ': ' + IntToStr(value));
+  log(LLWARN, message + ': ' + Str(value));
 end;
 
 procedure TLogger.warn(const message : ShortString; value : boolean);
@@ -203,7 +203,7 @@ end;
 
 procedure TLogger.error(const message : ShortString; value : integer);
 begin
-  log(LLERROR, message + ': ' + IntToStr(value));
+  log(LLERROR, message + ': ' + Str(value));
 end;
 
 procedure TLogger.error(const message : ShortString; value : boolean);
