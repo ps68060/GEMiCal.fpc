@@ -78,9 +78,13 @@ destructor TCellGrid.Destroy;
 procedure TCellGrid.FilterEvents(cal       : TCal;
                                  calDate   : TDateTime);
 
-  (* Purpose : Decide which Events should be displayed in the month
+  (* Purpose : Decide which Events should be displayed in the focus month defined by calDate.
    *           cal     = iCal calendar
-   *           calDate = date of 1st of month
+   *           calDate = date of 1st of focus month
+   *
+   *           For each event in the calendar, check if it is in the month to be displayed.
+   *           If it is, then call FilterEvent to get the event details and
+   *           store the events in the cellGrid.
    *)
 
   var
@@ -105,7 +109,7 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
     for i := 0 to cal.entries do
     begin
 
-      (*  calDate is date of month to be displayed *)
+      (*  calDate is 1st date of focus month to be displayed *)
       if      (cal.eventList[i].startDate.epoch < DateTimeToUnix(endMonthDate) )
           and (    (cal.eventList[i].endDate.epoch   > DateTimeToUnix(calDate) )
                 or (cal.eventList[i].endDate.epoch = 0) )
@@ -125,7 +129,14 @@ procedure TCellGrid.FilterEvent(cal       : TCal;
                                 daysInMon : Integer;
                                 e         : Integer);
 
-  (* Purpose : Store a single event in the cellGrid *)
+  (* Purpose : Store a single event in the cellGrid
+   *           cal     = iCal calendar
+   *           calDate = date of 1st of month
+   *           e       = event number in calendar
+   *           Check event, if it starts in the month to be displayed. If not, then use 1st of month as start date.
+   *           Check event, if it ends in the month to be displayed.   If not, then use last day of month as end date.
+   *           Iterate through the days of the event and store the event summary and location in the cellGrid for each day.
+   *)
 
   const
     SUMMARY_LEN = 30;
