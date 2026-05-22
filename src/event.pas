@@ -289,7 +289,7 @@ procedure TEvent.WriteEvent;
   end;
 
 
-function TEvent.isMonthEvent (y, m : Word)
+function TEvent.isMonthEvent(y, m : Word)
         : Boolean;
 
   (* Purpose : Determine if thisEvent falls within the period (month)

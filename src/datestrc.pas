@@ -516,15 +516,15 @@ function time2Str(hour, minute, second : Word;
 
   end;
 
-
+(*
 procedure EpochToYMD(epoch: LongInt;
                      var yy, mm, dd : Integer);
-  (* Purpose : Convert epoch seconds to year, month, day 
+  ( * Purpose : Convert epoch seconds to year, month, day 
    * Standard Gregorian calendar conversion.
    * This uses March as the first month of the year to simplify leap year calculations.
    * epoch zero is 1970-01-01 and 719468 days before that is 0000-03-01.
     * Algorithm from https://howardhinnant.github.io/date_algorithms.html#civil_from_days
-   *)
+   * )
   const
     SECS_PER_DAY = 86400;
     DAY_OFFSET   = 719468;  // days from 0000-03-01 to 1970-01-01
@@ -562,14 +562,15 @@ procedure EpochToYMD(epoch: LongInt;
     end;
 
   end;
+*)
 
-
+(*
 procedure EpochToHMS(epoch : LongInt;
                      var hh,
                          nn,
                          ss : Integer);
-  (* Purpose : Convert epoch seconds to hour, minute, second
-   *)
+  ( * Purpose : Convert epoch seconds to hour, minute, second
+   * )
   var
     tt: LongInt;
 
@@ -582,22 +583,27 @@ procedure EpochToHMS(epoch : LongInt;
     nn := (tt div 60) mod 60;
     ss := tt mod 60;
   end;
-
+*)
 
 function IsoDateFromEpoch(epoch : LongInt)
         : String;
   (* Purpose : Convert epoch seconds to ISO date string YYYY-MM-DD
    *)
   var
-    yy, mm, dd : Integer;
-    hh, nn, ss : Integer;
+//    yy, mm, dd : Integer;
+//    hh, nn, ss : Integer;
+    dateTime : TDateTime;
 
   begin
-    EpochToYMD(epoch, yy, mm, dd);
+    dateTime := UnixToDateTime(epoch);
+    IsoDateFromEpoch := DateTimeToISO8601(dateTime, false);
+    
+(*    EpochToYMD(epoch, yy, mm, dd);
     EpochToHMS(epoch, hh, nn, ss);
 
     IsoDateFromEpoch := Format('%04d-%02d-%02dT%02d:%02d:%02d',
                                 [yy,  mm,  dd,  hh,  nn, ss]);
+*)
   end;
 
 
@@ -668,7 +674,7 @@ function isLeapDay(y : Integer)
   end;
 
 
-function daysInMonth(myDate : TDateStruct)
+(**function daysInMonth(myDate : TDateStruct)
         :Integer;
   (* Purpose : Calculate date of end of month *)
 
@@ -679,7 +685,7 @@ function daysInMonth(myDate : TDateStruct)
     then
       daysInMonth := 29;
   end;
-
+**)
 
 function TDateStruct.isAllDay
         : Boolean;
