@@ -306,34 +306,33 @@ function TEvent.isMonthEvent (y, m : Word)
 
   var
     pStart,
-    pEnd   : TDateStruct;
-
-    daysInMon : Integer;
+    pEnd       : TDateTime;
+    daysInMon  : Integer;
 
   begin
     isMonthEvent := FALSE;
+    daysInMon := DaysInAMonth(y, m)
 
-    pStart := TDateStruct.create;
-    pStart.dtStr2Obj(date2Str(y, m, 1, FALSE) + ' ' + time2Str(0, 0, 0, FALSE) );
+    pStart := ISO8601ToDate(date2Str(y, m, 1,          FALSE) + 'T' + time2Str(0, 0, 0, FALSE) );
+    pEnd   := ISO8601ToDate(date2Str(y, m, daysInMon , FALSE) + 'T' + time2Str(23, 59, 59, FALSE) );
 
-    daysInMon := daysMon[m];
-    if (m = 2) and (isLeapDay(y))
-    then
-      daysInMon := 29;
+    pStartUnix := DateTimeToUnix(pStart);
+    PEndUnix   := DateTimeToUnix(pEnd);
 
-    pEnd := TDateStruct.create;
-    pEnd.dtStr2Obj(date2Str(y, m, daysInMon, FALSE) + ' ' + time2Str(23, 59, 59, FALSE) );
-
-    (* Does the event start/end overlap with the period start/end ? *)
-
-    if      (startDate.epoch > pStart.epoch)
-        and (startDate.epoch < pEnd.epoch)
+    (* Does the event start/end overlap with the period start/end ?
+     *  1: event starts in the month
+     *  2: event ends   in the month
+     *  3: event starts before month and ends after the month
+     *)
+    if      (startDate.epoch > pStartUnix )  // 1a: event starts after 1st of month
+        and (startDate.epoch < pEndUnix )    // 1b: event starts before end of month
       or
-            (endDate.epoch > pStart.epoch)
-        and (endDate.epoch < pEnd.epoch)
+            (endDate.epoch > pStartUnix )    // 2a: event ends after 1st of month
+        and (endDate.epoch < pEndUnix )      // 2b: event ends before end of month
       or
-            (startDate.epoch < pStart.epoch)
-        and (endDate.epoch   > pEnd.epoch)
+            (startDate.epoch < pStartUnix )  // 3a: event starts before 1st of month
+        and (endDate.epoch   > pEndUnix      // 3b: event ends after end of month
+             or endDate.epoch = 0 )          //  or event has no end date
     then
     begin
       isMonthEvent := TRUE;
