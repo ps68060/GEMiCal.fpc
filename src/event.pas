@@ -12,7 +12,8 @@ unit Event;
 interface
   uses
     Objects,
-    DateStrc;
+    DateStrc,
+    DateUtils;
 
 
 type
@@ -45,7 +46,7 @@ type
 
     Procedure WriteEvent;
 
-    Function isMonthEvent (y, m : Word)
+    Function IsMonthEvent (calDate : TDateTime)
             : Boolean;
   end;
 
@@ -195,21 +196,21 @@ function TEvent.GetEvent (VAR calFile : Text)
     if (length(dtStart) > 0)
     then
     begin
-      startDate.dtStr2Obj(dtStart);
+      startDate.CreateFromISO(dtStart);
     end;
 
     if (length(dtEnd) > 0)
     then
     begin
-      endDate.dtStr2Obj(dtEnd);
+      endDate.CreateFromISO(dtEnd);
     end
     else
     begin
-      endDate.dtStr2Obj(dtStart);
+      endDate.CreateFromISO(dtStart);
     end;
 
     GetEvent := TRUE;
-    (*writeEvent;*)
+    writeEvent;
 
   end;
 
@@ -289,15 +290,15 @@ procedure TEvent.WriteEvent;
   end;
 
 
-function TEvent.isMonthEvent(y, m : Word)
+function TEvent.IsMonthEvent(calDate : TDateTime)
         : Boolean;
 
   (* Purpose : Determine if thisEvent falls within the period (month)
    *           There are 4 cases in the period:
-   *           1: overlap start of period
-   *           2: contained within period
-   *           3: overlap end of period
-   *           4: start before, end after period
+   *           1a: overlap start of period
+   *           1b: contained within period
+   *           2a: overlap end of period
+   *           2b: start before, end after period
    *
    *           and 2 cases outside the period:
    *           5: start/end before period
@@ -307,40 +308,50 @@ function TEvent.isMonthEvent(y, m : Word)
   var
     pStart,
     pEnd       : TDateTime;
-    daysInMon  : Integer;
+    
+    pStartUnix,
+    pEndUnix   : Int64;
+
+    daysInMon  : Word;
+
+    startsBeforeMonthEnd,
+    endsAfterMonthStart : Boolean;
 
   begin
     isMonthEvent := FALSE;
-    daysInMon := DaysInAMonth(y, m)
+    daysInMon := DaysInMonth(calDate);
 
-    pStart := ISO8601ToDate(date2Str(y, m, 1,          FALSE) + 'T' + time2Str(0, 0, 0, FALSE) );
-    pEnd   := ISO8601ToDate(date2Str(y, m, daysInMon , FALSE) + 'T' + time2Str(23, 59, 59, FALSE) );
+    pStart := RecodeDay(calDate, 1);
+    pstart := RecodeTime(calDate, 0, 0, 0, 000);
+    
+    pEnd   := RecodeTime(calDate, 23, 59, 59, 999);
+    pEnd   := RecodeDay(calDate, daysInMon);
 
-    pStartUnix := DateTimeToUnix(pStart);
-    PEndUnix   := DateTimeToUnix(pEnd);
+    pStartUnix := DateTimeToUnix(pStart, false);
+    PEndUnix   := DateTimeToUnix(pEnd,   false);
 
     (* Does the event start/end overlap with the period start/end ?
-     *  1: event starts in the month
-     *  2: event ends   in the month
+     *  1: event starts before month end
+     *  2: event ends   after  month start
      *  3: event starts before month and ends after the month
      *)
-    if      (startDate.epoch > pStartUnix )  // 1a: event starts after 1st of month
-        and (startDate.epoch < pEndUnix )    // 1b: event starts before end of month
-      or
-            (endDate.epoch > pStartUnix )    // 2a: event ends after 1st of month
-        and (endDate.epoch < pEndUnix )      // 2b: event ends before end of month
-      or
-            (startDate.epoch < pStartUnix )  // 3a: event starts before 1st of month
-        and (endDate.epoch   > pEndUnix      // 3b: event ends after end of month
-             or endDate.epoch = 0 )          //  or event has no end date
+     
+    (* start before pEnd *)
+    if      (startDate.epoch < pEndUnix )    // 1b: event starts before end of month
+    then 
+      startsBeforeMonthEnd := true;
+
+    (* end after pStart *)
+    if      (endDate.epoch > pStartUnix )    // 2a: event ends after 1st of month
+    then
+      endsAfterMonthStart := true;
+
+    if (startsBeforeMonthEnd and endsAfterMonthStart)// or coversMonth)
     then
     begin
       isMonthEvent := TRUE;
       writeln ('Current event');
     end;
-
-    pStart.free;
-    pEnd.free;
 
   end;
 

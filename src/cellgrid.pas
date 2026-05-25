@@ -12,17 +12,18 @@ interface
     Objects,
 
     Cal,
-    DateStrc,
     CalCell,
+    DateStrc,
     DateUtils,
+    Event,
     SysUtils;
 
   const
-    NUMCELLS  = 31;
+    GRIDDAYS  = 31;
 
   type
     TCellGrid = class
-      calCell    : array [1..NUMCELLS] of TCalCell;
+      calCell    : array [1..GRIDDAYS] of TCalCell;
 
       constructor Create;
       destructor  Destroy; override;
@@ -51,7 +52,7 @@ constructor TCellGrid.Create;
     i : Integer;
 
   begin
-    for i := 1 to NUMCELLS
+    for i := 1 to GRIDDAYS
     do
     begin
       calCell[i] := TCalCell.Create;
@@ -64,7 +65,7 @@ destructor TCellGrid.Destroy;
     i : Integer;
 
   begin
-    for i := 1 to NUMCELLS
+    for i := 1 to GRIDDAYS
     do
     begin
       calCell[i].Free;
@@ -87,29 +88,19 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
    *)
 
   var
-    endMonthDate : TDateTime;
     i            : Integer;
-    dtStr        : String;
 
   begin
-    log.level := LLDEBUG;
+    log.level := LLINFO;
     log.debug ('CELLGRID.FilterEvents');
-
-    (* Calculate date of end of month *)
-    dtStr := date2Str(YearOf(calDate), MonthOf(calDate), DaysInMonth(calDate), FALSE);
-    log.debug('CELLGRID.FilterEvents end of Month ', dtStr);
-
-    endMonthDate := ISO8601ToDate(dtStr);
-//    endMonthDate.dtStr2Obj(dtStr);
-
-    log.debug('CELLGRID.FilterEvents  1st epoch= ', DateTimeToUnix(calDate) );
-    log.debug('CELLGRID.FilterEvents last epoch= ', DateTimeToUnix(endMonthDate) );
 
     for i := 0 to cal.entries do
     begin
+    log.debug('CELLGRID.FilterEvents  1st epoch= ', DateToISO8601(cal.eventList[1].startDate.fpDateTime) );
+    log.debug('CELLGRID.FilterEvents last epoch= ', DateToISO8601(cal.eventList[i].endDate.fpDateTime) );
 
       (*  calDate is 1st date of focus month to be displayed *)
-      if (cal.eventList[i].IsMonthEvent(YearOf(calDate), MonthOf(calDate)))
+      if (cal.eventList[i].IsMonthEvent(calDate) )
       then
       begin
         log.debug ('CELLGRID: IN Scope', i );
@@ -150,7 +141,7 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
     eDate       : Integer;
 
   begin
-    log.level := LLDEBUG;
+    log.level := LLINFO;
     log.debug ('FilterEvent: end date = ' , event.endDate.getDDFromIso);
     log.debug ('FilterEvent: epoch', event.endDate.epoch);
 
@@ -160,7 +151,8 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
     log.debug ('FilterEvent: event lasts ', daysBetween);
 
     (* Does the event Start in the displayed month ? *)
-    if (event.startDate.getMMFromIso = MonthOf(calDate) )
+//    if (event.startDate.getMMFromIso = MonthOf(calDate) )
+    if (IsSameMonth(calDate, event.startDate.fpDateTime) )
     then
       sDate := event.startDate.getDDFromIso
     else
@@ -169,27 +161,24 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
     allDay := event.endDate.isAllDay;
 
     (* Does the event End after the displayed month ? *)
-    if (event.endDate.getMMFromIso > MonthOf(calDate) )
+    if (IsSameMonth(calDate, event.endDate.fpDateTime) )
     then
-      eDate := DaysInMonth(calDate)
-
-    else
       (* All Day events *)
       if     (allDay)
       then
         eDate := sDate
       else
-        eDate := event.endDate.getDDFromIso;
+        eDate := event.endDate.getDDFromIso
+    else
+      eDate := DaysInMonth(calDate);
 
-
-    (* Iterate days and put info into cells. *)
+    (* Iterate days and put Event details into cells. *)
     for j := sDate to eDate
     do
     begin
-      log.debug ('FilterEvent: event date ',  + j);
-      log.debug ('FilterEvent: slot ', calCell[j].counter);
-      
-      event.writeEvent;
+      //log.debug ('FilterEvent: event date ',  + j);
+      //log.debug ('FilterEvent: slot ', calCell[j].counter);
+      //event.writeEvent;
 
       (* Abbreviate the Event summary and place it in a slot in the calCell *)
       summ  := Copy (event.summary,  1, SUMMARY_LEN);
@@ -202,10 +191,10 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
                   .location  := locat;
 
       calCell[j].cellEvents[calCell[j].counter]
-                  .timeStart.dtStr2Obj(cal.eventList[e].dtStart);
+                  .timeStart.CreateFromISO(event.dtStart);   //.dtStr2Obj(event.dtStart);
 
-      log.debug( 'FilterEvent: Summary ' +
-                 calCell[j].cellEvents[calCell[j].counter].summary );
+      //log.debug( 'FilterEvent: Summary ' +
+      //           calCell[j].cellEvents[calCell[j].counter].summary );
 
       calCell[j].eventNum := e;
 

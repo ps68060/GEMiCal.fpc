@@ -12,7 +12,8 @@ uses
   DlgConv,
   Cal,
   WinCal,
-  Tos, aes, vdi;
+  Tos, aes, vdi,
+  DateUtils;
 
 {$I gemical.i}
 
@@ -173,9 +174,7 @@ begin
 ///    myApplication.winCal^.calDate := TDateStruct.create;
 ///    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
 ///    myApplication.winCal^.calDate := TDateStruct.CreateFromISO(dtStr);
-    myApplication.winCal^.calDate := TDateStruct.CreateFromWords(year, month, 1, 00, 00, 00);
-
-    myApplication.winCal^.calDate.WriteDateStrc;
+    myApplication.winCal^.calDate := EncodeDateTime(year, month, 1, 00, 00, 00, 000);
 
     LoadCal;
 
@@ -284,8 +283,8 @@ begin
   log.level := LLINFO;
   log.debug('Prev Month Work');
 
-  month := myApplication.winCal^.calDate.getMMFromIso;
-  year  := myApplication.winCal^.calDate.getYYYYFromIso;
+  month := MonthOf(myApplication.winCal^.calDate);
+  year  := YearOf(myApplication.winCal^.calDate);
 
   dec (month);
 
@@ -316,8 +315,8 @@ begin
   log.level := LLINFO;
   log.debug('Next Month Work');
 
-  month := myApplication.winCal^.calDate.getMMFromIso;
-  year  := myApplication.winCal^.calDate.getYYYYFromIso;
+  month := MonthOf(myApplication.winCal^.calDate);
+  year  := YearOf(myApplication.winCal^.calDate);
 
   inc (month);
 
@@ -348,8 +347,8 @@ begin
   log.level := LLINFO;
   log.debug('Prev Year Work');
 
-  year  := myApplication.winCal^.calDate.getYYYYFromIso;
-  month := myApplication.winCal^.calDate.getMMFromIso;
+  month := MonthOf(myApplication.winCal^.calDate);
+  year  := YearOf(myApplication.winCal^.calDate);
 
   dec (year);
 
@@ -374,8 +373,8 @@ begin
   log.level := LLINFO;
   log.debug('Next Year Work');
 
-  year  := myApplication.winCal^.calDate.getYYYYFromIso;
-  month := myApplication.winCal^.calDate.getMMFromIso;
+  month := MonthOf(myApplication.winCal^.calDate);
+  year  := YearOf(myApplication.winCal^.calDate);
 
   inc (year);
 
@@ -417,15 +416,16 @@ procedure FilterCal(dtStr : String);
     log.debug('FilterCal: start');
     log.debug('FilterCal: dtStr ' + dtStr);
 
-    if (myApplication.winCal^.calDate <> NIL)
-    then
-      myApplication.winCal^.calDate.free;
+///    if (myApplication.winCal^.calDate <> NIL)
+///    then
+///      myApplication.winCal^.calDate.free;
 
 //    myApplication.winCal^.calDate := TDateStruct.create;
 //    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
-    myApplication.winCal^.calDate := TDateStruct.DateFromISO(dtStr);
+//    myApplication.winCal^.calDate := TDateStruct.DateFromISO(dtStr);
+    myApplication.winCal^.calDate := ISO8601ToDate(dtStr, true);
 
-    log.debug('FilterCal: date= ', myApplication.winCal^.calDate.humanDateTime);
+    log.debug('FilterCal: date= ', DateToISO8601(myApplication.winCal^.calDate, false) );
 
     if (cellGr <> NIL)
     then

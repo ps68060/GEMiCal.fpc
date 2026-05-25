@@ -158,8 +158,6 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
   (* Purpose : called on every change *)
   
   var
-    log         : TLogger;
-  
     New_X,
     New_Y : LongInt;
   
@@ -169,8 +167,8 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
     hcell       : SmallInt;
   
   begin
-    log.level := LLDEBUG;
-  
+    log.level := LLINFO;
+
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   
     new_X := Scroller^.GetXOrg;
@@ -183,17 +181,13 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
   
     vsf_interior(vdiHandle, FIS_HOLLOW);
     DrawGrid(6);
-  
+
     WriteDates;
   
     DisplayEvents;
-  log.debug('Paint: DisplayEvents');
   
     (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
   
-  log.debug('conf lat', conf.lat);
-  
-  log.debug('Paint: exit');
   end;
 
 
@@ -260,17 +254,13 @@ procedure TWinCal.CalcPos(row,
    *)
   
   begin
-    log.level := LLDEBUG;
-    log.debug('CalcPos: 1');
+    log.level := LLINFO;
     xVar := Curr.X + (col * cellWidth);
     yVar := Curr.Y + titleHeight + row * cellHeight;
   
     log.debug('xVar= ', xVar);
     log.debug('yVar= ', yVar);
     log.debug('CalcPos: exit');
-  
-  //  if row <= 1 then
-  //    writeln('CalcPos: row=', row,' ', Curr.Y, ' ', titleHeight, ':', headerHeight, ':', cellHeight, ' result=', yvar);
   end;
 
 
@@ -342,17 +332,14 @@ procedure TWinCal.DrawTitle;
   
     (* Sunrise and Sunset *)
     todayDate := TDateStruct.create;
-    todayDate.dtStr2Obj(dtStr);
-  log.debug('DrawTitle: date 8', dtStr);
+    todayDate.CreateFromISO(dtStr);
   
     sunRiseSet(conf.lat
               ,conf.lng
               ,conf.UTCoffset
               ,todayDate,  sunrise, sunset);
-  log.debug('DrawTitle: date 9');
   
     todayDate.free;
-  log.debug('DrawTitle: date 10');
   
     log.debug ('sunrise ' + sunrise);
     log.debug ('sunset '  + sunset);
@@ -488,8 +475,8 @@ procedure TWinCal.WriteDates;
     hCell        : SmallInt;
   
   begin
-    log.level := LLDEBUG;
-  
+    log.level := LLINFO;
+
     scrollX := Scroller^.GetXOrg;
     scrollY := Scroller^.GetYOrg;
   
@@ -499,16 +486,13 @@ procedure TWinCal.WriteDates;
     (* Get today's date and check if displaying current month *)
     GetDate (yearNow, monthNow, dateNow, dayOfWeek);
   
-  log.debug('WriteDates: 1');
     CalcCellGrid (DayOf(calDate), dateNow, row, col);
-  log.debug('WriteDates: 2');
   
     currentMonth := FALSE;
     if     (YearOf(calDate)  = yearNow)
        and (MonthOf(calDate) = monthNow)
     then
       currentMonth := TRUE;
-  log.debug('WriteDates: 3');
   
     (* Set the font to get the dimensions *)
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
@@ -518,7 +502,6 @@ procedure TWinCal.WriteDates;
     begin
       CalcCellGrid (DayOf(calDate), i, row, col);
       CalcPos  (row, col, pixX, pixY);
-  writeln ('dates: row = ', row, ' col = ', col, '  X = ', pixX, ' Y = ', pixY);
   
       if (currentMonth)
          and (i = dateNow)
@@ -582,50 +565,41 @@ procedure TWinCal.DisplayEvents;
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
     offset    := hCell + hcell div 2;
   
-  log.debug('DisplayEvents: 2');
-  
     vst_point(vdiHandle, 7, wchar, hchar, wCell, hCell);
-  log.debug('DisplayEvents: 3');
   
     for day := 1 to 31 do
     begin
       CalcCellGrid (DayOf(calDate), day, row, col);
-  log.debug('DisplayEvents: day ', day);
-  
       CalcPos(row, col, pixX, pixY);
-  
-      log.debug ('events: row ', row);
-      log.debug ('events: col ', col);
-  
-      for i := 0 to cellGr.calCell[day].counter - 1 do
+
+      if (cellGr.calCell[day].counter > 0)
+      then
       begin
-  log.debug('DisplayEvents: i ', i);
-  log.debug('Summary ', cellGr.calCell[day].cellEvents[i].summary);
-  log.debug('start ', cellGr.calCell[day].cellEvents[i].timeStart.humanDateTime);
+        for i := 0 to cellGr.calCell[day].counter - 1 do
+        begin
+          summ      := SubStr (cellGr.calCell[day].cellEvents[i].summary, 1, 16 );
+          time      := SubStr (cellGr.calCell[day].cellEvents[i].timeStart.humanDateTime, 11, 5 );
   
-        summ      := SubStr (cellGr.calCell[day].cellEvents[i].summary, 1, 16 );
-        time      := SubStr (cellGr.calCell[day].cellEvents[i].timeStart.humanDateTime, 11, 5 );
+          timePlace := SubStr (Concat(time,
+                                      ';',
+                                      cellGr.calCell[day].cellEvents[i].location), 1, 16 );
   
-        timePlace := SubStr (Concat(time,
-                                    ';',
-                                    cellGr.calCell[day].cellEvents[i].location), 1, 16 );
+          log.debug('Summary  ' + summ );
+          log.debug('counter ', i);
   
-        log.debug('Summary  ' + summ );
-        log.debug('counter ', i);
+          v_gtext(vdiHandle,
+                  scrollX + pixX + Attr.boxWidth div 2,
+                  scrollY + pixY + offset,        // (i * lineSpace),
+                  summ );
   
-        v_gtext(vdiHandle,
-                scrollX + pixX + Attr.boxWidth div 2,
-                scrollY + pixY + offset,        // (i * lineSpace),
-                summ );
-  
-        v_gtext(vdiHandle,
-                scrollX + pixX + Attr.boxWidth div 2,
-                scrollY + pixY + offset + Attr.boxHeight div 2,    //  (i + 1) * lineSpace,
-                timePlace );
-      end;
-  
-    end;
-  
+          v_gtext(vdiHandle,
+                  scrollX + pixX + Attr.boxWidth div 2,
+                  scrollY + pixY + offset + Attr.boxHeight div 2,    //  (i + 1) * lineSpace,
+                  timePlace );
+        end;  // for
+      end;  // if
+    end;  // for
+
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wcell, hcell);
   end;
 

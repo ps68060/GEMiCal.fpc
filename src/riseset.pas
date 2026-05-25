@@ -7,6 +7,7 @@ interface
   uses
     Trig,
     DateStrc,
+    DateUtils,
     Logger;
 
 
@@ -76,8 +77,6 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
  *)
 
 var
-  log     : TLogger;
-
   E, F,
   G, H : Double;
   I, I1,
@@ -101,6 +100,8 @@ var
   sr_mm,
   ss_hh,
   ss_mm  : Word;
+  
+  jd     : Double;
 
 begin
   log.level := LLINFO;
@@ -110,9 +111,12 @@ begin
   log.debug ('UTC = ', UTCoff);
 
   E := 0;
+  
+  jd := DateTimeToJulianDate(date.fpDateTime);
 
-  F := date.julianDate - UTCoff / 24;      (* Julian day *)
-  log.debug ('JD = ', date.julianDate);
+///  F := date.julianDate - UTCoff / 24;      (* Julian day *)
+  F := jd - UTCoff / 24;      (* Julian day *)
+  log.debug ('JD = ', jd);
   log.debug ('f = ', F);
 
   G := (F - 2451545) / 36525;               (* Julian century *)
