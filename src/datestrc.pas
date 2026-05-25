@@ -96,17 +96,6 @@ type
                     human : Boolean)
           : String;
 
-  procedure timeBetween(epoch1, epoch2:LongInt;
-                        var dd,
-                            hh,
-                            mi,
-                            ss : Integer;
-                        var future : Boolean);
-
-  function isLeapDay(y : Integer)
-          : Boolean;
-
-
 implementation
 
 uses
@@ -408,73 +397,6 @@ function time2Str(hour, minute, second : Word;
     (*writeln(tmStr); *)
     time2Str := tmStr;
 
-  end;
-
-
-procedure timeBetween(epoch1, epoch2 : LongInt;
-                      var dd,
-                          hh,
-                          mi,
-                          ss : Integer;
-                      var future : Boolean);
-  var
-    diffSec,
-    remSec  : LongInt;
-
-  begin
-    log.level := LLINFO;
-
-    log.debug('epoch1 ', epoch1);
-    log.debug('epoch2 ', epoch2);
-
-    if (epoch1 < epoch2)
-    then
-    begin
-      diffSec := epoch2 - epoch1;
-      future  := FALSE;
-    end
-    else
-    begin
-      diffSec := epoch1 - epoch2;
-      future   := TRUE;
-    end;
-
-    (*writeln('diffsec = ', diffSec);  *)
-    dd     := diffSec div daySec;
-
-    remSec := diffsec mod daySec;
-    hh     := remSec  div hourSec;
-
-    remSec := remSec mod hourSec;
-    mi     := remSec div minSec;
-
-    ss     := remSec mod minSec;
-
-  end;
-
-
-function isLeapDay(y : Integer)
-        : Boolean;
-  begin
-
-    if (y mod 4) = 0
-    then
-    begin
-
-      if (y mod 100) = 0
-      then
-      begin
-        if (y mod 400) = 0
-        then
-          isLeapDay := TRUE
-        else
-          isLeapDay := FALSE;
-      end
-      else
-        isLeapDay := TRUE;
-    end
-    else
-      isLeapDay := FALSE;
   end;
 
 

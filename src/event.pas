@@ -318,6 +318,8 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
     endsAfterMonthStart : Boolean;
 
   begin
+    log.level := LLDEBUG;
+
     isMonthEvent := FALSE;
     daysInMon := DaysInMonth(calDate);
 
@@ -335,18 +337,25 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
      *  2: event ends   after  month start
      *  3: event starts before month and ends after the month
      *)
-     
+  log.debug('Event.IsMonth startDate=', startDate.fpDateTime);
+  log.debug('Event.IsMonth   endDate=', endDate.fpDateTime);
+
+  log.debug('Event.IsMonth pStart=', pStart);
+  log.debug('Event.IsMonth   pEnd=', pEnd);
+
     (* start before pEnd *)
-    if      (startDate.epoch < pEndUnix )    // 1b: event starts before end of month
-    then 
+    if      (startDate.epoch < pEndUnix )       // 1b: event starts before end of month
+    then
       startsBeforeMonthEnd := true;
 
     (* end after pStart *)
-    if      (endDate.epoch > pStartUnix )    // 2a: event ends after 1st of month
+    if      (endDate.epoch > pStartUnix )       // 2a: event ends after 1st of month
     then
       endsAfterMonthStart := true;
 
-    if (startsBeforeMonthEnd and endsAfterMonthStart)// or coversMonth)
+  log.debug('startsBeforeMonthEnd=', startsBeforeMonthEnd);
+  log.debug('endsAfterMonthStart=', endsAfterMonthStart);
+    if (startsBeforeMonthEnd and endsAfterMonthStart)
     then
     begin
       isMonthEvent := TRUE;

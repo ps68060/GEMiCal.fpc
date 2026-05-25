@@ -91,13 +91,13 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
     i            : Integer;
 
   begin
-    log.level := LLINFO;
+    log.level := LLDEBUG;
     log.debug ('CELLGRID.FilterEvents');
 
     for i := 0 to cal.entries do
     begin
-    log.debug('CELLGRID.FilterEvents  1st epoch= ', DateToISO8601(cal.eventList[1].startDate.fpDateTime) );
-    log.debug('CELLGRID.FilterEvents last epoch= ', DateToISO8601(cal.eventList[i].endDate.fpDateTime) );
+    log.debug('CELLGRID.FilterEvents start= ', DateToISO8601(cal.eventList[1].startDate.fpDateTime) );
+    log.debug('CELLGRID.FilterEvents end= ',   DateToISO8601(cal.eventList[i].endDate.fpDateTime) );
 
       (*  calDate is 1st date of focus month to be displayed *)
       if (cal.eventList[i].IsMonthEvent(calDate) )
@@ -132,8 +132,6 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
     summ,
     locat       : String;
 
-    daysBetween : Real;
-
     allDay      : Boolean;
 
     j,
@@ -142,13 +140,7 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
 
   begin
     log.level := LLINFO;
-    log.debug ('FilterEvent: end date = ' , event.endDate.getDDFromIso);
-    log.debug ('FilterEvent: epoch', event.endDate.epoch);
-
-    daysBetween :=  (event.endDate.epoch -
-                     event.startDate.epoch) / daySec;
-
-    log.debug ('FilterEvent: event lasts ', daysBetween);
+    log.debug ('FilterEvent: end date = ' , DateToISO8601(event.endDate.fpDateTime) );
 
     (* Does the event Start in the displayed month ? *)
 //    if (event.startDate.getMMFromIso = MonthOf(calDate) )
