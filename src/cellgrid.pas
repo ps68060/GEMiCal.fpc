@@ -206,11 +206,15 @@ procedure CalcCellGrid(day,
    * returns:  row 0 to 5
    *           col 0 to 6
    *)
+  var
+    offset   : Integer;
 
   begin
     log.level := LLINFO;
-    row := (day - 1 + firstDay) div 7;
-    col := (day - 1 + firstDay) mod 7;
+    offset := day + firstDay;
+
+    row := offset div 7;
+    col := offset mod 7;
 
     log.debug ('CELLGRID: day ', day);
     log.debug ('CELLGRID: row ', row);

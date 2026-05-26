@@ -231,12 +231,12 @@ procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
     year,
     month,
     day,
-    dayOfWeek : Word;
+    dayNumber : Word;
   
     dayStr    : String;
   
   begin
-    GetDate (year, month, day, dayOfWeek) ;
+    GetDate (year, month, day, dayNumber) ;
     str (day, dayStr);
   
     v_gtext(vdiHandle, Work.X, Work.Y + (Work.h shr 1), ' ' + dayStr);
@@ -283,7 +283,7 @@ procedure TWinCal.DrawTitle;
     year,
     month,
     day,
-    dayOfWeek   : Word;
+    dayNumber   : Word;
   
     hour,
     minute,
@@ -316,7 +316,7 @@ procedure TWinCal.DrawTitle;
     vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
   
     (* Display date and time at top left *)
-    GetDate(year, month, day, dayOfWeek) ;
+    GetDate(year, month, day, dayNumber) ;
     GetTime(hour, minute, second, sec100);
   
     dtStr := date2str(year, month, day, FALSE);
@@ -451,6 +451,13 @@ procedure TWinCal.DrawGrid(rows  : Integer);
   end;
 
 
+function GetFirstOffset(calDate : TDateTime)
+        : Integer;
+  begin
+    GetFirstOffset := (DayOfweek(calDate) + 5) mod 7;
+  end;
+
+
 procedure TWinCal.WriteDates;
   var
     pixX,
@@ -459,8 +466,9 @@ procedure TWinCal.WriteDates;
     yearNow,
     monthNow,
     dateNow,
-    dayOfWeek    : Word;
-  
+    dayNumber,
+    firstOffset  : Word;
+
     currentMonth : Boolean;
   
     row, col     : LongInt;
@@ -475,16 +483,16 @@ procedure TWinCal.WriteDates;
     hCell        : SmallInt;
   
   begin
-    log.level := LLINFO;
+    log.level := LLDEBUG;
 
     scrollX := Scroller^.GetXOrg;
     scrollY := Scroller^.GetYOrg;
   
-    log.debug ('year ', YearOf(calDate) );
-    log.debug (mon1[MonthOf(calDate)] );
+    log.debug ('year  ', YearOf(calDate) );
+    log.debug ('month ', mon1[MonthOf(calDate)] );
   
     (* Get today's date and check if displaying current month *)
-    GetDate (yearNow, monthNow, dateNow, dayOfWeek);
+    GetDate (yearNow, monthNow, dateNow, dayNumber);
   
     CalcCellGrid (DayOf(calDate), dateNow, row, col);
   
@@ -496,12 +504,16 @@ procedure TWinCal.WriteDates;
   
     (* Set the font to get the dimensions *)
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
-  
+
+    firstOffset := GetFirstOffset(calDate);
+    writeln('DayOfWeek=', DayOfweek(calDate), ' ', DateToISO8601(calDate) );
+    writeln('WriteDates.firstOffset=', firstOffset);
+
     (* Display the dates, highlighting today *)
     for i := 1 to DaysInMonth(calDate) do
     begin
-      CalcCellGrid (DayOf(calDate), i, row, col);
-      CalcPos  (row, col, pixX, pixY);
+      CalcCellGrid(firstOffset, i, row, col);
+      CalcPos(row, col, pixX, pixY);
   
       if (currentMonth)
          and (i = dateNow)
@@ -569,7 +581,7 @@ procedure TWinCal.DisplayEvents;
   
     for day := 1 to 31 do
     begin
-      CalcCellGrid (DayOf(calDate), day, row, col);
+      CalcCellGrid (GetFirstOffset(calDate), day, row, col);
       CalcPos(row, col, pixX, pixY);
 
       if (cellGr.calCell[day].counter > 0)
