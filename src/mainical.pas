@@ -13,7 +13,8 @@ uses
   Cal,
   WinCal,
   Tos, aes, vdi,
-  DateUtils;
+  DateUtils,
+  SysUtils;
 
 {$I gemical.i}
 
