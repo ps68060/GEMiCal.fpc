@@ -71,7 +71,7 @@ type
 
   procedure LoadCal;
 
-  procedure FilterCal(dtStr : String);
+  procedure FilterCal;
 
 var
   myApplication : TMyApplication;
@@ -152,9 +152,7 @@ var
   year,
   month,
   day,
-  dayOfWeek : Word;
-
-  dtStr     : String;
+  dayNumber : Word;
 
 begin
   log.level := LLDEBUG;
@@ -163,27 +161,23 @@ begin
   if MyApplication.winCal = NIL
   then
   begin
-
     myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
 
-    GetDate (year, month, day, dayOfWeek) ;
-    dtStr := date2str(year, month, 1, FALSE);
-
-    // calDate holds the date for the displayed calendar month. It is used to filter the events for the month.
-    // Initially set to the current month. It is updated when the user navigates to a different month or year.
-///    myApplication.winCal^.calDate := TDateStruct.create;
-///    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
-///    myApplication.winCal^.calDate := TDateStruct.CreateFromISO(dtStr);
-    myApplication.winCal^.calDate := EncodeDateTime(year, month, 1, 00, 00, 00, 000);
-
     LoadCal;
+
+    // calDate holds the date for the displayed calendar month.
+    // Initially set to the current month.
+    // Used to filter the events for the month.
+    // Updated when the user navigates to a different month or year.
+
+    GetDate (year, month, day, dayNumber);
+    myApplication.winCal^.calDate := EncodeDateTime(year, month, 1, 00, 00, 00, 000);
 
     if (myApplication.iCal.entries > 0)
     then
     begin
       MyApplication.iCal.sort;
-      log.debug('next step: FilterCal dtStr', dtStr);
-      FilterCal(dtStr);
+      FilterCal;
     end;
 
   end;
@@ -198,15 +192,6 @@ end;
 
 
 procedure TLoadMenu.Work;
-
-var
-  year,
-  month,
-  day,
-  dayOfWeek : Word;
-
-  dtStr     : String;
-
 begin
   log.level := LLINFO;
   log.info('Load Menu Work');
@@ -217,26 +202,14 @@ begin
     BusyMouse;
 
     myApplication.iCal.Free;
-
-    //todo - is cellGr needed ?
-    if (cellGr <> NIL)
-    then
-      cellGr.Free;
-
-    cellGr := TCellGrid.Create;
-
     directory := myPath;
-
-    GetDate (year, month, day, dayOfWeek) ;
-    dtStr := date2str(year, month, 1, FALSE);
-
     LoadCal;
    
     if (myApplication.iCal.entries > 0)
     then
     begin
       myApplication.iCal.sort;
-      FilterCal(dtStr);
+      FilterCal;
     end;
 
     MyApplication.WinCal^.ForceRedraw;
@@ -274,30 +247,31 @@ end;
 
 procedure TNavPrevMon.Work;
 var
-  month,
+//  month,
   year        : Word;
 
-  dtStr       : String;
+//  dtStr       : String;
 
 begin
   log.level := LLINFO;
   log.debug('Prev Month Work');
 
-  month := MonthOf(myApplication.winCal^.calDate);
-  year  := YearOf(myApplication.winCal^.calDate);
+//  month := MonthOf(myApplication.winCal^.calDate);
+//  year  := YearOf(myApplication.winCal^.calDate);
 
-  dec (month);
+//  dec (month);
+  myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, -1);
 
-  if (month < 1)
-  then
-  begin
-    month := 12;
-    dec (year);
-  end;
+//  if (month < 1)
+//  then
+//  begin
+//    month := 12;
+//    dec (year);
+//  end;
 
-  dtStr := date2str(year, month, 1, FALSE);
+//  dtStr := date2str(year, month, 1, FALSE);
 
-  FilterCal(dtStr);
+  FilterCal;
 
   MyApplication.WinCal^.ForceRedraw;
 
@@ -306,30 +280,31 @@ end;
 
 procedure TNavNextMon.Work;
 var
-  month,
+//  month,
   year       : Word;
 
-  dtStr      : String;
+//  dtStr      : String;
 
 begin
   log.level := LLINFO;
   log.debug('Next Month Work');
 
-  month := MonthOf(myApplication.winCal^.calDate);
-  year  := YearOf(myApplication.winCal^.calDate);
+//  month := MonthOf(myApplication.winCal^.calDate);
+//  year  := YearOf(myApplication.winCal^.calDate);
 
-  inc (month);
+//  inc (month);
+  myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, 1);
 
-  if (month > 12)
-  then
-  begin
-    month := 1;
-    inc (year);
-  end;
+//  if (month > 12)
+//  then
+//  begin
+//    month := 1;
+//    inc (year);
+//  end;
 
-  dtStr := date2str(year, month, 1, FALSE);
+//  dtStr := date2str(year, month, 1, FALSE);
 
-  FilterCal(dtStr);
+  FilterCal;
 
   MyApplication.WinCal^.ForceRedraw;
 
@@ -338,24 +313,25 @@ end;
 
 procedure TNavPrevYear.Work;
 var
-  month,
+//  month,
   year      : Word;
 
-  dtStr     : String;
+//  dtStr     : String;
 
 begin
   log.level := LLINFO;
   log.debug('Prev Year Work');
 
-  month := MonthOf(myApplication.winCal^.calDate);
-  year  := YearOf(myApplication.winCal^.calDate);
+//  month := MonthOf(myApplication.winCal^.calDate);
+//  year  := YearOf(myApplication.winCal^.calDate);
 
-  dec (year);
+  myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, -1);
+//  dec (year);
 
-  dtStr := date2str(year, month, 1, FALSE);
-  log.DEBUG('PrevYear: calDate = ' + dtStr);
+//  dtStr := date2str(year, month, 1, FALSE);
+  log.DEBUG('PrevYear: calDate= ' + DateToStr(myApplication.winCal^.calDate) );
 
-  FilterCal(dtStr);
+  FilterCal;
 
   MyApplication.WinCal^.ForceRedraw;
 
@@ -365,23 +341,24 @@ end;
 procedure TNavNextYear.Work;
 var
   year      : Word;
-  month     : Word;
+//  month     : Word;
 
-  dtStr     : String;
+//  dtStr     : String;
 
 begin
   log.level := LLINFO;
   log.debug('Next Year Work');
 
-  month := MonthOf(myApplication.winCal^.calDate);
-  year  := YearOf(myApplication.winCal^.calDate);
+//  month := MonthOf(myApplication.winCal^.calDate);
+//  year  := YearOf(myApplication.winCal^.calDate);
 
-  inc (year);
+  myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, 1);
+//  inc (year);
 
-  dtStr := date2str(year, month, 1, FALSE);
-  log.DEBUG('NextYear: calDate = ' + dtStr);
+//  dtStr := date2str(year, month, 1, FALSE);
+  log.DEBUG('NextYear: calDate= ' + DateToStr(myApplication.winCal^.calDate) );
 
-  FilterCal(dtStr);
+  FilterCal;
 
   MyApplication.WinCal^.ForceRedraw;
 
@@ -394,7 +371,6 @@ procedure LoadCal;
  *)
 begin
   log.level := LLINFO;
-
   myApplication.iCal := TCal.Create;
 
   log.debug('Load ICS files from ' + directory);
@@ -403,28 +379,16 @@ begin
   myApplication.iCal.loadICS(directory);
   
   log.debug('loaded ', myApplication.iCal.entries );
-
 end;
 
 
-procedure FilterCal(dtStr : String);
+procedure FilterCal;
   (*
    * Purpose: Get the events for the date.
    *)
   begin
     log.level := LLDEBUG;
     log.debug('FilterCal: start');
-    log.debug('FilterCal: dtStr ' + dtStr);
-
-///    if (myApplication.winCal^.calDate <> NIL)
-///    then
-///      myApplication.winCal^.calDate.free;
-
-//    myApplication.winCal^.calDate := TDateStruct.create;
-//    myApplication.winCal^.calDate.dtStr2Obj(dtStr);
-//    myApplication.winCal^.calDate := TDateStruct.DateFromISO(dtStr);
-    myApplication.winCal^.calDate := ISO8601ToDate(dtStr, true);
-
     log.debug('FilterCal: date= ', DateToISO8601(myApplication.winCal^.calDate, false) );
 
     if (cellGr <> NIL)
