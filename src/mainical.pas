@@ -247,30 +247,12 @@ end;
 
 
 procedure TNavPrevMon.Work;
-var
-//  month,
-  year        : Word;
-
-//  dtStr       : String;
 
 begin
   log.level := LLINFO;
   log.debug('Prev Month Work');
 
-//  month := MonthOf(myApplication.winCal^.calDate);
-//  year  := YearOf(myApplication.winCal^.calDate);
-
-//  dec (month);
   myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, -1);
-
-//  if (month < 1)
-//  then
-//  begin
-//    month := 12;
-//    dec (year);
-//  end;
-
-//  dtStr := date2str(year, month, 1, FALSE);
 
   FilterCal;
 
@@ -280,30 +262,12 @@ end;
 
 
 procedure TNavNextMon.Work;
-var
-//  month,
-  year       : Word;
-
-//  dtStr      : String;
 
 begin
   log.level := LLINFO;
   log.debug('Next Month Work');
 
-//  month := MonthOf(myApplication.winCal^.calDate);
-//  year  := YearOf(myApplication.winCal^.calDate);
-
-//  inc (month);
   myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, 1);
-
-//  if (month > 12)
-//  then
-//  begin
-//    month := 1;
-//    inc (year);
-//  end;
-
-//  dtStr := date2str(year, month, 1, FALSE);
 
   FilterCal;
 
@@ -313,24 +277,12 @@ end;
 
 
 procedure TNavPrevYear.Work;
-var
-//  month,
-  year      : Word;
-
-//  dtStr     : String;
 
 begin
   log.level := LLINFO;
   log.debug('Prev Year Work');
 
-//  month := MonthOf(myApplication.winCal^.calDate);
-//  year  := YearOf(myApplication.winCal^.calDate);
-
   myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, -1);
-//  dec (year);
-
-//  dtStr := date2str(year, month, 1, FALSE);
-  log.DEBUG('PrevYear: calDate= ' + DateToStr(myApplication.winCal^.calDate) );
 
   FilterCal;
 
@@ -340,24 +292,12 @@ end;
 
 
 procedure TNavNextYear.Work;
-var
-  year      : Word;
-//  month     : Word;
-
-//  dtStr     : String;
 
 begin
   log.level := LLINFO;
   log.debug('Next Year Work');
 
-//  month := MonthOf(myApplication.winCal^.calDate);
-//  year  := YearOf(myApplication.winCal^.calDate);
-
   myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, 1);
-//  inc (year);
-
-//  dtStr := date2str(year, month, 1, FALSE);
-  log.DEBUG('NextYear: calDate= ' + DateToStr(myApplication.winCal^.calDate) );
 
   FilterCal;
 
