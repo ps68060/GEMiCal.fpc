@@ -76,7 +76,7 @@ procedure TLogger.log(msgLevel : TLogLevel;
     year,
     month,
     day,
-    dayOfWeek    : Word;
+    dayNumber    : Word;
 
   begin
     (*writeln (ord(level), ' ; ', ord(msgLevel) );*)
@@ -85,7 +85,7 @@ procedure TLogger.log(msgLevel : TLogLevel;
     then
     begin
       (* Get today's date *)
-      GetDate (year, month, day, dayOfWeek);
+      GetDate (year, month, day, dayNumber);
       writeln(msgLevel, ': ', message);
     end;
   end;

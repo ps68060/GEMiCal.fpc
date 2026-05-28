@@ -71,7 +71,7 @@ type
     function getSecFromIso
             : Integer;
 
-    procedure dayOfWeek;
+//    procedure dayOfWeek;
 
     procedure WriteDateStrc;
 
@@ -80,14 +80,6 @@ type
 
   end;
 
-
-  function date2Str(year, month, day : Word;
-                    human : Boolean)
-          : String;
-
-  function time2Str(hour, minute, second : Word;
-                    human : Boolean)
-          : String;
 
 implementation
 
@@ -251,7 +243,7 @@ function TDateStruct.getSecFromIso
     getSecFromIso := sec2;
   end;
 
-
+(*
 procedure TDateStruct.dayOfWeek;
   var
     t : array [0..11] of Integer;
@@ -290,7 +282,7 @@ procedure TDateStruct.dayOfWeek;
 
     day := trunc(d);
   end;
-
+*)
 
 procedure TDateStruct.WriteDateStrc;
   begin
@@ -301,66 +293,6 @@ procedure TDateStruct.WriteDateStrc;
            );
   end;
 
-(*
-function date2Str(year, month, day : Word;
-                  human : Boolean)
-        : String;
-  var
-    dtStr : String;
-  begin
-    (*writeln('Date is ', year, '/', month, '/', day ); *)
-
-    if (human)
-    then
-    begin
-      dtStr := IntToStr(trunc(year ) ) + '.';
-      dtStr := dtStr + LPad( IntToStr(trunc(month) ), 2, '0' ) + '.';
-      dtStr := dtStr + LPad( IntToStr(trunc(day)   ), 2, '0' );
-    end
-
-    else
-    begin
-      dtStr := IntToStr(trunc(year ) );
-      dtStr := dtStr + LPad( IntToStr(trunc(month) ), 2, '0' );
-      dtStr := dtStr + LPad( IntToStr(trunc(day)   ), 2, '0' );
-    end;
-
-    date2Str := dtStr;
-  end;
-*)
-(*
-function time2Str(hour, minute, second : Word;
-                  human : Boolean)
-        : String;
-  var
-    tmStr   : String;
-
-  begin
-    log.level := LLINFO;
-
-    (*writeln('Time is ', hour, ':', minute, ':', second ); *)
-
-    if (human)
-    then
-    begin
-      log.debug('human format');
-      tmStr :=         LPad( IntToStr(trunc(hour  ) ), 2, '0' ) + ':';
-      tmStr := tmStr + LPad( IntToStr(trunc(minute) ), 2, '0' ) + ':';
-      tmStr := tmStr + LPad( IntToStr(trunc(second) ), 2, '0' );
-    end
-
-    else
-    begin
-      tmStr :=         LPad( IntToStr(trunc(hour  ) ), 2, '0' );
-      tmStr := tmStr + LPad( IntToStr(trunc(minute) ), 2, '0' );
-      tmStr := tmStr + LPad( IntToStr(trunc(second) ), 2, '0' );
-    end;
-
-    (*writeln(tmStr); *)
-    time2Str := tmStr;
-
-  end;
-*)
 
 function TDateStruct.isAllDay
         : Boolean;

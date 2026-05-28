@@ -291,6 +291,8 @@ procedure TWinCal.DrawTitle;
     timeStr,
     sunrise,
     sunset     : String;
+    
+    currentDateTime : TDateTime;
   
   begin
     log.level := LLINFO;
