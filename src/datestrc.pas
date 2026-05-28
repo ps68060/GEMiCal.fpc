@@ -53,10 +53,6 @@ type
 
     constructor CreateFromISO(dtString : String);
 
-    constructor CreateFromWords(yyyy, mm, dd,
-                              hh, nn, ss : Word);
-
-
     function getYYYYFromIso
             : Integer;
 
@@ -151,22 +147,6 @@ constructor TDateStruct.CreateFromISO(dtString : String);
 
     log.debug('TDateStruct: epoch= ', epoch);
     log.debug('TDateStruct: day= ', day);
-  end;
-
-
-constructor TDateStruct.CreateFromWords(yyyy, mm, dd,
-                                        hh, nn, ss : Word);
-  var
-    lIsoDate : String;
-    lIsoTime : String;
-    lIsoDateTime : String;
-
-  begin
-    lIsoDate := date2Str(yyyy, mm, dd, FALSE);
-    lIsoTime := time2Str(hh, nn, ss, FALSE);
-    
-    lIsoDateTime := concat(isoDate, 'T', isoTime);
-    CreateFromISO(lIsoDateTime);
   end;
 
 
@@ -321,7 +301,7 @@ procedure TDateStruct.WriteDateStrc;
            );
   end;
 
-
+(*
 function date2Str(year, month, day : Word;
                   human : Boolean)
         : String;
@@ -347,8 +327,8 @@ function date2Str(year, month, day : Word;
 
     date2Str := dtStr;
   end;
-
-
+*)
+(*
 function time2Str(hour, minute, second : Word;
                   human : Boolean)
         : String;
@@ -380,7 +360,7 @@ function time2Str(hour, minute, second : Word;
     time2Str := tmStr;
 
   end;
-
+*)
 
 function TDateStruct.isAllDay
         : Boolean;
