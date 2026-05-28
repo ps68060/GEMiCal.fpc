@@ -265,7 +265,6 @@ procedure TWinCal.CalcPos(row,
 
 
 procedure TWinCal.DrawTitle;
-
   var
     title      : String;
   
@@ -590,7 +589,7 @@ procedure TWinCal.DisplayEvents;
         for i := 0 to cellGr.calCell[day].counter - 1 do
         begin
           summ      := SubStr (cellGr.calCell[day].cellEvents[i].summary, 1, 16 );
-          time      := SubStr (cellGr.calCell[day].cellEvents[i].timeStart.humanDateTime, 11, 5 );
+          time      := TimeToStr(cellGr.calCell[day].cellEvents[i].timeStart.fpDateTime);
   
           timePlace := SubStr (Concat(time,
                                       ';',

@@ -79,9 +79,6 @@ type
 
     procedure WriteDateStrc;
 
-    function humanDateTime
-            : String;
-
     function isAllDay
             : Boolean;
 
@@ -322,21 +319,6 @@ procedure TDateStruct.WriteDateStrc;
             ' epoch ',    epoch,
             ' ',          day1[day]
            );
-  end;
-
-
-function TDateStruct.humanDateTime
-        : String;
-  var
-    thisDate,
-    thisTime : String;
-
-  begin
-    thisDate := date2Str(getYYYYFromIso, getMMFromIso,  getDDFromIso,  true);
-    thistime := time2Str(getHrFromIso,   getMinFromIso, getSecFromIso, true);
-
-    humanDateTime := concat(thisDate, ' ', thisTime);
-
   end;
 
 
