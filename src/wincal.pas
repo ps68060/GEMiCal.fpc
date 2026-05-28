@@ -277,8 +277,6 @@ procedure TWinCal.DrawTitle;
     hAlign,
     vAlign     : SmallInt;
   
-    todayDate  : TDateStruct;
-  
     year,
     month,
     day,
@@ -289,7 +287,8 @@ procedure TWinCal.DrawTitle;
     second,
     sec100      : Word;
   
-    dtStr,
+    dateStr,
+    timeStr,
     sunrise,
     sunset     : String;
   
@@ -314,31 +313,29 @@ procedure TWinCal.DrawTitle;
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
     vst_Alignment(vdiHandle, 0, 0, hAlign, vAlign);
   
-    (* Display date and time at top left *)
+    (* Display current date and time at top left *)
     GetDate(year, month, day, dayNumber) ;
     GetTime(hour, minute, second, sec100);
-  
-    dtStr := date2str(year, month, day, FALSE);
+
+    currentDateTime := EncodeDateTime(year, month, day, hour, minute, second, sec100);
+    dateStr := DateToStr(currentDateTime);
+    timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
+
     v_gtext(vdiHandle,
             Work.X + Attr.charWidth,
             Work.Y + (headerHeight div 2),
-            date2Str(year, month, day, TRUE) );
+            dateStr);
   
     v_gtext(vdiHandle,
             Work.X + Attr.charWidth,
             Work.Y + Attr.charHeight*3,
-            time2Str(hour, minute, second, TRUE) );
+            timeStr );
   
-    (* Sunrise and Sunset *)
-    todayDate := TDateStruct.create;
-    todayDate.CreateFromISO(dtStr);
-  
+    (* Display sunrise and sunset times of 1st of month *)
     sunRiseSet(conf.lat
               ,conf.lng
               ,conf.UTCoffset
-              ,todayDate,  sunrise, sunset);
-  
-    todayDate.free;
+              ,calDate,  sunrise, sunset);
   
     log.debug ('sunrise ' + sunrise);
     log.debug ('sunset '  + sunset);

@@ -12,15 +12,15 @@ interface
 
 
   procedure sunRiseSet (lat, lng, UTCoff : Real;
-                        date : TDateStruct;
-                      var sunrise,
-                          sunset  : String);
+                        date : TDateTime;
+                        var sunrise,
+                            sunset  : String);
 
 implementation
 
 
 procedure sunRiseSet (lat, lng, UTCoff : Real;
-                      date : TDateStruct;
+                      date : TDateTime;
                       var sunrise,
                           sunset  : String);
 
@@ -43,8 +43,8 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
 *
 *     additionally returns the information opt, which contains information on every second of the day:
 *       opt.elev_ang_corr   : Apparent (refraction corrected) solar elevation in degrees
-*       opt.azmt_ang        : Solar azimuthal angle (deg cw from N)
-*       opt.solar_decl      : Solar declination in degrees
+*       opt.azAngle         : Solar azimuthal angle (deg clockwise from N)
+*       opt.solarDecl       : Solar declination in degrees
 * 
 *  4  sun_rise_set = sunRiseSet( ..., PLOT) If PLOT is true, 
 *
@@ -78,7 +78,7 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
 
   var
     E, F,
-    G, H : Double;
+    G, H    : Double;
     I, I1,
     J,
     K,
@@ -86,12 +86,12 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
     P, Q,
     R, T,
     U, V,
-    W, X  : Double;
+    W, X    : Double;
   
     AB, AC, AD,
-    solardecl,
-    azmt_ang,
-    azmt_ang_2 : Double;
+    solarDecl,
+    azAngle,
+    azAngle2 : Double;
   
     srise,
     sset    : Double;
@@ -99,7 +99,10 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
     sr_hh,
     sr_mm,
     ss_hh,
-    ss_mm  : Word;
+    ss_mm   : Word;
+    
+    srDateTime,
+    ssDateTime : TDateTime;
     
     jd     : Double;
   
@@ -112,7 +115,7 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
   
     E := 0;
     
-    jd := DateTimeToJulianDate(date.fpDateTime);
+    jd := DateTimeToJulianDate(date);
   
   ///  F := date.julianDate - UTCoff / 24;      (* Julian day *)
     F := jd - UTCoff / 24;      (* Julian day *)
@@ -195,33 +198,39 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
     if (nargout > 2)
     then
     begin
-      solar_decl    := T;
+      solarDecl     := T;
       elev_ang_corr := 90 - AD;
       AC_ind        := AC > 0;
   
-      azmt_ang := (acosd(( (sind(lat) * cosd(AD)) - sind(T)) / 
+      azAngle := (acosd(( (sind(lat) * cosd(AD)) - sind(T)) / 
                             (cosd(lat) * sind(AD)))
                            +180 )
                      mod 360.0;
   
-      azmt_ang_2 := (540 - acosd(((sind(lat) * cosd(AD)) - sind(T)) /
+      azAngle2 := (540 - acosd(((sind(lat) * cosd(AD)) - sind(T)) /
                         (cosd(lat) * sind(AD))) )
                      mod 360.0;
   
-      azmt_ang(AC_ind) := azmt_ang_2(AC_ind);
+      azAngle(AC_ind) := azAngle2(AC_ind);
     end;
     *)
   
     srise := X - W * 4 / 1440; (* fraction of 1 day *)
     sset  := X + W * 4 / 1440;
   
+    // Sunrise
     sr_hh   := trunc(srise * 24);
     sr_mm   := trunc((srise * 24 - sr_hh) * 60);
-    sunrise := time2str(sr_hh, sr_mm, 0, true);
-  
+    srDateTime := date;
+    srDateTime := RecodeTime(srDateTime, sr_hh, sr_mm, 0, 0);
+    sunrise := TimeToStr(srDateTime);
+
+    // Sunset
     ss_hh   := trunc(sset * 24);
     ss_mm   := trunc((sset * 24 - ss_hh) * 60);
-    sunset  := time2str(ss_hh, ss_mm, 0, true);  
+    ssDateTime := date;
+    ssDateTime := RecodeTime(ssDateTime, ss_hh, ss_mm, 0, 0);
+    sunset := TimeToStr(ssDateTime);
   
     log.debug('Sunrise : ' + sunrise);
     log.debug('Sunset  : ' + sunset);
