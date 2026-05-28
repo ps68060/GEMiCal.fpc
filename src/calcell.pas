@@ -25,7 +25,7 @@ interface
 
 implementation
 
-  constructor TCalCell.Create;
+constructor TCalCell.Create;
   var
     i : Integer;
 
@@ -42,7 +42,7 @@ implementation
   end;
 
 
-  destructor TCalCell.Destroy;
+destructor TCalCell.Destroy;
   var
     i : Integer;
 

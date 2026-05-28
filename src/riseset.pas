@@ -76,157 +76,156 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
 (* variable letters correspond to columns in the NOAA Excel
  *)
 
-var
-  E, F,
-  G, H : Double;
-  I, I1,
-  J,
-  K,
-  L, M,
-  P, Q,
-  R, T,
-  U, V,
-  W, X  : Double;
-
-  AB, AC, AD,
-  solardecl,
-  azmt_ang,
-  azmt_ang_2 : Double;
-
-  srise,
-  sset    : Double;
-
-  sr_hh,
-  sr_mm,
-  ss_hh,
-  ss_mm  : Word;
+  var
+    E, F,
+    G, H : Double;
+    I, I1,
+    J,
+    K,
+    L, M,
+    P, Q,
+    R, T,
+    U, V,
+    W, X  : Double;
   
-  jd     : Double;
-
-begin
-  log.level := LLINFO;
-
-  log.debug ('lat = ', lat);
-  log.debug ('lng = ', lng);
-  log.debug ('UTC = ', UTCoff);
-
-  E := 0;
+    AB, AC, AD,
+    solardecl,
+    azmt_ang,
+    azmt_ang_2 : Double;
   
-  jd := DateTimeToJulianDate(date.fpDateTime);
-
-///  F := date.julianDate - UTCoff / 24;      (* Julian day *)
-  F := jd - UTCoff / 24;      (* Julian day *)
-  log.debug ('JD = ', jd);
-  log.debug ('f = ', F);
-
-  G := (F - 2451545) / 36525;               (* Julian century *)
-
-  log.debug ('g = ', G);
-
-  I  := (280.46646 + G * (36000.76983 + G * 0.0003032));
-  I1 := trunc(I / 360);
-  I  := I - I1 * 360;                                            (* Sun mean LONGITUDE *)
-
-  J := 357.52911  + G * (35999.05029 - 0.0001537 * G);           (* Sun mean ANOMOLY   *)
-
-  log.debug ('i = ', I);
-  log.debug ('j = ', J);
-
-  K := 0.016708634   - G * (0.000042037 + 0.0000001267 * G);     (* Earth orbit eccentricity *)
-
-  log.debug ('k = ', K);
-
-  L := sind(J)     * (1.914602 - G * (0.004817 + 0.000014 * G))
-       + sind(2*J) * (0.019993 - 0.000101 * G)
-       + sind(3*J) * 0.000289;                                   (* Sun EQ of Centre *)
-
-  log.debug ('l = ', L);
-
-  M := I + L;  (* Sun True Longitude *)
-
-  log.debug ('m = ', M);
-
-  P := M - 0.00569 - 0.00478 * sind(125.04 - 1934.136 * G);      (* Sun apparent Longitude *)
-  log.debug ('p = ', P);
-
-  Q := 23 + (26 + ((21.448 - G * (46.815 + G * (0.00059 - G * 0.001813)))) /60) /60;  (* Mean Oblique Ecliptic *)
-  log.debug ('q = ', Q);
-
-  R := Q + 0.00256 * cosd(125.04 - 1934.136 * G);  (* Oblique Correction *)
-  log.debug ('r = ', R);
-
-  T := asind(sind(R) * sind(P));                   (* Sun Declination *)
-  log.debug ('t = ', T);
-
-  U := tand(R/2) * tand(R/2);    (* var y *)
-  V := 4 * rad2deg(U * sin(2 * deg2rad(I))
-                  - 2    * K     * sin(deg2rad(J))
-                  + 4    * K * U * sin(deg2rad(J)) * cos(2 * deg2rad(I)) 
-                  - 0.5  * U * U * sin(4 * deg2rad(I)) 
-                  - 1.25 * K * K * sin(2 * deg2rad(J)));  (* Eq of time (min) *)
-
-  log.debug ('v = ', V);
-
-
-  // NB NOAA uses -long for WEST !!
-  // So invert the normal convention
-  AB := trunc(E * 1440.0 + V - 4.0 * lng - 60.0 * UTCoff) mod 1440;    (* True Solar time (min) *)
-
-  if ((AB/4) < 0)
-  then
-    AC := AB/4 + 180   (* Hour Angle *)
-  else
-    AC := AB/4 - 180;  (* Hour Angle *)
-
-  AD := acosd(sind(lat) * sind(T) + cosd(lat) * cosd(T) * cosd(AC));        (* Solar Zenith angle *)
-
-  W := acosd(  (cosd(90.833)
-               / (cosd(lat) * cosd(T)))
-               - (tand(lat) * tand(T))
-            );
-
-  X  := (720 - 4 * lng - V + UTCoff * 60.0) / 1440;                         (* Solar noon (LST) *)
-
-  log.debug ('w = ', W);
-  log.debug ('x = ', X);
-
-  (* Results in degrees...
-
-  if (nargout > 2)
-  then
+    srise,
+    sset    : Double;
+  
+    sr_hh,
+    sr_mm,
+    ss_hh,
+    ss_mm  : Word;
+    
+    jd     : Double;
+  
   begin
-    solar_decl    := T;
-    elev_ang_corr := 90 - AD;
-    AC_ind        := AC > 0;
-
-    azmt_ang := (acosd(( (sind(lat) * cosd(AD)) - sind(T)) / 
-                          (cosd(lat) * sind(AD)))
-                         +180 )
-                   mod 360.0;
-
-    azmt_ang_2 := (540 - acosd(((sind(lat) * cosd(AD)) - sind(T)) /
-                      (cosd(lat) * sind(AD))) )
-                   mod 360.0;
-
-    azmt_ang(AC_ind) := azmt_ang_2(AC_ind);
+    log.level := LLINFO;
+  
+    log.debug ('lat = ', lat);
+    log.debug ('lng = ', lng);
+    log.debug ('UTC = ', UTCoff);
+  
+    E := 0;
+    
+    jd := DateTimeToJulianDate(date.fpDateTime);
+  
+  ///  F := date.julianDate - UTCoff / 24;      (* Julian day *)
+    F := jd - UTCoff / 24;      (* Julian day *)
+    log.debug ('JD = ', jd);
+    log.debug ('f = ', F);
+  
+    G := (F - 2451545) / 36525;               (* Julian century *)
+  
+    log.debug ('g = ', G);
+  
+    I  := (280.46646 + G * (36000.76983 + G * 0.0003032));
+    I1 := trunc(I / 360);
+    I  := I - I1 * 360;                                            (* Sun mean LONGITUDE *)
+  
+    J := 357.52911  + G * (35999.05029 - 0.0001537 * G);           (* Sun mean ANOMOLY   *)
+  
+    log.debug ('i = ', I);
+    log.debug ('j = ', J);
+  
+    K := 0.016708634   - G * (0.000042037 + 0.0000001267 * G);     (* Earth orbit eccentricity *)
+  
+    log.debug ('k = ', K);
+  
+    L := sind(J)     * (1.914602 - G * (0.004817 + 0.000014 * G))
+         + sind(2*J) * (0.019993 - 0.000101 * G)
+         + sind(3*J) * 0.000289;                                   (* Sun EQ of Centre *)
+  
+    log.debug ('l = ', L);
+  
+    M := I + L;  (* Sun True Longitude *)
+  
+    log.debug ('m = ', M);
+  
+    P := M - 0.00569 - 0.00478 * sind(125.04 - 1934.136 * G);      (* Sun apparent Longitude *)
+    log.debug ('p = ', P);
+  
+    Q := 23 + (26 + ((21.448 - G * (46.815 + G * (0.00059 - G * 0.001813)))) /60) /60;  (* Mean Oblique Ecliptic *)
+    log.debug ('q = ', Q);
+  
+    R := Q + 0.00256 * cosd(125.04 - 1934.136 * G);  (* Oblique Correction *)
+    log.debug ('r = ', R);
+  
+    T := asind(sind(R) * sind(P));                   (* Sun Declination *)
+    log.debug ('t = ', T);
+  
+    U := tand(R/2) * tand(R/2);    (* var y *)
+    V := 4 * rad2deg(U * sin(2 * deg2rad(I))
+                    - 2    * K     * sin(deg2rad(J))
+                    + 4    * K * U * sin(deg2rad(J)) * cos(2 * deg2rad(I)) 
+                    - 0.5  * U * U * sin(4 * deg2rad(I)) 
+                    - 1.25 * K * K * sin(2 * deg2rad(J)));  (* Eq of time (min) *)
+  
+    log.debug ('v = ', V);
+  
+  
+    // NB NOAA uses -long for WEST !!
+    // So invert the normal convention
+    AB := trunc(E * 1440.0 + V - 4.0 * lng - 60.0 * UTCoff) mod 1440;    (* True Solar time (min) *)
+  
+    if ((AB/4) < 0)
+    then
+      AC := AB/4 + 180   (* Hour Angle *)
+    else
+      AC := AB/4 - 180;  (* Hour Angle *)
+  
+    AD := acosd(sind(lat) * sind(T) + cosd(lat) * cosd(T) * cosd(AC));        (* Solar Zenith angle *)
+  
+    W := acosd(  (cosd(90.833)
+                 / (cosd(lat) * cosd(T)))
+                 - (tand(lat) * tand(T))
+              );
+  
+    X  := (720 - 4 * lng - V + UTCoff * 60.0) / 1440;                         (* Solar noon (LST) *)
+  
+    log.debug ('w = ', W);
+    log.debug ('x = ', X);
+  
+    (* Results in degrees...
+  
+    if (nargout > 2)
+    then
+    begin
+      solar_decl    := T;
+      elev_ang_corr := 90 - AD;
+      AC_ind        := AC > 0;
+  
+      azmt_ang := (acosd(( (sind(lat) * cosd(AD)) - sind(T)) / 
+                            (cosd(lat) * sind(AD)))
+                           +180 )
+                     mod 360.0;
+  
+      azmt_ang_2 := (540 - acosd(((sind(lat) * cosd(AD)) - sind(T)) /
+                        (cosd(lat) * sind(AD))) )
+                     mod 360.0;
+  
+      azmt_ang(AC_ind) := azmt_ang_2(AC_ind);
+    end;
+    *)
+  
+    srise := X - W * 4 / 1440; (* fraction of 1 day *)
+    sset  := X + W * 4 / 1440;
+  
+    sr_hh   := trunc(srise * 24);
+    sr_mm   := trunc((srise * 24 - sr_hh) * 60);
+    sunrise := time2str(sr_hh, sr_mm, 0, true);
+  
+    ss_hh   := trunc(sset * 24);
+    ss_mm   := trunc((sset * 24 - ss_hh) * 60);
+    sunset  := time2str(ss_hh, ss_mm, 0, true);  
+  
+    log.debug('Sunrise : ' + sunrise);
+    log.debug('Sunset  : ' + sunset);
+  
   end;
-  *)
-
-  srise := X - W * 4 / 1440; (* fraction of 1 day *)
-  sset  := X + W * 4 / 1440;
-
-  sr_hh   := trunc(srise * 24);
-  sr_mm   := trunc((srise * 24 - sr_hh) * 60);
-  sunrise := time2str(sr_hh, sr_mm, 0, true);
-
-  ss_hh   := trunc(sset * 24);
-  ss_mm   := trunc((sset * 24 - ss_hh) * 60);
-  sunset  := time2str(ss_hh, ss_mm, 0, true);  
-
-  log.debug('Sunrise : ' + sunrise);
-  log.debug('Sunset  : ' + sunset);
-
-end;
-
   
 end.

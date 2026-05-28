@@ -28,7 +28,6 @@ type
   (* Main Menu *)
 
   PLoadMenu    = ^TLoadMenu;
-
   PCalMenu     = ^TCalMenu;
 
   TLoadMenu =  OBJECT(TKeyMenu)
@@ -104,223 +103,209 @@ destructor TMyApplication.done;
 
 
 procedure TMyApplication.INITInstance;
-var
-  appDeskMenu    : PDeskMenu;
-  appLoadMenu    : PLoadMenu;
-  appDialogMenu  : PDialogMenu;
-  appCalMenu     : PCalMenu;
-  appNavPrevMon  : PNavPrevMon;
-  appNavNextMon  : PNavNextMon;
+  var
+    appDeskMenu    : PDeskMenu;
+    appLoadMenu    : PLoadMenu;
+    appDialogMenu  : PDialogMenu;
+    appCalMenu     : PCalMenu;
+    appNavPrevMon  : PNavPrevMon;
+    appNavNextMon  : PNavNextMon;
 
-  appNavPrevYear : PNavPrevYear;
-  appNavNextYear : PNavNextYear;
-                     
-begin
-  log.level := LLINFO;
+    appNavPrevYear : PNavPrevYear;
+    appNavNextYear : PNavNextYear;
 
-  (* Get current path *)
-  GetDir (0, directory);
+  begin
+    log.level := LLINFO;
 
-  LoadResource ('GEMICAL.RSC','');
-  
-  (* Load and set-up the menu *)
-  LoadMenu (TREE000);
+    (* Get current path *)
+    GetDir (0, directory);
 
-  appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));       (* Info *)
+    LoadResource ('GEMICAL.RSC','');
 
-  (* File Menu *)
-  apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));       (* Load *)
+    (* Load and set-up the menu *)
+    LoadMenu (TREE000);
 
-  appDialogMenu := new (PDialogMenu, Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
-  appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));    (* Display calendar *)
+    appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));       (* Info *)
 
-  (* Navigation menu *)
-  appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
-  appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
+    (* File Menu *)
+    apploadMenu := new (PLoadMenu,  Init(@SELF, K_Ctrl, Ctrl_L, M_FOLDER,   M_DESK2));       (* Load *)
 
-  appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
-  appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
+    appDialogMenu := new (PDialogMenu, Init(@SELF, K_Ctrl, Ctrl_C, M_DIALOG,   M_DESK2));    (* This needs to be pointer DialogMenu *)
+    appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));    (* Display calendar *)
 
-  INHERITED INITInstance;
-  SetQuit (M_END, M_DESK2);
+    (* Navigation menu *)
+    appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
+    appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
 
-end;
+    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
+    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
+
+    INHERITED INITInstance;
+    SetQuit (M_END, M_DESK2);
+  end;
 
 
 procedure TMyApplication.INITMainWindow;
+  var
+    year,
+    month,
+    day,
+    dayNumber : Word;
 
-var
-  year,
-  month,
-  day,
-  dayNumber : Word;
-
-begin
-  log.level := LLDEBUG;
-  log.debug('INIT Main Window');
-
-  if MyApplication.winCal = NIL
-  then
   begin
-    myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+    log.level := LLDEBUG;
+    log.debug('INIT Main Window');
 
-    LoadCal;
-
-    // calDate holds the date for the displayed calendar month.
-    // Initially set to the current month.
-    // Used to filter the events for the month.
-    // Updated when the user navigates to a different month or year.
-
-    GetDate (year, month, day, dayNumber);
-    myApplication.winCal^.calDate := EncodeDateTime(year, month, 1, 00, 00, 00, 000);
-
-    if (myApplication.iCal.entries > 0)
+    if MyApplication.winCal = NIL
     then
     begin
-      MyApplication.iCal.sort;
-      FilterCal;
+      myApplication.winCal := new(PWinCal, init(NIL, 'GEMiCal') );
+
+      LoadCal;
+
+      // calDate holds the date for the displayed calendar month.
+      // Initially set to the current month.
+      // Used to filter the events for the month.
+      // Updated when the user navigates to a different month or year.
+
+      GetDate (year, month, day, dayNumber);
+      myApplication.winCal^.calDate := EncodeDateTime(year, month, 1, 00, 00, 00, 000);
+
+      if (myApplication.iCal.entries > 0)
+      then
+      begin
+        MyApplication.iCal.sort;
+        FilterCal;
+      end;
     end;
 
+    if MyApplication.winCal <> NIL
+    then
+      MyApplication.winCal^.MakeWindow;
+
+    //myApplication.winCal^.calDate.free //todo ???;
   end;
-
-  if MyApplication.winCal <> NIL
-  then
-    MyApplication.winCal^.MakeWindow;
-
-  //myApplication.winCal^.calDate.free //todo ???;
-
-end;
 
 
 procedure TLoadMenu.Work;
-begin
-  log.level := LLINFO;
-  log.info('Load Menu Work');
-
-  if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
-  then
   begin
-    BusyMouse;
+    log.level := LLINFO;
+    log.info('Load Menu Work');
 
-    myApplication.iCal.Free;
-    directory := myPath;
-    LoadCal;
-   
-    if (myApplication.iCal.entries > 0)
+    if FileSelect(NIL, 'Load ICS file ', '*.*', myPath, myFile, TRUE)
     then
     begin
-      myApplication.iCal.sort;
-      FilterCal;
+      BusyMouse;
+
+      myApplication.iCal.Free;
+      directory := myPath;
+      LoadCal;
+
+      if (myApplication.iCal.entries > 0)
+      then
+      begin
+        myApplication.iCal.sort;
+        FilterCal;
+      end;
+
+      MyApplication.WinCal^.ForceRedraw;
+
+      ArrowMouse;
+      log.debug('Loaded');
     end;
-
-    MyApplication.WinCal^.ForceRedraw;
-
-    ArrowMouse;
-    log.debug('Loaded');
   end;
-
-end;
 
 
 procedure TCalMenu.Work;
-begin
-  log.level := LLINFO;
-  log.debug('CalMenu Work');
-
-  if aDialog <> NIL
-  then
-    aDialog^.MakeWindow;
-
-  (* Window *)
-  if MyApplication.WinCal = NIL
-  then
   begin
-    MyApplication.WinCal := new(PWinCal, Init(NIL, dAppName));
-    MyApplication.WinCal^.SetSubTitle('Calendar Month');
+    log.level := LLINFO;
+    log.debug('CalMenu Work');
+
+    if aDialog <> NIL
+    then
+      aDialog^.MakeWindow;
+
+    (* Window *)
+    if MyApplication.WinCal = NIL
+    then
+    begin
+      MyApplication.WinCal := new(PWinCal, Init(NIL, dAppName));
+      MyApplication.WinCal^.SetSubTitle('Calendar Month');
+    end;
+
+    if MyApplication.WinCal <> NIL
+    then
+      MyApplication.WinCal^.MakeWindow;
   end;
-
-  if MyApplication.WinCal <> NIL
-  then
-    MyApplication.WinCal^.MakeWindow;
-
-end;
 
 
 procedure TNavPrevMon.Work;
+  begin
+    log.level := LLINFO;
+    log.debug('Prev Month Work');
 
-begin
-  log.level := LLINFO;
-  log.debug('Prev Month Work');
+    myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, -1);
 
-  myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, -1);
+    FilterCal;
 
-  FilterCal;
-
-  MyApplication.WinCal^.ForceRedraw;
-
-end;
+    MyApplication.WinCal^.ForceRedraw;
+  end;
 
 
 procedure TNavNextMon.Work;
+  begin
+    log.level := LLINFO;
+    log.debug('Next Month Work');
 
-begin
-  log.level := LLINFO;
-  log.debug('Next Month Work');
+    myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, 1);
+  
+    FilterCal;
 
-  myApplication.winCal^.calDate := IncMonth(myApplication.winCal^.calDate, 1);
-
-  FilterCal;
-
-  MyApplication.WinCal^.ForceRedraw;
-
-end;
+    MyApplication.WinCal^.ForceRedraw;
+  end;
 
 
 procedure TNavPrevYear.Work;
+  begin
+    log.level := LLINFO;
+    log.debug('Prev Year Work');
 
-begin
-  log.level := LLINFO;
-  log.debug('Prev Year Work');
+    myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, -1);
 
-  myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, -1);
+    FilterCal;
 
-  FilterCal;
-
-  MyApplication.WinCal^.ForceRedraw;
-
-end;
+    MyApplication.WinCal^.ForceRedraw;
+  end;
 
 
 procedure TNavNextYear.Work;
+  begin
+    log.level := LLINFO;
+    log.debug('Next Year Work');
 
-begin
-  log.level := LLINFO;
-  log.debug('Next Year Work');
+    myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, 1);
 
-  myApplication.winCal^.calDate := IncYear(myApplication.winCal^.calDate, 1);
+    FilterCal;
 
-  FilterCal;
-
-  MyApplication.WinCal^.ForceRedraw;
-
-end;
+    MyApplication.WinCal^.ForceRedraw;
+  end;
 
 
 procedure LoadCal;
 (*
  * Purpose: Load all the *.ics files in directory.
  *)
-begin
-  log.level := LLINFO;
-  myApplication.iCal := TCal.Create;
+  begin
+    log.level := LLINFO;
+    myApplication.iCal := TCal.Create;
 
-  log.debug('Load ICS files from ' + directory);
+    log.debug('Load ICS files from ' + directory);
 
-  (* Load iCal events *)
-  myApplication.iCal.loadICS(directory);
+    (* Load iCal events *)
+    myApplication.iCal.loadICS(directory);
   
-  log.debug('loaded ', myApplication.iCal.entries );
-end;
+    log.debug('loaded ', myApplication.iCal.entries );
+  end;
 
 
 procedure FilterCal;

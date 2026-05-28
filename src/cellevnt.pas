@@ -23,7 +23,7 @@ interface
 
 implementation
 
-  constructor TCellEvent.Create;
+constructor TCellEvent.Create;
   begin
     summary   := '';
     location  := '';
@@ -34,7 +34,7 @@ implementation
   end;
 
 
-  destructor TCellEvent.Destroy;
+destructor TCellEvent.Destroy;
   begin
     timeStart.free;
     timeEnd.free;

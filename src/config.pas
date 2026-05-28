@@ -34,7 +34,7 @@ uses
     LNG_TK         = 'long';
     UTC_OFFSET_TK  = 'UTCoffset';
 
-  constructor TConfig.create;
+constructor TConfig.create;
   begin
     name      := 'default';
     lat       := 51.4779;
@@ -45,13 +45,13 @@ uses
   end;
 
 
-  destructor TConfig.destroy;
+destructor TConfig.destroy;
   begin
     inherited Destroy;
   end;
 
 
-  function getValue(keyValue : TToken; value : real; limit: real) : real;
+function getValue(keyValue : TToken; value : real; limit: real) : real;
   var
     code         : Integer;
     valReal      : Real;
@@ -71,11 +71,10 @@ uses
       log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
     else
       getValue := valReal;
-
   end;
 
 
-  procedure TConfig.readConfig;
+procedure TConfig.readConfig;
   var
     cnfFile      : Text;
 
@@ -129,7 +128,6 @@ uses
     log.debug ('UTC = ', UTCoffset);
 
     close(cnfFile);
-
   end;
 
 end.

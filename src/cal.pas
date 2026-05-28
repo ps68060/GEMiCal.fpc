@@ -37,7 +37,7 @@ implementation
     SysUtils,
     Logger;
 
-  constructor TCal.Create;
+constructor TCal.Create;
   var
     i : Integer;
   begin
@@ -51,7 +51,7 @@ implementation
   end;
 
 
-  destructor TCal.Destroy;
+destructor TCal.Destroy;
   var
     i : Integer;
   begin
@@ -64,7 +64,7 @@ implementation
   end;
 
 
-  Procedure TCal.LoadICS (directory : String);
+procedure TCal.LoadICS (directory : String);
   (*
    * Purpose : Load all the *.ics files from the <directory>.
    *)
@@ -93,8 +93,7 @@ implementation
   end;
 
 
-  Procedure TCal.DivideIcs (const calName : String);
-
+procedure TCal.DivideIcs (const calName : String);
   (*
    * Purpose : Read an ICS file and get all the Events
    *           into EventsList.
@@ -146,7 +145,7 @@ implementation
   end;
 
 
-  Procedure TCal.Sort;
+procedure TCal.Sort;
   var
     i, j    : Integer;
     swapper : TEvent;
