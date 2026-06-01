@@ -105,21 +105,23 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
       begin
         log.debug ('CELLGRID: IN Scope', i );
 
-        FilterEvent(cal.eventList[i], calDate, i);
+        ExpandEvent(cal.eventList[i], calDate, i);
       end;
 
     end;  (* for *)
   end;
 
 
-procedure TCellGrid.FilterEvent(event     : TEvent;
+procedure TCellGrid.ExpandEvent(event     : TEvent;
                                 calDate   : TDateTime;
                                 e         : Integer);
 
-  (* Purpose : Store a single event in the cellGrid
+  (* Purpose : Take a single event and write it to the cellGrid for the calDate month.
    *           cal     = iCal calendar
    *           calDate = date of 1st of month
    *           e       = event number in calendar
+   *
+   *           If the event covers multiple days, then the event summary and location are written to each day in the cellGrid.
    *           Check event, if it starts in the month to be displayed. If not, then use 1st of month as start date.
    *           Check event, if it ends in the month to be displayed.   If not, then use last day of month as end date.
    *           Iterate through the days of the event and store the event summary and location in the cellGrid for each day.
@@ -146,7 +148,7 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
 //    if (event.startDate.getMMFromIso = MonthOf(calDate) )
     if (IsSameMonth(calDate, event.startDate.fpDateTime) )
     then
-      sDate := event.startDate.getDDFromIso
+      sDate := DayOfTheMonth(event.startDate.fpDateTime)
     else
       sDate := 1;
 
@@ -160,7 +162,7 @@ procedure TCellGrid.FilterEvent(event     : TEvent;
       then
         eDate := sDate
       else
-        eDate := event.endDate.getDDFromIso
+        eDate := DayOfTheMonth(event.endDate.fpDateTime);
     else
       eDate := DaysInMonth(calDate);
 
