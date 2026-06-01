@@ -56,7 +56,7 @@ type
 
                    procedure DisplayEvents;
 
-                   procedure CalcPos(row,
+                   procedure CalcWinXY(row,
                                      col   : Integer;
                                      var xVar,
                                          yVar : SmallInt);
@@ -243,10 +243,10 @@ procedure TWinCal.IconPaint(var PaintInfo : TPaintStruct);
   end;
 
 
-procedure TWinCal.CalcPos(row,
-                          col   : Integer;
-                          var xVar,
-                              yVar : SmallInt);
+procedure TWinCal.CalcWinXY(row,
+                            col   : Integer;
+                            var xVar,
+                                yVar : SmallInt);
   (* Purpose : Calculate the x, y window coords of the cell from row, col.
    * inputs  : row 0 to 6
    *           col 0 to 5
@@ -260,7 +260,26 @@ procedure TWinCal.CalcPos(row,
   
     log.debug('xVar= ', xVar);
     log.debug('yVar= ', yVar);
-    log.debug('CalcPos: exit');
+    log.debug('CalcWinXY: exit');
+  end;
+
+
+procedure TWinCal.CalcGridRowCol(xPos,
+                                 yPos   : SmallInt;
+                                 var rowVar,
+                                     colVar : Integer);
+  (* Purpose : Calculate the row and column of the calendar cell from x, y window coords
+   * inputs  : x, y pixel coords.
+   * returns : row 0 to 6
+   *           col 0 to 5
+   *)
+  begin
+    log.level := LLINFO;
+    rowVar := (yPos - Curr.Y - titleHeight) div cellHeight;
+    colVar := (xPos - Curr.X) div cellWidth;
+    
+    log.debug('rowVar= ', rowVar);
+    log.debug('colVar= ', colVar);
   end;
 
 
@@ -387,7 +406,7 @@ procedure TWinCal.DrawGridHeading;
     LOG.DEBUG('DrawGridHeading: 1');
     for c := 0 to 6 do
     begin
-      CalcPos(0, c, pixX, pixY);
+      CalcWinXY(0, c, pixX, pixY);
       v_gtext(vdiHandle,
               scrollX + pixX + Attr.boxWidth div 2,
               scrollY + pixY + Attr.boxHeight - hCell*2, // hchar, (*(cellHeight div 2),*)
@@ -422,8 +441,8 @@ procedure TWinCal.DrawGrid(rows  : Integer);
     for r := 0 to rows do
     begin
       (* create a list of co-ords, declaration order above is the important bit *)
-      CalcPos (r, 0, pxy[0], pxy[1]);
-      CalcPos (r, 6, pxy[2], pxy[3]);
+      CalcWinXY (r, 0, pxy[0], pxy[1]);
+      CalcWinXY (r, 6, pxy[2], pxy[3]);
   
       pxy[2] := pxy[2] + cellWidth;
       pxy[1] := pxy[1] + scrollY;
@@ -438,8 +457,8 @@ procedure TWinCal.DrawGrid(rows  : Integer);
     for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
     begin
       (* Use column to calc X co-ord in [0] *)
-      CalcPos (0,    c, pxy[0], pxy[1]);
-      CalcPos (rows, c, pxy[2], pxy[3]);
+      CalcWinXY (0,    c, pxy[0], pxy[1]);
+      CalcWinXY (rows, c, pxy[2], pxy[3]);
   
       pxy[1] := pxy[1] + scrollY;
       pxy[3] := pxy[3] + scrollY;
@@ -452,7 +471,7 @@ procedure TWinCal.DrawGrid(rows  : Integer);
 function GetFirstOffset(calDate : TDateTime)
         : Integer;
   begin
-    GetFirstOffset := (DayOfweek(calDate) + 5) mod 7;
+    GetFirstOffset := (DayOfWeek(calDate) + 5) mod 7;
   end;
 
 
@@ -511,7 +530,7 @@ procedure TWinCal.WriteDates;
     for i := 1 to DaysInMonth(calDate) do
     begin
       CalcCellGrid(firstOffset, i, row, col);
-      CalcPos(row, col, pixX, pixY);
+      CalcWinXY(row, col, pixX, pixY);
   
       if (currentMonth)
          and (i = dateNow)
@@ -580,7 +599,7 @@ procedure TWinCal.DisplayEvents;
     for day := 1 to 31 do
     begin
       CalcCellGrid (GetFirstOffset(calDate), day, row, col);
-      CalcPos(row, col, pixX, pixY);
+      CalcWinXY(row, col, pixX, pixY);
 
       if (cellGr.calCell[day].counter > 0)
       then
