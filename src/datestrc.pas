@@ -46,7 +46,7 @@ type
     fpDateTime : TDateTime;
     epoch      : LongInt;
 
-    day     : Integer;
+///    day     : Integer;
 
     constructor Create;
     destructor  Destroy; override;
@@ -98,9 +98,9 @@ constructor TDateStruct.Create;
     tz      := '+0000';
 
     epoch  := 0;
-    day    := 4;
+///    day    := 4;
     
-    iso8601 := concat(isoDate, 'T', isoTime);
+    iso8601 := concat(isoDate, 'T', isoTime, tz);
     fpDateTime := ISO8601ToDate(iso8601, false);
   end;
 
@@ -135,10 +135,9 @@ constructor TDateStruct.CreateFromISO(dtString : String);
     fpDateTime := ISO8601ToDate(dtString, false);
 
     epoch      := DateTimeToUnix(fpDateTime);
-    day        := DayOfTheWeek(fpDateTime);
+//    day        := DayOfTheWeek(fpDateTime);
 
     log.debug('TDateStruct: epoch= ', epoch);
-    log.debug('TDateStruct: day= ', day);
   end;
 
 
@@ -289,7 +288,6 @@ procedure TDateStruct.WriteDateStrc;
     writeln('ISO ', isoDate, 'T', isoTime, tz,
             ' DateTime ', fpDateTime,
             ' epoch ',    epoch,
-            ' ',          day1[day]
            );
   end;
 
@@ -315,6 +313,44 @@ function TDateStruct.isAllDay
       isAllDay := true;
     end;
 
+  end;
+
+
+  function BSTstart
+          : TDateTime;
+    (* Purpose : Calculate the date of the last Sunday in March for a given year
+     *  inputs  : year = the year for which to calculate the last Sunday in March
+     *  returns : the date of the last Sunday in March (1 to 31)
+     *)
+  var
+    lDate      : TDateTime;
+    lastSunday : Integer;
+  begin
+    BSTstart := fpDateTime;
+    lDate := EncodeDate(YearOf(fpDateTime), 3, 31);
+
+    lastSunday := 31 - DayOfWeek(lDate) + 1; // Calculate the last Sunday
+    BSTstart := RecodeDay(lDate, lastSunday);
+    BSTstart := RecodeTime(BSTstart, 2, 0, 0, 0);  // Set time to 2:00am
+  end;
+
+
+  function BSTend
+          : TDateTime;
+    (* Purpose : Calculate the date of the last Sunday in October for a given year
+     *  inputs  : year = the year for which to calculate the last Sunday in October
+     *  returns : the date of the last Sunday in October (1 to 31)
+     *)
+  var
+    lDate      : TDateTime;
+    lastSunday : Integer;
+  begin
+    BSTend := fpDateTime;
+    lDate := EncodeDate(YearOf(fpDateTime), 10, 31);
+
+    lastSunday := 31 - DayOfWeek(lDate) + 1; // Calculate the last Sunday
+    BSTend := RecodeDay(lDate, lastSunday);
+    BSTend := RecodeTime(BSTend, 1, 0, 0, 0);  // Set time to 1:00am
   end;
 
 end.
