@@ -85,6 +85,20 @@ function TToken.StartsWith (const token : String)
 
 
 procedure TToken.TokeniseIcal (line : String);
+  (*
+   * Purpose : Tokenise an iCal line into tag, qualifier and value.
+   * The tag is the part before the first colon,
+   *  the value is the part after.
+   * The tag may have a qualifier separated by a semi-colon.
+   * e.g. "DTSTART;VALUE=DATE:20220101" would be tokenised as
+   *       part[0] = "DTSTART"
+   *       part[1] = "VALUE=DATE"
+   *       part[2] = "20220101"
+   * or  "DTSTART;TZID=Europe/London:20200516T000000" would be tokenised as
+   *       part[0] = "DTSTART"
+   *       part[1] = "TZID=Europe/London"
+   *       part[2] = "20200516T000000"
+   *)
   var
     posn         : Integer;
 
