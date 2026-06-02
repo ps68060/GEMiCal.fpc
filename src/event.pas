@@ -40,16 +40,21 @@ type
     constructor Create;
     destructor  Destroy; override;
 
-    Function GetEvent (VAR calFile : Text)
+    function GetEvent (VAR calFile : Text)
             : Boolean;
 
-    Function GetAlarm (var calFile : Text)
+    function GetAlarm (var calFile : Text)
             : Boolean;
 
-    Procedure DebugEvent;
+    procedure DebugEvent;
 
-    Function IsMonthEvent (calDate : TDateTime)
+    function IsMonthEvent (calDate : TDateTime)
             : Boolean;
+
+    procedure SaveEvent(var calFile : Text);
+
+    function GetTimeZone(TZIdString: String)
+            : String;
   end;
 
 
@@ -65,8 +70,10 @@ implementation
 
     CREATED_TK    = 'CREATED';
     UID_TK        = 'UID';
+
     DTSTART_TK    = 'DTSTART';
     DTEND_TK      = 'DTEND';
+    TZID_TK       = 'TZID';
 
     SUMMARY_TK    = 'SUMMARY';
     DESCR_TK      = 'DESCRIPTION';
@@ -118,13 +125,13 @@ function TEvent.GetEvent (VAR calFile : Text)
    *)
 
   var
-    dummy        : String;
     currentLn    : String;
 
     alarm        : Boolean;
     endEvent     : Boolean;
 
     tokens       : TToken;
+    subTokens    : TToken;
 
   begin
     log.level := LLINFO;
@@ -152,47 +159,47 @@ function TEvent.GetEvent (VAR calFile : Text)
         tokens := TToken.Create;
         tokens.tokeniseIcal(currentLn);
 
-        if (tokens.StartsWith(createdTk))
+        if (tokens.StartsWith(CREATED_TK))
         then
           created := tokens.part[2];
 
-        if (tokens.StartsWith(uidTk))
+        if (tokens.StartsWith(UID_TK))
         then
           uid := tokens.part[2];
 
-        if (tokens.StartsWith(dtStartTk))
+        if (tokens.StartsWith(DTSTART_TK))
         then
         begin
           dtStart   := tokens.part[2];
           dtStartTz := tokens.part[1];  // e.g. "DTSTART;TZID=Europe/London:20200516T000000" -> tz = "TZID=Europe/London"
           
-          if (dtStartTz.StartsWith(TZID_TK))
-          then
-            SplitAt('=', dtStartTz, dummy, dtStartTz);
+//          if (dtStartTz.StartsWith(TZID_TK))
+//          then
+//            dtStartTz := GetTimeZone(tokens.part[1]);
         end;
 
-        if (tokens.StartsWith(dtEndTk))
+        if (tokens.StartsWith(DTEND_TK))
         then
         begin
           dtEnd   := tokens.part[2];
           dtEndTz := tokens.part[1];  // e.g. "DTEND;TZID=Europe/London:20200516T000000" -> tz = "TZID=Europe/London"
           
-          if (dtEndTz.StartsWith(TZID_TK))
-          then
-            SplitAt('=', dtEndTz, dummy, dtEndTz);
+//          if (dtEndTz.StartsWith(TZID_TK))
+//          then
+//            dtEndTz := GetTimeZone(tokens.part[1]);
         end;
 
-        if ( tokens.StartsWith(SummaryTk))
+        if ( tokens.StartsWith(SUMMARY_TK))
            and (NOT alarm)
         then
           summary := tokens.part[2];
 
-        if ( tokens.StartsWith(descrTk))
+        if ( tokens.StartsWith(DESCR_TK))
            and (NOT alarm)
         then
           description := tokens.part[2];
 
-        if ( tokens.StartsWith(locationTk))
+        if ( tokens.StartsWith(LOCATION_TK))
            and (NOT alarm)
         then
           location := tokens.part[2];
@@ -238,6 +245,20 @@ function TEvent.GetEvent (VAR calFile : Text)
     GetEvent := TRUE;
     DebugEvent;
 
+  end;
+
+
+function TEvent.GetTimeZone(TZIdString: String)
+        : String;
+  var
+    subTokens  : TToken;
+  begin
+    subTokens := TToken.Create;
+    subTokens.TokeniseInf(TZIdString);
+
+    GetTimeZone := subTokens.part[2];
+    writeln ('start TZ= ', GetTimeZone);
+    subTokens.Destroy;
   end;
 
 
@@ -394,10 +415,10 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
   end;
 
 
-procedure TEvent.SaveEvent(calFile : Text);
+procedure TEvent.SaveEvent(var calFile : Text);
   (*
-  * Purpose : Write the event to the calendar file.
-  *)
+   * Purpose : Write the event to the calendar file.
+   *)
   begin
     writeln(calFile, BEGIN_EVENT_TK);
     writeln(calFile, CREATED_TK,  ':', created);

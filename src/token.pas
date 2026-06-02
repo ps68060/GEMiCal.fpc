@@ -52,10 +52,10 @@ destructor TToken.Destroy;
 
 
 procedure splitAt(divider     : Char;
-                    line        : String;
-                    var  before,
-                         after       : String
-                   );
+                  line        : String;
+                  var  before,
+                       after       : String
+                 );
   var
     posn        : Integer;
 

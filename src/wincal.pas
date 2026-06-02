@@ -57,9 +57,14 @@ type
                    procedure DisplayEvents;
 
                    procedure CalcWinXY(row,
-                                     col   : Integer;
-                                     var xVar,
-                                         yVar : SmallInt);
+                                       col   : Integer;
+                                       var xVar,
+                                           yVar : SmallInt);
+
+                   procedure CalcGridRowCol(xPos,
+                                            yPos   : SmallInt;
+                                            var rowVar,
+                                                colVar : Integer);
 
                    procedure DrawGrid(rows : Integer);
                  END;

@@ -32,8 +32,8 @@ type
     procedure Sort;
     
     procedure WriteIcsHeader(var calFile : Text);
+    procedure WriteIcsFooter(var calFile : Text);
     procedure SaveIcs (directory : String);
-    procedure WriteFooter(var calFile : Text);
   end;
 
 implementation
@@ -208,6 +208,12 @@ procedure TCal.WriteIcsHeader(var calFile : Text);
   end;
 
 
+procedure TCal.WriteIcsFooter(var calFile : Text);
+  begin
+    writeln(calFile, END_CAL_TK);
+  end;
+
+
 procedure TCal.SaveIcs (directory : String);
   (*
    * Purpose : Save all the events in the calendar to a file.
@@ -232,12 +238,6 @@ procedure TCal.SaveIcs (directory : String);
     close(calFile);
     
     WriteIcsFooter(calFile);
-  end;
-
-
-procedure TCal.WriteFooter(var calFile : Text);
-  begin
-    writeln(calFile, END_CAL_TK);
   end;
 
 end.

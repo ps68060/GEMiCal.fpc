@@ -31,7 +31,7 @@ interface
       procedure FilterEvents(cal       : TCal;
                              calDate   : TDateTime);
 
-      procedure FilterEvent(event     : TEvent;
+      procedure ExpandEvent(event     : TEvent;
                             calDate   : TDateTime;
                             e         : Integer);
     end;
@@ -158,7 +158,7 @@ procedure TCellGrid.ExpandEvent(event     : TEvent;
       then
         eDate := sDate
       else
-        eDate := DayOfTheMonth(event.endDate.fpDateTime);
+        eDate := DayOfTheMonth(event.endDate.fpDateTime)
     else
       eDate := DaysInMonth(calDate);
 
