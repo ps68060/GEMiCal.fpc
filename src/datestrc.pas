@@ -68,6 +68,11 @@ type
 
     procedure WriteDateStrc;
 
+    function BSTstart
+            : TDateTime;
+
+    function BSTend
+            : TDateTime;
   end;
 
 
@@ -277,13 +282,13 @@ procedure TDateStruct.WriteDateStrc;
   begin
     writeln('ISO ', isoDate, 'T', isoTime, tz,
             ' DateTime ', fpDateTime,
-            ' epoch ',    epoch,
+            ' epoch ',    epoch
            );
   end;
 
 
-  function BSTstart
-          : TDateTime;
+function TDateStruct.BSTstart
+        : TDateTime;
     (* Purpose : Calculate the date of the last Sunday in March for a given year
      *  inputs  : year = the year for which to calculate the last Sunday in March
      *  returns : the date of the last Sunday in March (1 to 31)
@@ -301,8 +306,8 @@ procedure TDateStruct.WriteDateStrc;
   end;
 
 
-  function BSTend
-          : TDateTime;
+function TDateStruct.BSTend
+        : TDateTime;
     (* Purpose : Calculate the date of the last Sunday in October for a given year
      *  inputs  : year = the year for which to calculate the last Sunday in October
      *  returns : the date of the last Sunday in October (1 to 31)
