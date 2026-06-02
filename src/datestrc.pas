@@ -16,10 +16,6 @@ interface
     DateUtils;
 
 const
-  daySec  = 86400;
-  hourSec = 3600;
-  minSec  = 60;
-
   mon1   : array [1..12] of String
          = ('January', 'February', 'March',     'April',   'May',      'June',
             'July',    'August',   'September', 'October', 'November', 'December');
@@ -27,9 +23,6 @@ const
   mon2   : array [1..12] of String
          = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-
-  daysMon : array [1..12] of Integer
-          = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 
   day1   : array [0..6] of String
          = ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
@@ -41,10 +34,10 @@ type
   TDateStruct = class
     isoDate    : String;
     isoTime    : String;
-    tz         : String;
-
-    fpDateTime : TDateTime;
     epoch      : LongInt;
+
+    fpDateTime : TDateTime;  // plan is to store as date-time as UTC
+    tz         : String;     // and retain the original timezone string for reference
 
 ///    day     : Integer;
 
@@ -75,9 +68,6 @@ type
 
     procedure WriteDateStrc;
 
-    function isAllDay
-            : Boolean;
-
   end;
 
 
@@ -107,7 +97,7 @@ constructor TDateStruct.Create;
 
 destructor TDateStruct.Destroy;
   begin
-    inherited destroy;
+    inherited Destroy;
   end;
 
 
@@ -289,30 +279,6 @@ procedure TDateStruct.WriteDateStrc;
             ' DateTime ', fpDateTime,
             ' epoch ',    epoch,
            );
-  end;
-
-
-function TDateStruct.isAllDay
-        : Boolean;
-  (* Purpose : Is this an all day event ? *)
-
-  begin
-    if     (getHrFromIso  = 0)
-       and (getMinFromIso = 0)
-       and (getSecFromIso = 0)
-    then
-      isAllDay := true
-    else
-      isAllDay := false;
-
-    if     (getYYYYFromIso = 1970)
-       and (getMMFromIso   = 1)
-       and (getDDFromIso   = 1)
-    then
-    begin
-      isAllDay := true;
-    end;
-
   end;
 
 

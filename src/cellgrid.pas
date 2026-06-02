@@ -134,8 +134,6 @@ procedure TCellGrid.ExpandEvent(event     : TEvent;
     summ,
     locat       : String;
 
-    allDay      : Boolean;
-
     j,
     sDate,
     eDate       : Integer;
@@ -152,13 +150,11 @@ procedure TCellGrid.ExpandEvent(event     : TEvent;
     else
       sDate := 1;
 
-    allDay := event.endDate.isAllDay;
-
     (* Does the event End after the displayed month ? *)
     if (IsSameMonth(calDate, event.endDate.fpDateTime) )
     then
       (* All Day events *)
-      if     (allDay)
+      if     (event.allDay)
       then
         eDate := sDate
       else
@@ -172,7 +168,7 @@ procedure TCellGrid.ExpandEvent(event     : TEvent;
     begin
       //log.debug ('FilterEvent: event date ',  + j);
       //log.debug ('FilterEvent: slot ', calCell[j].counter);
-      //event.writeEvent;
+      //event.DebugEvent;
 
       (* Abbreviate the Event summary and place it in a slot in the calCell *)
       summ  := Copy (event.summary,  1, SUMMARY_LEN);
