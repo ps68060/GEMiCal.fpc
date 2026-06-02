@@ -13,8 +13,10 @@ interface
     Objects,
     Event;
 
-const
-  MAXEVENTS = 9999;
+  const
+    MAXEVENTS = 9999;
+    BEGIN_CAL_TK = 'BEGIN:VCALENDAR';
+    END_CAL_TK   = 'END:VCALENDAR';
 
 type
   TCal = class
@@ -25,10 +27,13 @@ type
     constructor Create;
     destructor  Destroy; override;
 
-    Procedure LoadICS (directory : String);
-    Procedure DivideIcs (const calName : String);
-    Procedure Sort;
-
+    procedure LoadIcs (directory : String);
+    procedure DivideIcs (const calName : String);
+    procedure Sort;
+    
+    procedure WriteIcsHeader(var calFile : Text);
+    procedure SaveIcs (directory : String);
+    procedure WriteFooter(var calFile : Text);
   end;
 
 implementation
@@ -64,7 +69,7 @@ destructor TCal.Destroy;
   end;
 
 
-procedure TCal.LoadICS (directory : String);
+procedure TCal.LoadIcs (directory : String);
   (*
    * Purpose : Load all the *.ics files from the <directory>.
    *)
@@ -169,8 +174,8 @@ procedure TCal.Sort;
         begin
           (*
           writeln('Before swap ', i, ' ', j);
-          eventList[i].writeEvent;
-          eventList[j].writeEvent;
+          eventList[i].debugEvent;
+          eventList[j].debugEvent;
           *)
 
           swapper            := eventList[i];
@@ -180,8 +185,8 @@ procedure TCal.Sort;
           (*
           writeln;
           writeln('After swap');
-          eventList[i].writeEvent;
-          eventList[j].writeEvent;
+          eventList[i].debugEvent;
+          eventList[j].debugEvent;
           writeln;
           writeln;
           *)
@@ -192,6 +197,47 @@ procedure TCal.Sort;
 
     log.debug('Sorted ', entries);
 
+  end;
+
+
+procedure TCal.WriteIcsHeader(var calFile : Text);
+  begin
+    writeln(calFile, BEGIN_CAL_TK);
+    writeln(calFile, 'VERSION:2.0');
+    writeln(calFile, 'PRODID:-//GEMiCal//ICALTEST//EN');
+  end;
+
+
+procedure TCal.SaveIcs (directory : String);
+  (*
+   * Purpose : Save all the events in the calendar to a file.
+   *)
+  var
+    calFile  : Text;
+    i        : Integer;
+    
+  begin
+    log.level := LLDEBUG;
+    
+    (* Open the calendar file for writing *)
+    assign (calFile, directory + '/calTest.ics');
+    rewrite (calFile);
+    
+    WriteIcsHeader(calFile);
+    
+    for i := 0 to entries - 1 do
+    begin
+      eventList[i].SaveEvent(calFile);
+    end;
+    close(calFile);
+    
+    WriteIcsFooter(calFile);
+  end;
+
+
+procedure TCal.WriteFooter(var calFile : Text);
+  begin
+    writeln(calFile, END_CAL_TK);
   end;
 
 end.
