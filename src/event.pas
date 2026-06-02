@@ -20,10 +20,12 @@ type
   TEvent = class
     filename    : String;
     created     : String;
+    uid         : String;
     summary     : String;
     description : String;
     dtStart     : String;
     dtStartTz   : String;
+    allDay      : Boolean;
     dtEnd       : String;
     dtEndTz     : String;
     location    : String;
@@ -35,8 +37,8 @@ type
     alarmTrigger     : String;
     alarmDescription : String;
 
-    constructor create;
-    destructor  destroy; override;
+    constructor Create;
+    destructor  Destroy; override;
 
     Function GetEvent (VAR calFile : Text)
             : Boolean;
@@ -44,7 +46,7 @@ type
     Function GetAlarm (var calFile : Text)
             : Boolean;
 
-    Procedure WriteEvent;
+    Procedure DebugEvent;
 
     Function IsMonthEvent (calDate : TDateTime)
             : Boolean;
@@ -58,14 +60,18 @@ implementation
     Logger;
 
   const
-    endEventTk   = 'END:VEVENT';
-    createdTk    = 'CREATED';
-    dtStartTk    = 'DTSTART';
-    dtEndTk      = 'DTEND';
-    SummaryTk    = 'SUMMARY';
-    descrTk      = 'DESCRIPTION';
-    locationTk   = 'LOCATION';
-    recurRuleTk  = 'RRULE';
+    BEGIN_EVENT_TK = 'BEGIN:VEVENT';
+    END_EVENT_TK   = 'END:VEVENT';
+
+    CREATED_TK    = 'CREATED';
+    UID_TK        = 'UID';
+    DTSTART_TK    = 'DTSTART';
+    DTEND_TK      = 'DTEND';
+
+    SUMMARY_TK    = 'SUMMARY';
+    DESCR_TK      = 'DESCRIPTION';
+    LOCATION_TK   = 'LOCATION';
+    RECUR_RULE_TK = 'RRULE';
 
     beginAlarmTk  = 'BEGIN:VALARM';
     endAlarmTk    = 'END:VALARM';
@@ -73,14 +79,16 @@ implementation
     alarmDescTk   = 'DESCRIPTION:';
     alarmActionTk = 'ACTION:';
 
-constructor TEvent.create;
+constructor TEvent.Create;
   begin
     filename    := '';
     created     := '';
+    uid         := '';
     summary     := '';
     description := '';
     dtstart     := '';
     dtstartTz   := '';
+    allDay      := TRUE;
     dtend       := '';
     dtendTz     := '';
     location    := '';
@@ -93,12 +101,12 @@ constructor TEvent.create;
     endDate   := TDateStruct.create;
   end;
 
-destructor TEvent.destroy;
+destructor TEvent.Destroy;
   begin
     startDate.free;
     endDate.free;
 
-    inherited destroy;
+    inherited Destroy;
   end;
 
 
@@ -110,7 +118,7 @@ function TEvent.GetEvent (VAR calFile : Text)
    *)
 
   var
-    convStr      : String;
+    dummy        : String;
     currentLn    : String;
 
     alarm        : Boolean;
@@ -133,7 +141,7 @@ function TEvent.GetEvent (VAR calFile : Text)
       log.debug(currentLn);
 
       (* Look for End Event *)
-      if ( pos(endEventTk, currentLn) = 1 )
+      if ( pos(END_EVENT_TK, currentLn) = 1 )
       then
       begin
         endEvent := TRUE;
@@ -148,18 +156,30 @@ function TEvent.GetEvent (VAR calFile : Text)
         then
           created := tokens.part[2];
 
+        if (tokens.StartsWith(uidTk))
+        then
+          uid := tokens.part[2];
+
         if (tokens.StartsWith(dtStartTk))
         then
         begin
           dtStart   := tokens.part[2];
-          dtStartTz := tokens.part[1];
+          dtStartTz := tokens.part[1];  // e.g. "DTSTART;TZID=Europe/London:20200516T000000" -> tz = "TZID=Europe/London"
+          
+          if (dtStartTz.StartsWith(TZID_TK))
+          then
+            SplitAt('=', dtStartTz, dummy, dtStartTz);
         end;
 
-        if ( tokens.StartsWith(dtEndTk))
+        if (tokens.StartsWith(dtEndTk))
         then
         begin
           dtEnd   := tokens.part[2];
-          dtEndTz := tokens.part[1];
+          dtEndTz := tokens.part[1];  // e.g. "DTEND;TZID=Europe/London:20200516T000000" -> tz = "TZID=Europe/London"
+          
+          if (dtEndTz.StartsWith(TZID_TK))
+          then
+            SplitAt('=', dtEndTz, dummy, dtEndTz);
         end;
 
         if ( tokens.StartsWith(SummaryTk))
@@ -197,6 +217,12 @@ function TEvent.GetEvent (VAR calFile : Text)
     then
     begin
       startDate.CreateFromISO(dtStart);
+      if (pos(dtStart, 'T') = 0)  (* all day event *)
+      then
+        allDay := TRUE
+      else
+        allDay := FALSE;
+
     end;
 
     if (length(dtEnd) > 0)
@@ -210,7 +236,7 @@ function TEvent.GetEvent (VAR calFile : Text)
     end;
 
     GetEvent := TRUE;
-    writeEvent;
+    DebugEvent;
 
   end;
 
@@ -271,11 +297,14 @@ procedure WriteNN(myString : String);
   end;
 
 
-procedure TEvent.WriteEvent;
+procedure TEvent.DebugEvent;
 
   begin
     write('Event on     : ');
     startDate.WriteDateStrc;
+    
+    write('uid          : ');
+    WriteNN (uid);
 
     WriteNN (summary);
     WriteNN (description);
@@ -362,6 +391,27 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
       writeln ('Current event');
     end;
 
+  end;
+
+
+procedure TEvent.SaveEvent(calFile : Text);
+  (*
+  * Purpose : Write the event to the calendar file.
+  *)
+  begin
+    writeln(calFile, BEGIN_EVENT_TK);
+    writeln(calFile, CREATED_TK,  ':', created);
+    writeln(calFile, UID_TK,      ':', uid);
+    writeln(calFile, DTSTART_TK,  ':', dtStart);
+
+    if (NOT allDay)
+    then
+      writeln(calFile, DTEND_TK,    ':', dtEnd);
+
+    writeln(calFile, SUMMARY_TK,  ':', summary);
+    writeln(calFile, DESCR_TK,    ':', description);
+    writeln(calFile, LOCATION_TK, ':', location);
+    writeln(calFile, END_EVENT_TK);
   end;
 
 end.
