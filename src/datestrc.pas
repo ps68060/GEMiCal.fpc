@@ -44,7 +44,7 @@ type
     constructor Create;
     destructor  Destroy; override;
 
-    constructor CreateFromISO(dtString : String);
+    constructor CreateFromISO(iso8601 : String);
 
 //    function getYYYYFromIso
 //            : Integer;
@@ -83,6 +83,7 @@ uses
 constructor TDateStruct.Create;
   var
     iso8601 : String;
+    validDT  : Boolean;
 
   begin
 //    isoDate := '19700101';
@@ -94,7 +95,7 @@ constructor TDateStruct.Create;
 ///    day    := 4;
     
     iso8601 := '19700101T000000+0000';  //concat(isoDate, 'T', isoTime, tz);
-    fpDateTime := ISO8601ToDate(iso8601, false);
+    validDT := TryISOStrToDateTime(iso8601, fpDateTime);
   end;
 
 
@@ -104,32 +105,30 @@ destructor TDateStruct.Destroy;
   end;
 
 
-constructor TDateStruct.CreateFromISO(dtString : String);
+constructor TDateStruct.CreateFromISO(iso8601 : String);
   (* Purpose : Initialise the TDateStruct from an ISO8601 date-time string
-   *   dtString : ISO8601 format used in ical/ics
+   *   iso8601 : ISO8601 format used in ical/ics
    *              YYYYMMDDThhnnss
    *              where the date and time are separated by a 'T' and the time is in 24 hour format.
    *)
   var
-   jd     : Double;
+    validDT  : Boolean;
 
   begin
     log.level := LLINFO;
+    log.debug('CREATE from ISO date-time  ' + iso8601);
 
-    log.debug('CREATE from ISO date-time  ' + dtString);
+//    isoDate := Copy(iso8601, 1, 8);
+//    isoTime := Copy(iso8601, 10, 6);
 
-//    isoDate := Copy(dtString, 1, 8);
-//    isoTime := Copy(dtString, 10, 6);
-
-    if (length(dtString) >= 16 )
+    if (length(iso8601) >= 16 )
     then
-      tz := Copy (dtString, 16, length(dtString) );
+      tz := Copy (iso8601, 16, length(iso8601) );
 
-    fpDateTime := ISO8601ToDate(dtString, false);
+    validDT := TryISOStrToDateTime(iso8601, fpDateTime);
+    epoch   := DateTimeToUnix(fpDateTime);
 
-    epoch      := DateTimeToUnix(fpDateTime);
-
-    log.debug('TDateStruct: epoch= ', epoch);
+    log.debug('TDateStruct: fpDateTime= ', fpDateTime);
   end;
 
 (*
