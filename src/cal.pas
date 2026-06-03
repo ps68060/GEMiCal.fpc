@@ -21,7 +21,7 @@ interface
 type
   TCal = class
     version   : String;
-    eventList : array [0..MAXEVENTS] of TEvent;
+    eventList : array of TEvent;
     entries   : Integer;
 
     constructor Create;
@@ -48,11 +48,6 @@ constructor TCal.Create;
   begin
     version := '2.0';
     entries := 0;
-
-    for i := 0 to MAXEVENTS do
-    begin
-      eventList[i] := TEvent.create;
-    end;
   end;
 
 
@@ -135,7 +130,7 @@ procedure TCal.DivideIcs (const calName : String);
       if ( pos (checkStart, currentLn) = 1 )
       then
       begin
-        eventList[entries] := TEvent.create;
+        eventList[entries] := TEvent.Create;
       
         eventList[entries].getEvent(calFile);
         eventList[entries].filename := calName;
