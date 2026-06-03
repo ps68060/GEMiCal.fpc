@@ -103,6 +103,12 @@ destructor TMyApplication.done;
 
 
 procedure TMyApplication.INITInstance;
+  const
+    K_Left  = $4B00;
+    K_Right = $4D00;
+    K_Up    = $4800;
+    K_Down  = $5000;
+
   var
     appDeskMenu    : PDeskMenu;
     appLoadMenu    : PLoadMenu;
@@ -134,11 +140,11 @@ procedure TMyApplication.INITInstance;
     appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));    (* Display calendar *)
 
     (* Navigation menu *)
-    appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));
-    appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));
+    appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));  // K_Up
+    appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));  // K_Down
 
-    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));
-    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));
+    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));  // K_Left
+    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));  // K_Right
 
     INHERITED INITInstance;
     SetQuit (M_END, M_DESK2);
@@ -164,7 +170,7 @@ procedure TMyApplication.INITMainWindow;
       LoadCal;
 
       // calDate holds the date for the displayed calendar month.
-      // Initially set to the current month.
+      // Initially set to the 1st of the current month.
       // Used to filter the events for the month.
       // Updated when the user navigates to a different month or year.
 
