@@ -80,11 +80,11 @@ implementation
     LOCATION_TK   = 'LOCATION';
     RECUR_RULE_TK = 'RRULE';
 
-    beginAlarmTk  = 'BEGIN:VALARM';
-    endAlarmTk    = 'END:VALARM';
-    triggerTk     = 'TRIGGER:';
-    alarmDescTk   = 'DESCRIPTION:';
-    alarmActionTk = 'ACTION:';
+    BEGIN_ALARM_TK  = 'BEGIN:VALARM';
+    END_ALARM_TK    = 'END:VALARM';
+    TRIGGER_TK      = 'TRIGGER:';
+    ALARM_DESC_TK   = 'DESCRIPTION:';
+    ALARM_ACTION_TK = 'ACTION:';
 
 constructor TEvent.Create;
   begin
@@ -205,11 +205,11 @@ function TEvent.GetEvent (VAR calFile : Text)
           location := tokens.part[2];
 
         if (NOT alarm )
-            and (tokens.StartsWith(beginAlarmTk))
+            and (tokens.StartsWith(BEGIN_ALARM_TK))
         then
           alarm := GetAlarm(calFile);
 
-        if (tokens.StartsWith(endAlarmTk))
+        if (tokens.StartsWith(END_ALARM_TK))
         then
           alarm := FALSE;
 
@@ -280,7 +280,7 @@ function TEvent.GetAlarm (var calFile : Text)
       readln ( calFile, currentLn );
 
       (* Look for End Alarm *)
-      if ( pos(endAlarmTk, currentLn) = 1 )
+      if ( pos(END_ALARM_TK, currentLn) = 1 )
       then
       begin
 
@@ -290,15 +290,15 @@ function TEvent.GetAlarm (var calFile : Text)
       else
       begin
 
-        if (pos(triggerTk, currentLn) = 1 )
+        if (pos(TRIGGER_TK, currentLn) = 1 )
         then
           alarmTrigger := COPY (currentLn, 9, length(currentLn));
 
-        if (pos(alarmActionTk, currentLn) = 1 )
+        if (pos(ALARM_ACTION_TK, currentLn) = 1 )
         then
           alarmAction  := COPY (currentLn, 8, length(currentLn));
 
-        if (pos(alarmDescTk, currentLn) = 1 )
+        if (pos(ALARM_DESC_TK, currentLn) = 1 )
         then
           alarmDescription := COPY (currentLn, 13, length(currentLn));
 
