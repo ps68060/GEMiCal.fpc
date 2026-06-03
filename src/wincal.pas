@@ -346,6 +346,13 @@ procedure TWinCal.DrawTitle;
     currentDateTime := EncodeDateTime(year, month, day, hour, minute, second, sec100);
     dateStr := DateToStr(currentDateTime);
     timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
+    
+    if   (BSTStart(currentDateTime.fpDateTime) < currentDateTime.fpDateTime)
+      and  (BSTEnd(currentDateTime.fpDateTime) > currentDateTime.fpDateTime)
+    then
+      dateStr := dateStr + ' BST';
+    else
+      dateStr := dateStr + ' GMT';
 
     v_gtext(vdiHandle,
             Work.X + Attr.charWidth,
