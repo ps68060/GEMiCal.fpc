@@ -181,7 +181,7 @@ procedure TMyApplication.INITMainWindow;
       then
       begin
 ///        MyApplication.iCal.sort;
-           myApplication.iCal.eventList.sort(startDate.fpDate, true); // sort by start date, then by end date
+///           myApplication.iCal.eventList.sort(startDate.fpDate, true); // sort by start date, then by end date
         FilterCal;
       end;
     end;

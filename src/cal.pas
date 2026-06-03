@@ -48,6 +48,8 @@ constructor TCal.Create;
   begin
     version := '2.0';
     entries := 0;
+    SetLength(eventList, MAXEVENTS);
+    log.debug('TCal.Create');
   end;
 
 
@@ -55,11 +57,6 @@ destructor TCal.Destroy;
   var
     i : Integer;
   begin
-    for i := 0 to MAXEVENTS do
-    begin
-      eventList[i].free;
-    end;
-    
     inherited Destroy;
   end;
 
@@ -125,6 +122,7 @@ procedure TCal.DivideIcs (const calName : String);
     begin
 
       readln ( calFile, currentLn );
+      log.debug ('entries=', entries);
       log.debug (currentLn);
 
       if ( pos (checkStart, currentLn) = 1 )

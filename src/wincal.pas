@@ -347,12 +347,12 @@ procedure TWinCal.DrawTitle;
     dateStr := DateToStr(currentDateTime);
     timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
     
-    if   (BSTStart(currentDateTime.fpDateTime) < currentDateTime.fpDateTime)
-      and  (BSTEnd(currentDateTime.fpDateTime) > currentDateTime.fpDateTime)
+    if   (BSTStart(currentDateTime) < currentDateTime)
+      and  (BSTEnd(currentDateTime) > currentDateTime)
     then
-      dateStr := dateStr + ' BST';
+      timeStr := timeStr + ' :BST'
     else
-      dateStr := dateStr + ' GMT';
+      timeStr := timeStr + ' :GMT';
 
     v_gtext(vdiHandle,
             Work.X + Attr.charWidth,

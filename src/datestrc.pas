@@ -15,20 +15,27 @@ interface
     SysUtils,
     DateUtils;
 
-const
-  mon1   : array [1..12] of String
-         = ('January', 'February', 'March',     'April',   'May',      'June',
-            'July',    'August',   'September', 'October', 'November', 'December');
+  const
+    mon1   : array [1..12] of String
+           = ('January', 'February', 'March',     'April',   'May',      'June',
+              'July',    'August',   'September', 'October', 'November', 'December');
 
-  mon2   : array [1..12] of String
-         = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+    mon2   : array [1..12] of String
+           = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+              'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
-  day1   : array [0..6] of String
-         = ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+    day1   : array [0..6] of String
+           = ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 
-  day2   : array [0..6] of String
-         = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+    day2   : array [0..6] of String
+           = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+
+    function BSTstart(dateTime : TDateTime)
+            : TDateTime;
+
+    function BSTend(dateTime : TDateTime)
+            : TDateTime;
+
 
 type
   TDateStruct = class
@@ -66,11 +73,6 @@ type
 
     procedure WriteDateStrc;
 
-    function BSTstart
-            : TDateTime;
-
-    function BSTend
-            : TDateTime;
   end;
 
 
@@ -243,7 +245,7 @@ procedure TDateStruct.WriteDateStrc;
   end;
 
 
-function TDateStruct.BSTstart
+function BSTstart(dateTime : TDateTime)
         : TDateTime;
     (* Purpose : Calculate the date of the last Sunday in March for a given year
      *  inputs  : year = the year for which to calculate the last Sunday in March
@@ -253,16 +255,15 @@ function TDateStruct.BSTstart
     lDate      : TDateTime;
     lastSunday : Integer;
   begin
-    BSTstart := fpDateTime;
-    lDate := EncodeDate(YearOf(fpDateTime), 3, 31);
+    lDate := EncodeDate(YearOf(dateTime), 3, 31);
 
-    lastSunday := 31 - DayOfWeek(lDate) + 1; // Calculate the last Sunday
-    BSTstart := RecodeDay(lDate, lastSunday);
+    lastSunday := 31 - DayOfWeek(lDate) + 1;       // Calculate the last Sunday
+    BSTstart := RecodeDay(lDate, lastSunday);      // Set date to clock change day
     BSTstart := RecodeTime(BSTstart, 2, 0, 0, 0);  // Set time to 2:00am
   end;
 
 
-function TDateStruct.BSTend
+function BSTend(dateTime : TDateTime)
         : TDateTime;
     (* Purpose : Calculate the date of the last Sunday in October for a given year
      *  inputs  : year = the year for which to calculate the last Sunday in October
@@ -272,11 +273,10 @@ function TDateStruct.BSTend
     lDate      : TDateTime;
     lastSunday : Integer;
   begin
-    BSTend := fpDateTime;
-    lDate := EncodeDate(YearOf(fpDateTime), 10, 31);
+    lDate := EncodeDate(YearOf(dateTime), 10, 31);
 
-    lastSunday := 31 - DayOfWeek(lDate) + 1; // Calculate the last Sunday
-    BSTend := RecodeDay(lDate, lastSunday);
+    lastSunday := 31 - DayOfWeek(lDate) + 1;   // Calculate the last Sunday
+    BSTend := RecodeDay(lDate, lastSunday);    // Set date to clock change day
     BSTend := RecodeTime(BSTend, 1, 0, 0, 0);  // Set time to 1:00am
   end;
 
