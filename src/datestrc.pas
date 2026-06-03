@@ -32,8 +32,8 @@ const
 
 type
   TDateStruct = class
-    isoDate    : String;
-    isoTime    : String;
+//    isoDate    : String;
+//    isoTime    : String;
     epoch      : LongInt;
 
     fpDateTime : TDateTime;  // plan is to store as date-time as UTC
@@ -46,25 +46,23 @@ type
 
     constructor CreateFromISO(dtString : String);
 
-    function getYYYYFromIso
-            : Integer;
+//    function getYYYYFromIso
+//            : Integer;
 
-    function getMMFromIso
-            : Integer;
+//    function getMMFromIso
+//            : Integer;
 
-    function getDDFromIso
-            : Integer;
+//    function getDDFromIso
+//            : Integer;
 
-    function getHrFromIso
-            : Integer;
+//    function getHrFromIso
+//            : Integer;
 
-    function getMinFromIso
-            : Integer;
+//    function getMinFromIso
+//            : Integer;
             
-    function getSecFromIso
-            : Integer;
-
-//    procedure dayOfWeek;
+//    function getSecFromIso
+//            : Integer;
 
     procedure WriteDateStrc;
 
@@ -87,15 +85,15 @@ constructor TDateStruct.Create;
     iso8601 : String;
 
   begin
-    isoDate := '19700101';
+//    isoDate := '19700101';
 
-    isoTime := '000000';
+//    isoTime := '000000';
     tz      := '+0000';
 
     epoch  := 0;
 ///    day    := 4;
     
-    iso8601 := concat(isoDate, 'T', isoTime, tz);
+    iso8601 := '19700101T000000+0000';  //concat(isoDate, 'T', isoTime, tz);
     fpDateTime := ISO8601ToDate(iso8601, false);
   end;
 
@@ -120,8 +118,8 @@ constructor TDateStruct.CreateFromISO(dtString : String);
 
     log.debug('CREATE from ISO date-time  ' + dtString);
 
-    isoDate := Copy(dtString, 1, 8);
-    isoTime := Copy(dtString, 10, 6);
+//    isoDate := Copy(dtString, 1, 8);
+//    isoTime := Copy(dtString, 10, 6);
 
     if (length(dtString) >= 16 )
     then
@@ -130,12 +128,11 @@ constructor TDateStruct.CreateFromISO(dtString : String);
     fpDateTime := ISO8601ToDate(dtString, false);
 
     epoch      := DateTimeToUnix(fpDateTime);
-//    day        := DayOfTheWeek(fpDateTime);
 
     log.debug('TDateStruct: epoch= ', epoch);
   end;
 
-
+(*
 function TDateStruct.getYYYYFromIso
         : Integer;
   var
@@ -151,9 +148,9 @@ function TDateStruct.getYYYYFromIso
 
     getYYYYFromIso := year4;
   end;
+*)
 
-
-function TDateStruct.getMMFromIso
+(*function TDateStruct.getMMFromIso
         : Integer;
   var
     code   : Integer;
@@ -168,8 +165,8 @@ function TDateStruct.getMMFromIso
 
     getMMFromIso := month2;
   end;
-
-
+*)
+(*
 function TDateStruct.getDDFromIso
         : Integer;
   var
@@ -185,8 +182,8 @@ function TDateStruct.getDDFromIso
 
     getDDFromIso := dd;
   end;
-
-
+*)
+(*
 function TDateStruct.getHrFromIso
         : Integer;
   var
@@ -202,8 +199,8 @@ function TDateStruct.getHrFromIso
 
     getHrFromIso := hr2;
   end;
-
-
+*)
+(*
 function TDateStruct.getMinFromIso
         : Integer;
   var
@@ -219,8 +216,8 @@ function TDateStruct.getMinFromIso
 
     getMinFromIso := min2;
   end;
-
-
+*)
+(*
 function TDateStruct.getSecFromIso
         : Integer;
   var
@@ -236,51 +233,11 @@ function TDateStruct.getSecFromIso
 
     getSecFromIso := sec2;
   end;
-
-(*
-procedure TDateStruct.dayOfWeek;
-  var
-    t : array [0..11] of Integer;
-    lyyyy,
-    lmm,
-    ldd    : Integer;
-    d      : Real;
-
-  begin
-    t[0] := 0;
-    t[1] := 3;
-    t[2] := 2;
-
-    t[3] := 5;
-    t[4] := 0;
-    t[5] := 3;
-
-    t[6] := 5;
-    t[7] := 1;
-    t[8] := 4;
-
-    t[9]  := 6;
-    t[10] := 2;
-    t[11] := 4;
-
-    lyyyy := getYYYYFromIso;
-    lmm   := getMMFromIso; 
-    ldd   := getDDFromIso;
-
-    if (lmm < 3)
-    then
-      lyyyy := lyyyy - 1;
-
-    d :=  ( lyyyy + lyyyy div 4 - lyyyy div 100 + lyyyy div 400 + trunc(t[lmm-1]) + trunc(ldd) ) ;
-    d := d - 7 * (int(d/7) );
-
-    day := trunc(d);
-  end;
 *)
 
 procedure TDateStruct.WriteDateStrc;
   begin
-    writeln('ISO ', isoDate, 'T', isoTime, tz,
+    writeln(//'ISO ', isoDate, 'T', isoTime, tz,
             ' DateTime ', fpDateTime,
             ' epoch ',    epoch
            );

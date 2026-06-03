@@ -143,7 +143,6 @@ procedure TCellGrid.ExpandEvent(event     : TEvent;
     log.debug ('FilterEvent: end date = ' , DateToISO8601(event.endDate.fpDateTime) );
 
     (* Does the event Start in the displayed month ? *)
-//    if (event.startDate.getMMFromIso = MonthOf(calDate) )
     if (IsSameMonth(calDate, event.startDate.fpDateTime) )
     then
       sDate := DayOfTheMonth(event.startDate.fpDateTime)
