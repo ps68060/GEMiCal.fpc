@@ -40,7 +40,8 @@ implementation
 
   uses
     SysUtils,
-    Logger;
+    Logger,
+    Token;
 
 constructor TCal.Create;
   var
@@ -121,16 +122,15 @@ procedure TCal.DivideIcs (const calName : String);
       log.debug ('entries=', entries);
       //log.debug (currentLn);
 
-      if (currentLn.StartsWith(BEGIN_EVENT_TK) )
+      if (Pos(BEGIN_EVENT_TK, currentLn) = 1 )
       then
       begin
-        SetLength(eventList, length(eventList) + 1);
+        entries := length(eventList);
+        SetLength(eventList, entries + 1);
         eventList[entries] := TEvent.Create;
       
         eventList[entries].getEvent(calFile);
         eventList[entries].filename := calName;
-
-        inc (entries);
       end;
 
     end;
