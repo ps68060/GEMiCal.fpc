@@ -39,37 +39,15 @@ interface
 
 type
   TDateStruct = class
-//    isoDate    : String;
-//    isoTime    : String;
     epoch      : LongInt;
 
     fpDateTime : TDateTime;  // plan is to store as date-time as UTC
     tz         : String;     // and retain the original timezone string for reference
 
-///    day     : Integer;
-
     constructor Create;
     destructor  Destroy; override;
 
     constructor CreateFromISO(iso8601 : String);
-
-//    function getYYYYFromIso
-//            : Integer;
-
-//    function getMMFromIso
-//            : Integer;
-
-//    function getDDFromIso
-//            : Integer;
-
-//    function getHrFromIso
-//            : Integer;
-
-//    function getMinFromIso
-//            : Integer;
-            
-//    function getSecFromIso
-//            : Integer;
 
     procedure WriteDateStrc;
 
@@ -88,13 +66,8 @@ constructor TDateStruct.Create;
     validDT  : Boolean;
 
   begin
-//    isoDate := '19700101';
-
-//    isoTime := '000000';
     tz      := '+0000';
-
     epoch  := 0;
-///    day    := 4;
     
     iso8601 := '19700101T000000+0000';  //concat(isoDate, 'T', isoTime, tz);
     validDT := TryISOStrToDateTime(iso8601, fpDateTime);
@@ -120,9 +93,6 @@ constructor TDateStruct.CreateFromISO(iso8601 : String);
     log.level := LLINFO;
     log.debug('CREATE from ISO date-time  ' + iso8601);
 
-//    isoDate := Copy(iso8601, 1, 8);
-//    isoTime := Copy(iso8601, 10, 6);
-
     if (length(iso8601) >= 16 )
     then
       tz := Copy (iso8601, 16, length(iso8601) );
@@ -133,113 +103,10 @@ constructor TDateStruct.CreateFromISO(iso8601 : String);
     log.debug('TDateStruct: fpDateTime= ', fpDateTime);
   end;
 
-(*
-function TDateStruct.getYYYYFromIso
-        : Integer;
-  var
-    code  : Integer;
-    year4 : Integer;
-
-  begin
-    year4 := 1970;
-    val ( COPY (isoDate, 1, 4), year4, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of year at ', code, ' in ', isoDate);
-
-    getYYYYFromIso := year4;
-  end;
-*)
-
-(*function TDateStruct.getMMFromIso
-        : Integer;
-  var
-    code   : Integer;
-    month2 : Integer;
-
-  begin
-    month2 := 1;
-    val ( COPY (isoDate, 5, 2), month2, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of month at ', code, ' in ', isoDate);
-
-    getMMFromIso := month2;
-  end;
-*)
-(*
-function TDateStruct.getDDFromIso
-        : Integer;
-  var
-    code   : Integer;
-    dd     : Integer;
-
-  begin
-    dd := 1;
-    val ( COPY (isoDate, 7, 2), dd, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of day-date at ', code, ' in ', isoDate);
-
-    getDDFromIso := dd;
-  end;
-*)
-(*
-function TDateStruct.getHrFromIso
-        : Integer;
-  var
-    code   : Integer;
-    hr2    : Integer;
-
-  begin
-    hr2 := 0;
-    val ( COPY (isoTime, 1, 2), hr2, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of hour at ', code, ' in ', isoTime);
-
-    getHrFromIso := hr2;
-  end;
-*)
-(*
-function TDateStruct.getMinFromIso
-        : Integer;
-  var
-    code   : Integer;
-    min2   : Integer;
-
-  begin
-    min2 := 0;
-    val ( COPY (isoTime, 3, 2), min2, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of mi at ', code, ' in ', isoTime);
-
-    getMinFromIso := min2;
-  end;
-*)
-(*
-function TDateStruct.getSecFromIso
-        : Integer;
-  var
-    code   : Integer;
-    sec2   : Integer;
-
-  begin
-    sec2 := 0;
-    val ( COPY (isoTime, 5, 2), sec2, code );
-    if (code <> 0)
-    then
-      writeln ('Integer conversion error of ss at ', code, ' in ', isoTime);
-
-    getSecFromIso := sec2;
-  end;
-*)
 
 procedure TDateStruct.WriteDateStrc;
   begin
-    writeln(//'ISO ', isoDate, 'T', isoTime, tz,
-            ' DateTime ', fpDateTime,
+    writeln(' DateTime ', fpDateTime,
             ' epoch ',    epoch
            );
   end;
