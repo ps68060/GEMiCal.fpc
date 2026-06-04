@@ -97,19 +97,15 @@ procedure TCal.DivideIcs (const calName : String);
    *           Return the number of events.
    *)
 
+  const
+    BEGIN_EVENT_TK = 'BEGIN:VEVENT';
   var
     calFile  : Text;
-
-    checkStart  : String;
     currentLn   : String;
-
-    i           : Integer;
 
   begin
     log.level := LLDEBUG;
     log.debug('DivideIcs: ');
-
-    checkStart := 'BEGIN:VEVENT';
 
     (* Open the calendar file for reading *)
     assign (calFile, calName);
@@ -125,7 +121,7 @@ procedure TCal.DivideIcs (const calName : String);
       log.debug ('entries=', entries);
       log.debug (currentLn);
 
-      if ( pos (checkStart, currentLn) = 1 )
+      if (currentLn.StartsWith(BEGIN_EVENT_TK) )
       then
       begin
         eventList[entries] := TEvent.Create;
