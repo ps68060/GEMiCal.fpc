@@ -48,7 +48,7 @@ constructor TCal.Create;
   begin
     version := '2.0';
     entries := 0;
-    SetLength(eventList, MAXEVENTS);
+///    SetLength(eventList, MAXEVENTS);
     log.debug('TCal.Create');
   end;
 
@@ -119,11 +119,12 @@ procedure TCal.DivideIcs (const calName : String);
 
       readln ( calFile, currentLn );
       log.debug ('entries=', entries);
-      log.debug (currentLn);
+      //log.debug (currentLn);
 
       if (currentLn.StartsWith(BEGIN_EVENT_TK) )
       then
       begin
+        SetLength(eventList, length(eventList) + 1);
         eventList[entries] := TEvent.Create;
       
         eventList[entries].getEvent(calFile);
@@ -134,7 +135,7 @@ procedure TCal.DivideIcs (const calName : String);
 
     end;
 
-    log.debug('DivideIcd: loaded ', entries );
+    log.debug('DivideIcs: loaded ', entries );
 
   end;
 
