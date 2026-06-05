@@ -124,7 +124,7 @@ function BSTstart(dateTime : TDateTime)
   begin
     lDate := EncodeDate(YearOf(dateTime), 3, 31);
 
-    lastSunday := 31 - DayOfWeek(lDate) + 1;       // Calculate the last Sunday
+    lastSunday := 31 - DayOfWeek(lDate) + 1;       // Calculate the last Sunday (Delphi convention is 1=Sunday)
     BSTstart := RecodeDay(lDate, lastSunday);      // Set date to clock change day
     BSTstart := RecodeTime(BSTstart, 2, 0, 0, 0);  // Set time to 2:00am
   end;
