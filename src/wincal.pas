@@ -163,33 +163,34 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
   (* Purpose : called on every change *)
   
   var
-    New_X,
-    New_Y : LongInt;
+//    New_X,
+//    New_Y : LongInt;
   
     wchar,
     hchar       : SmallInt;
     wcell,
     hcell       : SmallInt;
+
+    rows        : Integer;
   
   begin
     log.level := LLINFO;
 
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   
-    new_X := Scroller^.GetXOrg;
-    new_Y := Scroller^.GetYOrg;
+//    new_X := Scroller^.GetXOrg;
+//    new_Y := Scroller^.GetYOrg;
   
     (* Display the year and month in larger text *)
     DrawTitle;
     DrawGridHeading;
   
     vsf_interior(vdiHandle, FIS_HOLLOW);
-    WriteDates;
-    DrawGrid(6);
+    rows := WriteDates;
+    DrawGrid(rows);
     DisplayEvents;
   
     (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
-  
   end;
 
 
@@ -342,9 +343,9 @@ procedure TWinCal.DrawTitle;
 
     currentDateTime := EncodeDateTime(year, month, day, hour, minute, second, sec100);
     dateStr := DateToStr(currentDateTime);
+    dateStr := dateStr + ' ' + mon1[DayOfTheWeek(currentDateTime)];
+
     timeStr := SubString(TimeToStr(currentDateTime), 0, 4);
-    
-    dateStr := dateStr + ' ' + mon1
     if   (BSTStart(currentDateTime) < currentDateTime)
       and  (BSTEnd(currentDateTime) > currentDateTime)
     then
@@ -485,7 +486,11 @@ function GetFirstOffset(aDate : TDateTime)
   end;
 
 
-procedure TWinCal.WriteDates;
+function TWinCal.WriteDates
+        : Integer;
+  (* Purpose : Write the dates in the calendar, highlighting today if current month
+   *           return: the row number of the last date written.
+   *)
   var
     pixX,
     pixY         : SmallInt;
@@ -561,7 +566,8 @@ procedure TWinCal.WriteDates;
                 IntToStr(i) );
     end;
   
-  log.debug('WriteDates: exit');
+  log.debug('WriteDates: exit, last row=', row);
+    WriteDates := row;
   end;
 
 
