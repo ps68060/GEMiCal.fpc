@@ -96,8 +96,8 @@ procedure TCellGrid.FilterEvents(cal       : TCal;
 
     for i := 0 to cal.entries do
     begin
-    log.debug('CELLGRID.FilterEvents start= ', DateToISO8601(cal.eventList[1].startDate.fpDateTime) );
-    log.debug('CELLGRID.FilterEvents end= ',   DateToISO8601(cal.eventList[i].endDate.fpDateTime) );
+  log.debug('CELLGRID.FilterEvents start= ', DateToISO8601(cal.eventList[i].startDate.fpDateTime) );
+  log.debug('CELLGRID.FilterEvents end= ',   DateToISO8601(cal.eventList[i].endDate.fpDateTime) );
 
       (*  calDate is 1st date of focus month to be displayed *)
       if (cal.eventList[i].IsMonthEvent(calDate) )
