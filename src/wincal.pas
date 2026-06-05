@@ -79,7 +79,7 @@ implementation
     Dos,
 
     Logger,
-    StrSubs,
+//    StrSubs,
     RiseSet;
 
 const
@@ -181,14 +181,11 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
   
     (* Display the year and month in larger text *)
     DrawTitle;
-  
     DrawGridHeading;
   
     vsf_interior(vdiHandle, FIS_HOLLOW);
-    DrawGrid(6);
-
     WriteDates;
-  
+    DrawGrid(6);
     DisplayEvents;
   
     (* new(PButton, Init(@SELF, 99, 99, true, '') );  *)
@@ -345,8 +342,9 @@ procedure TWinCal.DrawTitle;
 
     currentDateTime := EncodeDateTime(year, month, day, hour, minute, second, sec100);
     dateStr := DateToStr(currentDateTime);
-    timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
+    timeStr := SubString(TimeToStr(currentDateTime), 0, 4);
     
+    dateStr := dateStr + ' ' + mon1
     if   (BSTStart(currentDateTime) < currentDateTime)
       and  (BSTEnd(currentDateTime) > currentDateTime)
     then
@@ -382,7 +380,7 @@ procedure TWinCal.DrawTitle;
     v_gtext(vdiHandle,
             Work.X + Work.W - (25 * Attr.charWidth),
             Work.Y + Attr.charHeight*3,
-            SubStr(sunrise, 1, 5) + ' / ' + SubStr(sunset, 1, 5));
+            SubString(sunrise, 0, 4) + ' / ' + SubStr(sunset, 1, 5));
   end;
 
 
@@ -480,10 +478,10 @@ procedure TWinCal.DrawGrid(rows  : Integer);
   end;
 
 
-function GetFirstOffset(calDate : TDateTime)
+function GetFirstOffset(aDate : TDateTime)
         : Integer;
   begin
-    GetFirstOffset := (DayOfWeek(calDate) + 5) mod 7;
+    GetFirstOffset := (DayOfWeek(aDate) + 5) mod 7;
   end;
 
 
@@ -618,12 +616,12 @@ procedure TWinCal.DisplayEvents;
       begin
         for i := 0 to cellGr.calCell[day].counter - 1 do
         begin
-          summ      := SubStr (cellGr.calCell[day].cellEvents[i].summary, 1, 16 );
+          summ      := SubString(cellGr.calCell[day].cellEvents[i].summary, 0, 15 );
           time      := TimeToStr(cellGr.calCell[day].cellEvents[i].timeStart.fpDateTime);
   
-          timePlace := SubStr (Concat(time,
+          timePlace := SubString(Concat(time,
                                       ';',
-                                      cellGr.calCell[day].cellEvents[i].location), 1, 16 );
+                                      cellGr.calCell[day].cellEvents[i].location), 0, 15 );
   
           log.debug('Summary  ' + summ );
           log.debug('counter ', i);

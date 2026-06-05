@@ -57,8 +57,8 @@ type
 implementation
 
 uses
-    Logger,
-    StrSubs;
+    Logger;
+//    ,StrSubs;
 
 constructor TDateStruct.Create;
   var

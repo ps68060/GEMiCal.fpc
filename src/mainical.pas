@@ -211,7 +211,7 @@ procedure TLoadMenu.Work;
       if (myApplication.iCal.entries > 0)
       then
       begin
-        myApplication.iCal.sort;
+///        myApplication.iCal.sort;
         FilterCal;
       end;
 
@@ -304,12 +304,16 @@ procedure LoadCal;
  *)
   begin
     log.level := LLINFO;
+    if (myApplication.iCal <> NIL)
+    then
+      myApplication.iCal.Free;
+
     myApplication.iCal := TCal.Create;
 
     log.debug('Load ICS files from ' + directory);
 
     (* Load iCal events *)
-    myApplication.iCal.loadICS(directory);
+    myApplication.iCal.LoadICS(directory);
   
     log.debug('loaded ', myApplication.iCal.entries );
   end;
@@ -330,7 +334,7 @@ procedure FilterCal;
 
     cellGr := TCellGrid.Create;
     cellGr.FilterEvents(myApplication.iCal,
-                      myApplication.winCal^.calDate);
+                        myApplication.winCal^.calDate);
     log.debug('FilterCal: done');
 
   end;
