@@ -140,8 +140,8 @@ procedure TMyApplication.INITInstance;
     appCalMenu    := new (PCalMenu,    Init(@SELF, K_Ctrl, Ctrl_M, M_CALENDAR, M_DESK2));    (* Display calendar *)
 
     (* Navigation menu *)
-    appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, Ctrl_O, M_MONTHPREV, M_DESK3));  // K_Up
-    appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, Ctrl_K, M_MONTHNEXT, M_DESK3));  // K_Down
+    appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, K_Up,   M_MONTHPREV, M_DESK3));  // K_Up
+    appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, K_Down, M_MONTHNEXT, M_DESK3));  // K_Down
 
     appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));  // K_Left
     appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));  // K_Right

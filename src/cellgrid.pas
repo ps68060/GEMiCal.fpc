@@ -37,10 +37,10 @@ interface
     end;
 
 
-    procedure CalcCellGrid(day,
-                           firstDay : Integer;
+    procedure CalcCellGrid(firstDay,
+                           day      : Integer;
                            var row,
-                               col : Integer);
+                               col  : Integer);
 
 implementation
 
@@ -193,13 +193,13 @@ procedure TCellGrid.ExpandEvent(event     : TEvent;
   end;
 
 
-procedure CalcCellGrid(day,
-                       firstDay : Integer;
+procedure CalcCellGrid(firstDay,
+                       day      : Integer;
                        var row,
-                           col : Integer);
+                           col  : Integer);
   (* Purpose : Calculate the row and column of the calendar day
-   * inputs  : firstDay = the day number of the 1st of the month
-   *           day      = the date in the month
+   * inputs  : firstDay = the day number of the 1st of the month 0-6 (Sun-Sat)
+   *           day      = the date in the month 1-31
    * returns:  row 0 to 5
    *           col 0 to 6
    *)
@@ -208,7 +208,7 @@ procedure CalcCellGrid(day,
 
   begin
     log.level := LLINFO;
-    offset := day + firstDay;
+    offset := day - 1 + firstDay;
 
     row := offset div 7;
     col := offset mod 7;

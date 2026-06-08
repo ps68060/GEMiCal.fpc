@@ -1,5 +1,6 @@
 {$I projopts.i}
 {$mode objfpc}
+{$modeswitch typehelpers}
 
 unit WinCal;
 
@@ -48,7 +49,7 @@ type
                    procedure IconPaint(var PaintInfo : TPaintStruct);  VIRTUAL;
                    procedure SetupSize;                                VIRTUAL;
 
-                   procedure WriteDates;                               VIRTUAL;
+                   function WriteDates       : Integer;
 
                    procedure DrawTitle;
 
@@ -79,7 +80,7 @@ implementation
     Dos,
 
     Logger,
-//    StrSubs,
+    StrSubs,
     RiseSet;
 
 const
@@ -163,9 +164,6 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
   (* Purpose : called on every change *)
   
   var
-//    New_X,
-//    New_Y : LongInt;
-  
     wchar,
     hchar       : SmallInt;
     wcell,
@@ -178,15 +176,12 @@ procedure TWinCal.Paint(var PaintInfo : TPaintStruct);
 
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
   
-//    new_X := Scroller^.GetXOrg;
-//    new_Y := Scroller^.GetYOrg;
-  
     (* Display the year and month in larger text *)
     DrawTitle;
     DrawGridHeading;
   
     vsf_interior(vdiHandle, FIS_HOLLOW);
-    rows := WriteDates;
+    rows := WriteDates + 1;
     DrawGrid(rows);
     DisplayEvents;
   
@@ -289,6 +284,9 @@ procedure TWinCal.CalcGridRowCol(xPos,
 procedure TWinCal.DrawTitle;
   var
     title      : String;
+
+    scrollX,
+    scrollY    : Integer;
   
     wchar,
     hchar      : SmallInt;
@@ -318,6 +316,9 @@ procedure TWinCal.DrawTitle;
   
   begin
     log.level := LLINFO;
+
+    scrollX := Scroller^.GetXOrg;
+    scrollY := Scroller^.GetYOrg;
   
     writeln('TITLE DATE = ', YearOf(calDate),
                         '-', MonthOf(calDate));
@@ -343,15 +344,15 @@ procedure TWinCal.DrawTitle;
 
     currentDateTime := EncodeDateTime(year, month, day, hour, minute, second, sec100);
     dateStr := DateToStr(currentDateTime);
-    dateStr := dateStr + ' ' + mon1[DayOfTheWeek(currentDateTime)];
+    dateStr := dateStr + ' ' + day2[DayOfWeek(currentDateTime) - 1];
 
-    timeStr := SubString(TimeToStr(currentDateTime), 0, 4);
+    timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
     if   (BSTStart(currentDateTime) < currentDateTime)
       and  (BSTEnd(currentDateTime) > currentDateTime)
     then
-      timeStr := timeStr + ' :BST'
+      timeStr := timeStr + '-BST'
     else
-      timeStr := timeStr + ' :GMT';
+      timeStr := timeStr + '-GMT';
 
     v_gtext(vdiHandle,
             Work.X + Attr.charWidth,
@@ -381,7 +382,7 @@ procedure TWinCal.DrawTitle;
     v_gtext(vdiHandle,
             Work.X + Work.W - (25 * Attr.charWidth),
             Work.Y + Attr.charHeight*3,
-            SubString(sunrise, 0, 4) + ' / ' + SubStr(sunset, 1, 5));
+            SubStr(sunrise, 1, 5) + ' / ' + SubStr(sunset, 1, 5) );
   end;
 
 
@@ -482,7 +483,7 @@ procedure TWinCal.DrawGrid(rows  : Integer);
 function GetFirstOffset(aDate : TDateTime)
         : Integer;
   begin
-    GetFirstOffset := (DayOfWeek(aDate) + 5) mod 7;
+    GetFirstOffset := (DayOfWeek(aDate) + 6) mod 7;
   end;
 
 
@@ -522,12 +523,11 @@ function TWinCal.WriteDates
   
     log.debug ('year  ', YearOf(calDate) );
     log.debug ('month ', mon1[MonthOf(calDate)] );
+    log.debug ('date  ', DayOf(calDate) );
   
     (* Get today's date and check if displaying current month *)
     GetDate (yearNow, monthNow, dateNow, dayNumber);
-  
-    CalcCellGrid (DayOf(calDate), dateNow, row, col);
-  
+
     currentMonth := FALSE;
     if     (YearOf(calDate)  = yearNow)
        and (MonthOf(calDate) = monthNow)
@@ -538,15 +538,20 @@ function TWinCal.WriteDates
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
     firstOffset := GetFirstOffset(calDate);
-    writeln('DayOfWeek=', DayOfweek(calDate), ' ', DateToISO8601(calDate) );
-    writeln('WriteDates.firstOffset=', firstOffset);
+    writeln('DayOfWeek    =', DayOfWeek(calDate) );
+    writeln('DayOfTheWeek =', DayOfTheWeek(calDate), ' ', DateToISO8601(calDate) );
+    writeln('firstOffset  =', firstOffset);
+
+ CalcCellGrid(firstOffset, 1, row, col);
+ log.level := LLDEBUG;
+ log.debug('row=', row);
 
     (* Display the dates, highlighting today *)
     for i := 1 to DaysInMonth(calDate) do
     begin
       CalcCellGrid(firstOffset, i, row, col);
       CalcWinXY(row, col, pixX, pixY);
-  
+
       if (currentMonth)
          and (i = dateNow)
       then
@@ -622,12 +627,12 @@ procedure TWinCal.DisplayEvents;
       begin
         for i := 0 to cellGr.calCell[day].counter - 1 do
         begin
-          summ      := SubString(cellGr.calCell[day].cellEvents[i].summary, 0, 15 );
+          summ      := SubStr (cellGr.calCell[day].cellEvents[i].summary, 1, 16 );
           time      := TimeToStr(cellGr.calCell[day].cellEvents[i].timeStart.fpDateTime);
   
-          timePlace := SubString(Concat(time,
+          timePlace := SubStr (Concat(time,
                                       ';',
-                                      cellGr.calCell[day].cellEvents[i].location), 0, 15 );
+                                      cellGr.calCell[day].cellEvents[i].location), 1, 16 );
   
           log.debug('Summary  ' + summ );
           log.debug('counter ', i);
