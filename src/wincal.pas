@@ -289,8 +289,7 @@ procedure TWinCal.DrawTitle;
     scrollY    : Integer;
   
     wchar,
-    hchar      : SmallInt;
-  
+    hchar,  
     wCell,
     hCell      : SmallInt;
   
@@ -400,7 +399,7 @@ procedure TWinCal.DrawGridHeading;
     c           : Integer;
   
     wchar,
-    hchar       : SmallInt;
+    hchar,
     wcell,
     hcell       : SmallInt;
   
