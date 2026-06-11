@@ -51,6 +51,8 @@ type
     function IsMonthEvent (calDate : TDateTime)
             : Boolean;
 
+  function InScope(calDate : TDateTime)
+          : Boolean;
     procedure SaveEvent(var calFile : Text);
 
     function GetTimeZone(TZIdString: String)
@@ -157,7 +159,7 @@ function TEvent.GetEvent (VAR calFile : Text)
       else
       begin
         tokens := TToken.Create;
-        tokens.tokeniseIcal(currentLn);
+        tokens.tokeniseIcal(currentLn);  // Split string at : and ; and store in tokens.part[0..n]
 
         if (tokens.StartsWith(CREATED_TK))
         then
@@ -412,6 +414,35 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
       writeln ('Current event');
     end;
 
+  end;
+
+
+function TEvent.InScope(calDate : TDateTime)
+        : Boolean;
+  (* Purpose : Decide if the event is in scope for display in the calendar.
+   *           calDate = date of 1st of month to be displayed
+   *
+   *           For now, the scope is defined as events that start within 2 years before or after the month to be displayed.
+   *           This is to avoid displaying events that are too far in the past or future.
+   *)
+  var
+    yearScopeStart,
+    yearScopeEnd   : TDateTime;
+
+  begin
+    log.level := LLDEBUG;
+    log.debug ('InScope: start date = ' , DateToISO8601(event.startDate.fpDateTime) );
+    log.debug ('InScope: end date = ' ,   DateToISO8601(event.endDate.fpDateTime) );
+
+    yearScopeStart := RecodeYear(calYearOf(calDate) - 2);
+    yearScopeEnd   := RecodeYear(calYearOf(calDate) + 2);
+
+    if (startDate.fpDateTime >= yearScopeStart) and
+       (startDate.fpDateTime <= yearScopeEnd)
+    then
+      InScope := TRUE
+    else
+      InScope := FALSE;
   end;
 
 
