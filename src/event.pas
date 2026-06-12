@@ -133,7 +133,7 @@ function TEvent.GetEvent (VAR calFile : Text)
     endEvent     : Boolean;
 
     tokens       : TToken;
-    subTokens    : TToken;
+    offset       : String;
 
   begin
     log.level := LLINFO;
@@ -172,23 +172,19 @@ function TEvent.GetEvent (VAR calFile : Text)
         if (tokens.StartsWith(DTSTART_TK))
         then
         begin
+          (*       part[0] = "DTSTART"
+           *       part[1] = "TZID=Europe/London"
+           *       part[2] = "20200516T000000"
+           *)
           dtStart   := tokens.part[2];
-          dtStartTz := tokens.part[1];  // e.g. "DTSTART;TZID=Europe/London:20200516T000000" -> tz = "TZID=Europe/London"
-          
-//          if (dtStartTz.StartsWith(TZID_TK))
-//          then
-//            dtStartTz := GetTimeZone(tokens.part[1]);
+          dtStartTz := GetTimeZone(tokens.part[1]);
         end;
 
         if (tokens.StartsWith(DTEND_TK))
         then
         begin
           dtEnd   := tokens.part[2];
-          dtEndTz := tokens.part[1];  // e.g. "DTEND;TZID=Europe/London:20200516T000000" -> tz = "TZID=Europe/London"
-          
-//          if (dtEndTz.StartsWith(TZID_TK))
-//          then
-//            dtEndTz := GetTimeZone(tokens.part[1]);
+          dtEndTz := GetTimeZone(tokens.part[1]);
         end;
 
         if ( tokens.StartsWith(SUMMARY_TK))
@@ -226,7 +222,16 @@ function TEvent.GetEvent (VAR calFile : Text)
     then
     begin
       startDate.CreateFromISO(dtStart);
-      if (pos(dtStart, 'T') = 0)  (* all day event *)
+
+      if (length(dtStartTz) > 0)
+      then
+      begin
+        offset := TimeZoneToOffset(dtStart, startDate.fpDateTime);
+        dtStart := Concat(dtStart, offset);
+        log.debug('Time with Offset=', dtStart);
+      end;  
+
+      if (pos(dtStart, 'T') = 0)  // No time so it is an all day event
       then
         allDay := TRUE
       else
@@ -238,7 +243,16 @@ function TEvent.GetEvent (VAR calFile : Text)
     then
     begin
       endDate.CreateFromISO(dtEnd);
+
+      if (length(dtEndTz) > 0)
+      then
+      begin
+        offset := TimeZoneToOffset(dtEnd, endDate.fpDateTime);
+        dtEnd := Concat(dtEnd, offset);
+        log.debug('Time with Offset=', dtEnd);
+      end;
     end
+
     else
     begin
       endDate.CreateFromISO(dtStart);
@@ -252,17 +266,19 @@ function TEvent.GetEvent (VAR calFile : Text)
 
 function TEvent.GetTimeZone(TZIdString: String)
         : String;
-  var
-    subTokens  : TToken;
   begin
-    subTokens := TToken.Create;
-    subTokens.TokeniseInf(TZIdString);
+    (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
+    subtokens := TToken.Create;
+    subtokens.TokeniseInf(TZIdString); // e.g. "TZID=Europe/London".  Split string at =
 
-    GetTimeZone := subTokens.part[2];
-    writeln ('start TZ= ', GetTimeZone);
+    if (subTokens.StartsWith(TZID_TK))
+    then
+      GetTimeZone := subTokens.part[2]
+    else
+      GetTimeZone := '';
+
     subTokens.Destroy;
   end;
-
 
 function TEvent.GetAlarm (var calFile : Text)
         : Boolean;
