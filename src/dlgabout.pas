@@ -11,7 +11,7 @@ interface
 
 const
   dDate    = '16.01.2022';
-  dVersion = '0.0';                          (**  not used yet **)
+  dVersion = 'Vn 0.0';                          (**  not used yet **)
 
 type
   PDeskMenu    = ^TDeskMenu;   (* About *)
@@ -52,7 +52,7 @@ procedure TDeskMenu.Work;
       new (d_Frame,    INIT(aDialog, D_BOX, 'Info', 'A Frame !'));
   
       new (d_Infoline, INIT(adialog, D_INFO, 26, FALSE, 'Version date'));
-      d_Infoline^.SetText('' + dDate + ' ½ P.Slegg');
+      d_Infoline^.SetText(dVersion + ' ' + dDate + ' ½ P.Slegg');
   
       new (d_Exit, INIT(aDialog, D_OK,   id_OK,   TRUE,  'Exit this dialog'));
       new (o_Help, INIT(aDialog, D_HELP, id_HELP, FALSE, 'Helptext'));
@@ -73,9 +73,10 @@ function TAboutDial.OK: Boolean;
 
 function TAboutDial.HELP: Boolean;
   begin
-    Application^.Alert(@self,1,NO_ICON,'Enter a Latitude and Longitude and'+
-                                       '|convert to a Grid Reference'+
-                                       '|or vice versa.','&OK');
+    Application^.Alert(@self,1,NO_ICON,'Use:' + 
+                                       '|Ctrl-UP and Ctrl-DOWN to change month.'+
+                                       '|Ctrl-H and Ctrl-J to change year.'+
+                                       '|Ctrl-L to load .ICS files.','&OK');
     HELP := FALSE;
   end;
 
