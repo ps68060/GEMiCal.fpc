@@ -56,6 +56,12 @@ procedure splitAt(divider     : Char;
                   var  before,
                        after       : String
                  );
+  (* Purpose : Split a line at the first occurrence of a divider character.)
+   *           The part before the divider is returned in "before",
+   *           the part after the divider is returned in "after".
+   *           If the divider is not found, "before" is set to the whole line
+   *           and "after" is set to an empty string.
+             *)
   var
     posn        : Integer;
 
