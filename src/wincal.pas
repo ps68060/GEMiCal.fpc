@@ -346,8 +346,7 @@ procedure TWinCal.DrawTitle;
     dateStr := dateStr + ' ' + day2[DayOfWeek(currentDateTime) - 1];
 
     timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
-    if   (BSTStart(currentDateTime) < currentDateTime)
-      and  (BSTEnd(currentDateTime) > currentDateTime)
+    if   (IsBST(currentDateTime))
     then
       timeStr := timeStr + '-BST'
     else

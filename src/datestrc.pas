@@ -36,6 +36,12 @@ interface
     function BSTend(dateTime : TDateTime)
             : TDateTime;
 
+    function IsBST(dateTime : TDateTime)
+            : Boolean;
+
+    function TimeZoneToOffset(tzIdStr: String, dateTime : TDateTime)
+            : String;
+
 
 type
   TDateStruct = class
@@ -112,6 +118,14 @@ procedure TDateStruct.WriteDateStrc;
   end;
 
 
+function IsBST(dateTime : TDateTime)
+        : Boolean;
+  begin
+    isBST :=   (BSTStart(dateTime) < dateTime)
+           and (BSTEnd(dateTime)   > dateTime);
+  end;
+
+
 function BSTstart(dateTime : TDateTime)
         : TDateTime;
     (* Purpose : Calculate the date of the last Sunday in March for a given year
@@ -145,6 +159,80 @@ function BSTend(dateTime : TDateTime)
     lastSunday := 31 - DayOfWeek(lDate) + 1;   // Calculate the last Sunday
     BSTend := RecodeDay(lDate, lastSunday);    // Set date to clock change day
     BSTend := RecodeTime(BSTend, 1, 0, 0, 0);  // Set time to 1:00am
+  end;
+
+
+function TimeZoneToOffset(tzIdStr: String, dateTime : TDateTime)
+        : String;
+  var
+    summerTime : Boolean;
+
+  begin
+    writeln ('TimeZone= ', tzidstr);
+
+    if (tzidstr = 'Atlantic/Reykjavik')
+    then
+      Exit ('+00:00');
+
+    summerTime := IsBST(dateTime);
+    // Share the same offset and clock change rules as London
+    if tzIdStr in [
+            'Europe/London',
+            'Europe/Dublin',
+            'Europe/Lisbon',
+            'Atlantic/Canary']
+    then
+    begin
+      if summerTime
+      then
+        Exit('+01:00')
+      else
+        Exit('+00:00');
+    end;
+
+    // Share the same offset and clock change rules as Paris
+    if tzIdStr in [
+            'Europe/Paris',
+            'Europe/Amsterdam',
+            'Europe/Berlin',
+            'Europe/Brussels',
+            'Europe/Budapest',
+            'Europe/Copenhagen',
+            'Europe/Madrid',
+            'Europe/Oslo',
+            'Europe/Prague',
+            'Europe/Rome',
+            'Europe/Stockholm',
+            'Europe/Vienna',
+            'Europe/Warsaw',
+            'Europe/Zurich']
+    then
+    begin
+      if summerTime
+      then
+        Exit('+02:00')
+      else
+        Exit('+01:00');
+    end;
+
+    if tzIdStr in [
+            'Europe/Athens',
+            'Europe/Bucharest',
+            'Europe/Helsinki',
+            'Europe/Riga',
+            'Europe/Sofia',
+            'Europe/Tallinn',
+            'Europe/Vilnius',
+            'Asia/Nicosia',
+            'Asia/Famagusta']
+    then
+    begin
+      if summerTime
+      then
+        Exit('+03:00')
+      else
+        Exit('+02:00');
+    end;
   end;
 
 end.
