@@ -126,36 +126,35 @@ end;
 
 
 function TDialogDial.ExitDlg (AnIndx:Integer): Boolean;
-
-(* Purpose : If any EXIT button is pressed this routine is called *)
-
-begin
-  (**WRITELN ('EXITDLG ', AnIndx); **)
-  ExitDlg := TRUE;                                    (* Determines whether the Dialog exits afterwards. *)
-
-  CASE AnIndx OF
-    B_PREV_MONTH:
-    begin
-      (**WRITELN('Button A = <', MyApplication.Desk2Menu^.o_Button_A^.GetText, '>'); **)
-(***
-      IF MyApplication.Desk2Menu^.o_Button_A^.GetText = 'To Grid'
-      THEN
-        MyApplication.Desk2Menu^.o_Button_A^.SetText  ('&To Polar')
-
-      ELSE
-        MyApplication.Desk2Menu^.o_Button_A^.SetText  ('&To Grid ');
-***)
-      ExitDlg := FALSE;                               (* Determines whether the Dialog exits afterwards. *)
-
+  
+  (* Purpose : If any EXIT button is pressed this routine is called *)
+  
+  begin
+    (**WRITELN ('EXITDLG ', AnIndx); **)
+    ExitDlg := TRUE;                                    (* Determines whether the Dialog exits afterwards. *)
+  
+    CASE AnIndx OF
+      B_PREV_MONTH:
+      begin
+        (**WRITELN('Button A = <', MyApplication.Desk2Menu^.o_Button_A^.GetText, '>'); **)
+  (***
+        IF MyApplication.Desk2Menu^.o_Button_A^.GetText = 'To Grid'
+        THEN
+          MyApplication.Desk2Menu^.o_Button_A^.SetText  ('&To Polar')
+  
+        ELSE
+          MyApplication.Desk2Menu^.o_Button_A^.SetText  ('&To Grid ');
+  ***)
+        ExitDlg := FALSE;                               (* Determines whether the Dialog exits afterwards. *)
+  
+      end;
+  
     end;
-
-  end;
-end;  
+  end;  
 
 function TDialogDial.GetIconTitle : String;
-begin
-  GetIconTitle := 'Button';
-end;
-
+  begin
+    GetIconTitle := 'Button';
+  end;
 
 end.

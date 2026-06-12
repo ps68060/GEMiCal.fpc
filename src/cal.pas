@@ -14,7 +14,6 @@ interface
     Event;
 
   const
-    MAXEVENTS = 9999;
     BEGIN_CAL_TK = 'BEGIN:VCALENDAR';
     END_CAL_TK   = 'END:VCALENDAR';
 
