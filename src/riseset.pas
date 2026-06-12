@@ -12,7 +12,7 @@ interface
     Logger;
 
 
-  procedure sunRiseSet (lat, lng, UTCoff : Real;
+  procedure SunRiseSet (lat, lng, UTCoff : Real;
                         date : TDateTime;
                         var sunrise,
                             sunset  : String);
@@ -20,7 +20,7 @@ interface
 implementation
 
 
-procedure sunRiseSet (lat, lng, UTCoff : Real;
+procedure SunRiseSet (lat, lng, UTCoff : Real;
                       date : TDateTime;
                       var sunrise,
                           sunset  : String);
@@ -28,7 +28,7 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
 (*
 * SUNRISESET Compute apparent sunrise and sunset times in seconds.
 *
-*  1  sun_rise_set = sunRiseSet( lat, lng, UTCoff, date)
+*  1  sun_rise_set = SunRiseSet( lat, lng, UTCoff, date)
 *
 *     Computes the *apparent* (refraction corrected) sunrise  and sunset times in seconds from mignight and
 *     returns them as sun_rise_set.
@@ -36,18 +36,18 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
 *     UTCoff is the timezone, i.e. the local time offset to UTC (Coordinated Universal Time) in hours,
 *     date is the date in format 'dd-mmm-yyyy' ( see below for an example).
 * 
-*  2  [sun_rise_set, noon] = sunRiseSet( lat, lng, UTCoff, date)
+*  2  [sun_rise_set, noon] = SunRiseSet( lat, lng, UTCoff, date)
 *
 *     additionally returns the solar noon in seconds from midnight.
 * 
-*  3  [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date) 
+*  3  [sun_rise_set, noon, opt] = SunRiseSet( lat, lng, UTCoff, date) 
 *
 *     additionally returns the information opt, which contains information on every second of the day:
 *       opt.elev_ang_corr   : Apparent (refraction corrected) solar elevation in degrees
 *       opt.azAngle         : Solar azimuthal angle (deg clockwise from N)
 *       opt.solarDecl       : Solar declination in degrees
 * 
-*  4  sun_rise_set = sunRiseSet( ..., PLOT) If PLOT is true, 
+*  4  sun_rise_set = SunRiseSet( ..., PLOT) If PLOT is true, 
 *
 *     plots of the elevation and azimuthal angle are created.
 * 
@@ -57,7 +57,7 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
 *     UTCoff = 2;         % UTC offset
 *     date = '15-jun-2017';
 * 
-*     [sun_rise_set, noon, opt] = sunRiseSet( lat, lng, UTCoff, date, 1);
+*     [sun_rise_set, noon, opt] = SunRiseSet( lat, lng, UTCoff, date, 1);
 *
 * 
 * Richard Droste
@@ -118,7 +118,6 @@ procedure sunRiseSet (lat, lng, UTCoff : Real;
     
     jd := DateTimeToJulianDate(date);
   
-  ///  F := date.julianDate - UTCoff / 24;      (* Julian day *)
     F := jd - UTCoff / 24;      (* Julian day *)
     log.debug ('JD = ', jd);
     log.debug ('f = ', F);

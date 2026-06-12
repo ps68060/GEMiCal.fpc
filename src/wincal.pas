@@ -363,7 +363,7 @@ procedure TWinCal.DrawTitle;
             timeStr );
   
     (* Display sunrise and sunset times of 1st of month *)
-    sunRiseSet(conf.lat
+    SunRiseSet(conf.lat
               ,conf.lng
               ,conf.UTCoffset
               ,calDate,  sunrise, sunset);

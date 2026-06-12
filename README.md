@@ -16,6 +16,7 @@ Current functions:
 4. the ICS folder can be changed.
 5. gemical.cnf holds the lat-long and UTC offset so that the sunrise
    and sunset times can be calculated.
+6. added some rudimentary timezone calculations, mostly for Europe.
 
 Future features:
 * Improved Timezone handling.
