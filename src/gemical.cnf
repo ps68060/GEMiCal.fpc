@@ -5,3 +5,4 @@ lat=53.48
 long=0
 # timezone offset hours
 UTCoffset=0
+Timezone=Europe/London

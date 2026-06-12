@@ -33,6 +33,7 @@ uses
     LAT_TK         = 'lat';
     LNG_TK         = 'long';
     UTC_OFFSET_TK  = 'UTCoffset';
+    TIMEZONE_TK    = 'Timezone';
 
 constructor TConfig.create;
   begin
@@ -40,6 +41,7 @@ constructor TConfig.create;
     lat       := 51.4779;
     lng       := 0.0;
     UTCoffset := 0.0;
+    Timezone  := 'UTC';
 
     readConfig;
   end;
@@ -51,7 +53,7 @@ destructor TConfig.destroy;
   end;
 
 
-function getValue(keyValue : TToken; value : real; limit: real) : real;
+function GetValue(keyValue : TToken; value : real; limit: real) : real;
   var
     code         : Integer;
     valReal      : Real;
@@ -59,7 +61,7 @@ function getValue(keyValue : TToken; value : real; limit: real) : real;
   begin
     log.level := LLINFO;
 
-    getValue := value;
+    GetValue := value;
     val(keyValue.part[1], valReal, code);
 
     if (code <> 0)
@@ -70,7 +72,7 @@ function getValue(keyValue : TToken; value : real; limit: real) : real;
     then
       log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
     else
-      getValue := valReal;
+      GetValue := valReal;
   end;
 
 
@@ -80,9 +82,6 @@ procedure TConfig.readConfig;
 
     currentLn    : String;
     tokens       : TToken;
-    code         : Integer;
-
-    valReal      : Real;
 
   begin
     log.level := LLINFO;
@@ -107,17 +106,22 @@ procedure TConfig.readConfig;
       (* Get the latitude, if it is invalid, keep default *)
       if ( tokens.StartsWith(LAT_TK) )
       then
-        lat := getValue(tokens, lat, 90.0);
+        lat := GetValue(tokens, lat, 90.0);
 
       (* Get the longitude, if it is invalid, keep default *)
       if ( tokens.StartsWith(LNG_TK) )
       then
-        lng := getValue(tokens, lng, 180.0);
+        lng := GetValue(tokens, lng, 180.0);
 
       (* Get the UTC offset, if it is invalid, keep default *)
       if ( tokens.StartsWith(UTC_OFFSET_TK) )
       then
-        UTCoffset := getValue(tokens, UTCoffset, 12.0);
+        UTCoffset := GetValue(tokens, UTCoffset, 12.0);
+
+      (* Get the local Timezone *)
+      if ( tokens.StartsWith(TIMEZONE_TK) )
+      then
+        Timezone := tokens.part[1];
 
       tokens.Free;
     end;  (* while *)
