@@ -14,6 +14,7 @@ type
     lat         : Real;
     lng         : Real;
     UTCoffset   : Real;
+    Timezone    : String;
 
     constructor create;
     destructor  destroy; override;

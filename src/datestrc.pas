@@ -1,8 +1,7 @@
 {$I projopts.i}
 {$mode objfpc}
 
-unit
-  DateStrc;
+unit DateStrc;
 
 (* AUTHOR  : P SLEGG
    DATE    : 17th May 2020 Version 1
@@ -13,7 +12,8 @@ interface
   uses
     Objects,
     SysUtils,
-    DateUtils;
+    DateUtils,
+    StrngHlp;
 
   const
     mon1   : array [1..12] of String
@@ -39,7 +39,7 @@ interface
     function IsBST(dateTime : TDateTime)
             : Boolean;
 
-    function TimeZoneToOffset(tzIdStr: String, dateTime : TDateTime)
+    function TimeZoneToOffset(tzIdStr: String; dateTime : TDateTime)
             : String;
 
 
@@ -64,7 +64,6 @@ implementation
 
 uses
     Logger;
-//    ,StrSubs;
 
 constructor TDateStruct.Create;
   var
@@ -162,37 +161,18 @@ function BSTend(dateTime : TDateTime)
   end;
 
 
-function TimeZoneToOffset(tzIdStr: String, dateTime : TDateTime)
+function TimeZoneToOffset(tzIdStr: String; dateTime : TDateTime)
         : String;
-  var
-    summerTime : Boolean;
-
-  begin
-    writeln ('TimeZone= ', tzidstr);
-
-    if (tzidstr = 'Atlantic/Reykjavik')
-    then
-      Exit ('+00:00');
-
-    summerTime := IsBST(dateTime);
-    // Share the same offset and clock change rules as London
-    if tzIdStr in [
-            'Europe/London',
+        
+  const
+    ZoneEuropeWest : array of String
+         = ('Europe/London',
             'Europe/Dublin',
             'Europe/Lisbon',
-            'Atlantic/Canary']
-    then
-    begin
-      if summerTime
-      then
-        Exit('+01:00')
-      else
-        Exit('+00:00');
-    end;
+            'Atlantic/Canary'); 
 
-    // Share the same offset and clock change rules as Paris
-    if tzIdStr in [
-            'Europe/Paris',
+    ZoneEuropeEast : array of String
+         = ('Europe/Paris',
             'Europe/Amsterdam',
             'Europe/Berlin',
             'Europe/Brussels',
@@ -205,18 +185,10 @@ function TimeZoneToOffset(tzIdStr: String, dateTime : TDateTime)
             'Europe/Stockholm',
             'Europe/Vienna',
             'Europe/Warsaw',
-            'Europe/Zurich']
-    then
-    begin
-      if summerTime
-      then
-        Exit('+02:00')
-      else
-        Exit('+01:00');
-    end;
+            'Europe/Zurich');
 
-    if tzIdStr in [
-            'Europe/Athens',
+    ZoneAsiaWest : array of String
+         = ('Europe/Athens',
             'Europe/Bucharest',
             'Europe/Helsinki',
             'Europe/Riga',
@@ -224,9 +196,50 @@ function TimeZoneToOffset(tzIdStr: String, dateTime : TDateTime)
             'Europe/Tallinn',
             'Europe/Vilnius',
             'Asia/Nicosia',
-            'Asia/Famagusta']
+            'Asia/Famagusta');
+
+  var
+    summerTime : Boolean;
+
+  begin
+      log.level := LLDEBUG;
+    writeln ('TimeZone= ', tzidstr);
+
+    if (tzidstr = 'Atlantic/Reykjavik')
+    then
+      Exit ('+00:00');
+
+    summerTime := IsBST(dateTime);
+    // Share the same offset and clock change rules as London
+    if Contains(ZoneEuropeWest, tzIdStr)
     then
     begin
+      log.debug('TZ is London like');
+
+      if summerTime
+      then
+        Exit('+01:00')
+      else
+        Exit('+00:00');
+    end;
+
+    // Share the same offset and clock change rules as Paris
+    if Contains(ZoneEuropeEast, tzIdStr)
+    then
+    begin
+      log.debug('TZ is Paris like');
+      if summerTime
+      then
+        Exit('+02:00')
+      else
+        Exit('+01:00');
+    end;
+
+    if Contains(ZoneAsiaWest, tzIdStr)
+    then
+    begin
+      log.debug('TZ is Athens like');
+
       if summerTime
       then
         Exit('+03:00')

@@ -136,7 +136,7 @@ function TEvent.GetEvent (VAR calFile : Text)
     offset       : String;
 
   begin
-    log.level := LLINFO;
+    log.level := LLDEBUG;
 
     endEvent     := FALSE;
     alarm        := FALSE;
@@ -266,6 +266,8 @@ function TEvent.GetEvent (VAR calFile : Text)
 
 function TEvent.GetTimeZone(TZIdString: String)
         : String;
+  var
+    subTokens  : TToken;
   begin
     (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
     subtokens := TToken.Create;
@@ -279,6 +281,7 @@ function TEvent.GetTimeZone(TZIdString: String)
 
     subTokens.Destroy;
   end;
+
 
 function TEvent.GetAlarm (var calFile : Text)
         : Boolean;
@@ -447,11 +450,11 @@ function TEvent.InScope(calDate : TDateTime)
 
   begin
     log.level := LLDEBUG;
-    log.debug ('InScope: start date = ' , DateToISO8601(event.startDate.fpDateTime) );
-    log.debug ('InScope: end date = ' ,   DateToISO8601(event.endDate.fpDateTime) );
+    log.debug ('InScope: start date = ' , DateToISO8601(startDate.fpDateTime) );
+    log.debug ('InScope: end date = ' ,   DateToISO8601(endDate.fpDateTime) );
 
-    yearScopeStart := RecodeYear(calYearOf(calDate) - 2);
-    yearScopeEnd   := RecodeYear(calYearOf(calDate) + 2);
+    yearScopeStart := RecodeYear(calDate, YearOf(calDate) - 2);
+    yearScopeEnd   := RecodeYear(calDate, YearOf(calDate) + 2);
 
     if (startDate.fpDateTime >= yearScopeStart) and
        (startDate.fpDateTime <= yearScopeEnd)
