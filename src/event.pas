@@ -386,51 +386,57 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
     daysInMon  : Word;
 
     startsBeforeMonthEnd,
-    endsAfterMonthStart : Boolean;
+    endsAfterMonthStart  : Boolean;
 
   begin
     log.level := LLDEBUG;
 
-    isMonthEvent := FALSE;
+    isMonthEvent         := FALSE;
+    startsBeforeMonthEnd := FALSE;
+    endsAfterMonthStart  := FALSE;
+
     daysInMon := DaysInMonth(calDate);
+    log.debug('CalDate=', DateToISO8601(calDate));
 
     pStart := RecodeDay(calDate, 1);
-    pstart := RecodeTime(calDate, 0, 0, 0, 000);
+    pstart := RecodeTime(pStart, 0, 0, 0, 000);
+    log.debug('pStart=', DateToISO8601(pStart));
     
-    pEnd   := RecodeTime(calDate, 23, 59, 59, 999);
     pEnd   := RecodeDay(calDate, daysInMon);
+    pEnd   := RecodeTime(pEnd, 23, 59, 59, 999);
+    log.debug('pEnd=', DateToISO8601(pEnd));
 
-    pStartUnix := DateTimeToUnix(pStart, false);
-    PEndUnix   := DateTimeToUnix(pEnd,   false);
+///    pStartUnix := DateTimeToUnix(pStart, false);
+///    PEndUnix   := DateTimeToUnix(pEnd,   false);
 
     (* Does the event start/end overlap with the period start/end ?
      *  1: event starts before month end
      *  2: event ends   after  month start
      *  3: event starts before month and ends after the month
      *)
-  log.debug('Event.IsMonth startDate=', startDate.fpDateTime);
-  log.debug('Event.IsMonth   endDate=', endDate.fpDateTime);
-
-  log.debug('Event.IsMonth pStart=', pStart);
-  log.debug('Event.IsMonth   pEnd=', pEnd);
-
     (* start before pEnd *)
-    if      (startDate.epoch < pEndUnix )       // 1b: event starts before end of month
+    if      (startDate.fpDateTime < pEnd )       // 1b: event starts before end of month
     then
-      startsBeforeMonthEnd := true;
+      startsBeforeMonthEnd := TRUE;
 
     (* end after pStart *)
-    if      (endDate.epoch > pStartUnix )       // 2a: event ends after 1st of month
+    if      (endDate.fpDateTime > pStart )       // 2a: event ends after 1st of month
     then
-      endsAfterMonthStart := true;
-
+      endsAfterMonthStart := TRUE;
+      
   log.debug('startsBeforeMonthEnd=', startsBeforeMonthEnd);
   log.debug('endsAfterMonthStart=', endsAfterMonthStart);
-    if (startsBeforeMonthEnd and endsAfterMonthStart)
+    if  (startsBeforeMonthEnd and endsAfterMonthStart)
     then
     begin
       isMonthEvent := TRUE;
       writeln ('Current event');
+  log.debug('Event.IsMonth pStart   =', pStart);
+  log.debug('Event.IsMonth startDate=', startDate.fpDateTime);
+
+  log.debug('Event.IsMonth pEnd     =', pEnd);
+  log.debug('Event.IsMonth endDate  =', endDate.fpDateTime);
+
     end;
 
   end;
