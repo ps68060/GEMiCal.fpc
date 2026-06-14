@@ -45,8 +45,6 @@ interface
 
 type
   TDateStruct = class
-    epoch      : LongInt;
-
     fpDateTime : TDateTime;  // plan is to store as date-time as UTC
     tz         : String;     // and retain the original timezone string for reference
 
@@ -72,7 +70,6 @@ constructor TDateStruct.Create;
 
   begin
     tz      := '+0000';
-    epoch  := 0;
     
     iso8601 := '19700101T000000+0000';  //concat(isoDate, 'T', isoTime, tz);
     validDT := TryISOStrToDateTime(iso8601, fpDateTime);
@@ -103,17 +100,13 @@ constructor TDateStruct.CreateFromISO(iso8601 : String);
       tz := Copy (iso8601, 16, length(iso8601) );
 
     validDT := TryISOStrToDateTime(iso8601, fpDateTime);
-    epoch   := DateTimeToUnix(fpDateTime);
-
     log.debug('TDateStruct: fpDateTime= ', fpDateTime);
   end;
 
 
 procedure TDateStruct.WriteDateStrc;
   begin
-    writeln(' DateTime ', fpDateTime,
-            ' epoch ',    epoch
-           );
+    writeln(' DateTime ', fpDateTime);
   end;
 
 

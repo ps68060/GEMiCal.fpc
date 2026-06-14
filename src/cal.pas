@@ -161,8 +161,8 @@ procedure TCal.Sort;
       do
       begin
 
-        if (eventList[i].startDate.epoch  >
-            eventList[j].startDate.epoch )
+        if (eventList[i].startDate.fpDateTime  >
+            eventList[j].startDate.fpDateTime )
         then
         begin
           (*
