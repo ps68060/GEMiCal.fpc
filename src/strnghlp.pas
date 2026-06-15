@@ -1,5 +1,6 @@
 {$I projopts.i}
-{$mode objfpc}{$H+}
+{$mode objfpc}
+{$modeswitch typehelpers}
 
 unit strnghlp;
 
