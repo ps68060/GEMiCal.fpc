@@ -194,6 +194,19 @@ procedure TMyApplication.INITMainWindow;
   end;
 
 
+procedure TMyApplication.HandleMouse(var Event: OSMouseEvent);
+  begin
+    inherited HandleMouse(Event);
+  
+    if Event.State = msButtonDown
+    then
+    begin
+      writeln('Mouse clicked at X=', Event.X, ' Y=', Event.Y);
+      writeln('Buttons=', Event.Buttons);
+    end;
+  end;
+
+
 procedure TLoadMenu.Work;
   begin
     log.level := LLINFO;
