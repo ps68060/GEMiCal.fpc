@@ -380,9 +380,6 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
     pStart,
     pEnd       : TDateTime;
     
-    pStartUnix,
-    pEndUnix   : Int64;
-
     daysInMon  : Word;
 
     startsBeforeMonthEnd,
@@ -396,18 +393,12 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
     endsAfterMonthStart  := FALSE;
 
     daysInMon := DaysInMonth(calDate);
-    log.debug('CalDate=', DateToISO8601(calDate));
 
     pStart := RecodeDay(calDate, 1);
     pstart := RecodeTime(pStart, 0, 0, 0, 000);
-    log.debug('pStart=', DateToISO8601(pStart));
     
     pEnd   := RecodeDay(calDate, daysInMon);
     pEnd   := RecodeTime(pEnd, 23, 59, 59, 999);
-    log.debug('pEnd=', DateToISO8601(pEnd));
-
-///    pStartUnix := DateTimeToUnix(pStart, false);
-///    PEndUnix   := DateTimeToUnix(pEnd,   false);
 
     (* Does the event start/end overlap with the period start/end ?
      *  1: event starts before month end
@@ -431,12 +422,6 @@ function TEvent.IsMonthEvent(calDate : TDateTime)
     begin
       isMonthEvent := TRUE;
       writeln ('Current event');
-  log.debug('Event.IsMonth pStart   =', pStart);
-  log.debug('Event.IsMonth startDate=', startDate.fpDateTime);
-
-  log.debug('Event.IsMonth pEnd     =', pEnd);
-  log.debug('Event.IsMonth endDate  =', endDate.fpDateTime);
-
     end;
 
   end;
