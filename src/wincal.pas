@@ -1,6 +1,5 @@
 {$I projopts.i}
 {$mode objfpc}
-{$modeswitch typehelpers}
 
 unit WinCal;
 
@@ -64,8 +63,7 @@ type
 
                    procedure CalcGridRowCol(xPos,
                                             yPos   : SmallInt;
-                                            var rowVar,
-                                                colVar : Integer);
+                                            var rowColVar : array [0..1] of SmallInt);
 
                    procedure DrawGrid(rows : Integer);
                  END;
@@ -264,20 +262,20 @@ procedure TWinCal.CalcWinXY(row,
 
 procedure TWinCal.CalcGridRowCol(xPos,
                                  yPos   : SmallInt;
-                                 var rowVar,
-                                     colVar : Integer);
+                                 var rowColVar : array [0..1] of SmallInt);
   (* Purpose : Calculate the row and column of the calendar cell from x, y window coords
    * inputs  : x, y pixel coords.
-   * returns : row 0 to 6
-   *           col 0 to 5
+   * returns : rowColVar
+    *          where [0] is row = 0 to 6
+   *                 [1] is col = 0 to 5
    *)
   begin
     log.level := LLINFO;
-    rowVar := (yPos - Curr.Y - titleHeight) div cellHeight;
-    colVar := (xPos - Curr.X) div cellWidth;
-    
-    log.debug('rowVar= ', rowVar);
-    log.debug('colVar= ', colVar);
+    rowColVar[0] := (yPos - Curr.Y - titleHeight) div cellHeight;
+    rowColVar[1] := (xPos - Curr.X) div cellWidth;
+
+    log.debug('rowVar= ', rowColVar[0]);
+    log.debug('colVar= ', rowColVar[1]);
   end;
 
 
@@ -388,7 +386,7 @@ procedure TWinCal.DrawGridHeading;
   (* Purpose : Draw the column headings *)
   
   var
-    pxArray     : Array [1..10] of Integer;
+    pxy         : Array [0..1] of SmallInt;
   
     pixX,
     pixY        : SmallInt;
