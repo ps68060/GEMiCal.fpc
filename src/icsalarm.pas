@@ -11,6 +11,7 @@ unit IcsAlarm;
 interface
   uses
     Objects,
+    Constant,
     DateStruct;
 
 type
@@ -25,13 +26,6 @@ type
   
 
 implementation
-
-  const
-     beginAlarmTk  = 'BEGIN:VALARM';
-     endAlarmTk    = 'END:VALARM';
-     triggerTk     = 'TRIGGER:';
-     alarmDescTk   = 'DESCRIPTION:';
-     alarmActionTk = 'ACTION:';
 
 constructor TAlarm.create;
   begin

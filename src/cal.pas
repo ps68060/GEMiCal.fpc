@@ -11,11 +11,8 @@ unit Cal;
 interface
   uses
     Objects,
+    Constant,
     Event;
-
-  const
-    BEGIN_CAL_TK = 'BEGIN:VCALENDAR';
-    END_CAL_TK   = 'END:VCALENDAR';
 
 type
   TCal = class
@@ -71,7 +68,6 @@ procedure TCal.LoadIcs (directory : String);
    *)
 
   var
-    attr    : Word;
     fileRec : TRawbyteSearchRec;
     calName : String;
 
