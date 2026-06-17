@@ -244,8 +244,8 @@ procedure TWinCal.CalcWinXY(row,
                             var xVar,
                                 yVar : SmallInt);
   (* Purpose : Calculate the x, y window coords of the cell from row, col.
-   * inputs  : row 0 to 6
-   *           col 0 to 5
+   * inputs  : row 0 to 5
+   *           col 0 to 6
    * returns : x, y pixel positions of the top left corner of the calendar cell
    *)
   
@@ -266,8 +266,8 @@ procedure TWinCal.CalcGridRowCol(xPos,
   (* Purpose : Calculate the row and column of the calendar cell from x, y window coords
    * inputs  : x, y pixel coords.
    * returns : rowColVar
-    *          where [0] is row = 0 to 6
-   *                 [1] is col = 0 to 5
+    *          where [0] is row = 0 to 5
+   *                 [1] is col = 0 to 6
    *)
   begin
     log.level := LLINFO;
@@ -341,7 +341,7 @@ procedure TWinCal.DrawTitle;
 
     currentDateTime := EncodeDateTime(year, month, day, hour, minute, second, sec100);
     dateStr := DateToStr(currentDateTime);
-    dateStr := dateStr + ' ' + day2[DayOfWeek(currentDateTime) - 1];
+    dateStr := dateStr + ' ' + day2[DayOfWeek(currentDateTime)];
 
     timeStr := SubStr(TimeToStr(currentDateTime), 1, 5);
     if   (IsBST(currentDateTime))
@@ -411,13 +411,12 @@ procedure TWinCal.DrawGridHeading;
     DrawGrid (1);
   
     (* Write Day labels *)
-    LOG.DEBUG('DrawGridHeading: 1');
-    for c := 0 to 6 do
+    for c := 1 to 7 do
     begin
-      CalcWinXY(0, c, pixX, pixY);
+      CalcWinXY(0, c-1, pxy[0], pxy[1]);
       v_gtext(vdiHandle,
-              scrollX + pixX + Attr.boxWidth div 2,
-              scrollY + pixY + Attr.boxHeight - hCell*2, // hchar, (*(cellHeight div 2),*)
+              scrollX + pxy[0] + Attr.boxWidth div 2,
+              scrollY + pxy[1] + Attr.boxHeight - hCell*2, // hchar, (*(cellHeight div 2),*)
               day1[c] );
     end;
   
@@ -438,7 +437,6 @@ procedure TWinCal.DrawGrid(rows  : Integer);
   
     scrollX := Scroller^.GetXOrg;
     scrollY := Scroller^.GetYOrg;
-    log.debug('DrawGrid: scroll X ', scrollX);
   
     (* Draw heading line *)
     pxy[0] := Curr.X;  //todo - fudged to the right
@@ -461,12 +459,11 @@ procedure TWinCal.DrawGrid(rows  : Integer);
     end;
 
     (* Draw vertical lines for days by changing x co-ords *)
-    log.debug ('Draw vertical grid');
-    for c := 0 to 7 do  (* 8 vertical lines for 7 columns *)
+    for c := 1 to 8 do  (* 8 vertical lines for 7 columns *)
     begin
       (* Use column to calc X co-ord in [0] *)
-      CalcWinXY (0,    c, pxy[0], pxy[1]);
-      CalcWinXY (rows, c, pxy[2], pxy[3]);
+      CalcWinXY (0,    c-1, pxy[0], pxy[1]);
+      CalcWinXY (rows, c-1, pxy[2], pxy[3]);
   
       pxy[1] := pxy[1] + scrollY;
       pxy[3] := pxy[3] + scrollY;
@@ -491,7 +488,9 @@ function TWinCal.WriteDates
   var
     pixX,
     pixY         : SmallInt;
-  
+
+    pxy          : Array [0..1] of SmallInt;
+
     yearNow,
     monthNow,
     dateNow,
@@ -546,7 +545,7 @@ function TWinCal.WriteDates
     for i := 1 to DaysInMonth(calDate) do
     begin
       CalcCellGrid(firstOffset, i, row, col);
-      CalcWinXY(row, col, pixX, pixY);
+      CalcWinXY(row, col, pxy[0], pxy[1]);
 
       if (currentMonth)
          and (i = dateNow)
@@ -555,15 +554,15 @@ function TWinCal.WriteDates
         (* Highlight today *)
         vst_effects(vdiHandle, TF_UNDERLINED or TF_THICKENED);
         v_gtext(vdiHandle,
-                scrollX + pixX + Attr.boxWidth div 2,
-                scrollY + pixY + Attr.boxHeight,  (* Use char height and not the char cell height *)
-                IntToStr(i) + ' ' + day2[(DayOf(calDate) + i - 1) mod 7]);
+                scrollX + pxy[0] + Attr.boxWidth div 2,
+                scrollY + pxy[1] + Attr.boxHeight,  (* Use char height and not the char cell height *)
+                IntToStr(i) + ' ' + day2[(DayOf(calDate) + i) mod 7]);
         vst_effects(vdiHandle, TF_NORMAL);
       end
       else
         v_gtext(vdiHandle,
-                scrollX + pixX + Attr.boxWidth div 2,
-                scrollY + pixY + Attr.boxHeight,
+                scrollX + pxy[0] + Attr.boxWidth div 2,
+                scrollY + pxy[1] + Attr.boxHeight,
                 IntToStr(i) );
     end;
   
@@ -606,7 +605,6 @@ procedure TWinCal.DisplayEvents;
   
     scrollX := Scroller^.GetXOrg;
     scrollY := Scroller^.GetYOrg;
-  log.debug('DisplayEvents: 1');
   
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
     offset    := hCell + hcell div 2;
@@ -629,10 +627,6 @@ procedure TWinCal.DisplayEvents;
           timePlace := SubStr (Concat(time,
                                       ';',
                                       cellGr.calCell[day].cellEvents[i].location), 1, 16 );
-  
-          log.debug('Summary  ' + summ );
-          log.debug('counter ', i);
-  
           v_gtext(vdiHandle,
                   scrollX + pixX + Attr.boxWidth div 2,
                   scrollY + pixY + offset,        // (i * lineSpace),

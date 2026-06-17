@@ -24,10 +24,10 @@ interface
            = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
-    day1   : array [0..6] of String
+    day1   : array [1..7] of String
            = ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 
-    day2   : array [0..6] of String
+    day2   : array [1..7] of String
            = ('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
 
     function BSTstart(dateTime : TDateTime)
