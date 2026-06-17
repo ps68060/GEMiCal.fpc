@@ -63,7 +63,7 @@ type
 
                    procedure CalcGridRowCol(xPos,
                                             yPos   : SmallInt;
-                                            var rowColVar : array [0..1] of SmallInt);
+                                            var rowColVar : array of SmallInt);
 
                    procedure DrawGrid(rows : Integer);
                  END;
@@ -262,7 +262,7 @@ procedure TWinCal.CalcWinXY(row,
 
 procedure TWinCal.CalcGridRowCol(xPos,
                                  yPos   : SmallInt;
-                                 var rowColVar : array [0..1] of SmallInt);
+                                 var rowColVar : array of SmallInt);
   (* Purpose : Calculate the row and column of the calendar cell from x, y window coords
    * inputs  : x, y pixel coords.
    * returns : rowColVar

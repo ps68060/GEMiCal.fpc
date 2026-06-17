@@ -5,6 +5,7 @@ unit Constant;
 
 interface
 
+
   const
     BEGIN_CAL_TK = 'BEGIN:VCALENDAR';
     END_CAL_TK   = 'END:VCALENDAR';
@@ -29,5 +30,7 @@ interface
     TRIGGER_TK      = 'TRIGGER:';
     ALARM_DESC_TK   = 'DESCRIPTION:';
     ALARM_ACTION_TK = 'ACTION:';
+
+implementation
 
 end.

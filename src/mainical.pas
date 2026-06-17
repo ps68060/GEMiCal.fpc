@@ -194,7 +194,7 @@ procedure TMyApplication.INITMainWindow;
   end;
 
 
-procedure TMyApplication.HandleMouse(var Event: OSMouseEvent);
+(*procedure TMyApplication.HandleMouse(var Event: OSMouseEvent);
   begin
     inherited HandleMouse(Event);
   
@@ -205,7 +205,7 @@ procedure TMyApplication.HandleMouse(var Event: OSMouseEvent);
       writeln('Buttons=', Event.Buttons);
     end;
   end;
-
+*)
 
 procedure TLoadMenu.Work;
   begin

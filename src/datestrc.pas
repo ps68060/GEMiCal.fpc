@@ -69,7 +69,7 @@ constructor TDateStruct.Create;
     validDT  : Boolean;
 
   begin
-    tz      := '+0000';
+    tz      := 'Europe/London';
     
     iso8601 := '19700101T000000+0000';  //concat(isoDate, 'T', isoTime, tz);
     validDT := TryISOStrToDateTime(iso8601, fpDateTime);
