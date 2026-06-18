@@ -1,83 +1,79 @@
-unit DlgConv;
+{$I projopts.i}
+{$mode objfpc}
 
+unit DlgConv;
 
 interface
 
   uses
     OTypes,
     OWindows,
-    ODialogs;
+    ODialogs,
+    Constant;
 
 {$I gemical.i}
-
-const
-  dAppName = 'GEMiCal';
 
 type
   PDialogMenu  = ^TDialogMenu;
 
   (* Menu2 > Dialogue Dialogue *)
-  TDialogMenu  =  OBJECT(TKeyMenu)
+  TDialogMenu  =  object(TKeyMenu)
                     o_Button_A,
                     o_Button_B,
                     o_Button_C,
                     o_Button_D,
                     o_Exit        : PButton;
                     o_Box         : PGroupBox;
-                    procedure Work; VIRTUAL;
+                    procedure Work; virtual;
                   end;
 
 
   PDialogDial  = ^TDialogDial; 
   TDialogDial  =  OBJECT(TDialog)
-                    function ExitDlg (anIndx: Integer): Boolean; VIRTUAL;
-                    function OK                       : Boolean; VIRTUAL;
-                    function GetIconTitle: String;               VIRTUAL;
+                    function ExitDlg (anIndx: Integer): Boolean; virtual;
+                    function OK                       : Boolean; virtual;
+                    function GetIconTitle: String;               virtual;
                   end;
-
 
 implementation
 
 var
-  Buffer     : RECORD
+  buffer     : record
                  Latitude
                 ,Longitude : String[7];
                end;
 
 
 procedure TDialogMenu.Work;
+  (* Purpose: Create and render the Calendar Dialogue. *)
 
-(* Purpose Create and render the Calendar Dialogue. *)
-
-begin
-
-  (* Create dialogue *)
-  if aDialog = NIL
-  then
   begin
-    aDialog := new (PDialogDial, INIT (NIL, dAppName, TREE002));
-
-    new (o_Exit,     INIT (aDialog, B_EXIT,       id_NO, TRUE,       (* id_NO calls the .ExitDlg function *)
-                           'Close the dialog'));
-
-    new (o_Button_A, INIT (aDialog, B_PREV_MONTH, id_OK, TRUE,       (* id_OK calls the .OK function *)
-                           'Prev Month'));
-
-    new (o_Button_B, INIT (aDialog, B_NEXT_MONTH, id_OK, TRUE,
-                           'Next Month'));
-
-    new (o_Button_C, INIT (aDialog, B_PREV_YEAR, id_OK, TRUE,
-                           'Prev Year'));
-
-    new (o_Button_D, INIT (aDialog, B_NEXT_YEAR, id_OK, TRUE,
-                           'Prev Year'));
-(**
-    new (o_Box,      INIT (ADialog, D_BOX,    'A Box',
-                           'Lat, Long Datum'));
-**)
-    aDialog^.TransferBuffer := @Buffer;
-
-  end;
+    if aDialog = NIL
+    then
+    begin
+      aDialog := new (PDialogDial, INIT (NIL, dAppName, TREE002));
+  
+      new (o_Exit,     INIT (aDialog, B_EXIT,       id_NO, TRUE,       (* id_NO calls the .ExitDlg function *)
+                             'Close the dialog'));
+  
+      new (o_Button_A, INIT (aDialog, B_PREV_MONTH, id_OK, TRUE,       (* id_OK calls the .OK function *)
+                             'Prev Month'));
+  
+      new (o_Button_B, INIT (aDialog, B_NEXT_MONTH, id_OK, TRUE,
+                             'Next Month'));
+  
+      new (o_Button_C, INIT (aDialog, B_PREV_YEAR, id_OK, TRUE,
+                             'Prev Year'));
+  
+      new (o_Button_D, INIT (aDialog, B_NEXT_YEAR, id_OK, TRUE,
+                             'Prev Year'));
+  (**
+      new (o_Box,      INIT (ADialog, D_BOX,    'A Box',
+                             'Lat, Long Datum'));
+  **)
+      aDialog^.Transferbuffer := @buffer;
+  
+    end;
 
   (* Display the dialogue *)
   if aDialog <> NIL
@@ -88,41 +84,31 @@ end;
 
 
 function TDialogDial.OK: Boolean;
-
 (* Purpose : If any OK button is pressed then this routine is called *)
 
-VAR
-  i,
-  AnIndx  : Integer;
-  Valid   : Boolean;
+var
+  valid   : Boolean;
 
-  Msg,
-  Latitude, Longitude,
-  Easting,  Northing  : String;
+  Latitude, Longitude  : String;
 
-
-begin
-  Valid := INHERITED OK;
-
-  if Valid = TRUE
-  then
   begin
-
-    (* Convert from Latitude/Longitude to Grid reference *)
-
-    Latitude  := Buffer.Latitude;
-    Longitude := Buffer.Longitude;
-
-(**      Application^.Alert( @self, 1, NO_ICON, 'OK DIALOG button 1'
-                                           + '| Lat = ' + Latitude
-                                           + '| Long= ' + Longitude, '&OK');
-**)
-
-  end;  (* if valid *)
-
-  OK := FALSE;                                        (* Determines whether the Dialog exits afterwards. *)
-
-end;  
+    valid := INHERITED OK;
+  
+    if valid = TRUE
+    then
+    begin
+        (* Convert from Latitude/Longitude to Grid reference *)
+      Latitude  := buffer.Latitude;
+      Longitude := buffer.Longitude;
+  
+  (**      Application^.Alert( @self, 1, NO_ICON, 'OK DIALOG button 1'
+                                             + '| Lat = ' + Latitude
+                                             + '| Long= ' + Longitude, '&OK');
+  **)
+    end;  (* if valid *)
+  
+    OK := FALSE;                                        (* Determines whether the Dialog exits afterwards. *)
+ end;  
 
 
 function TDialogDial.ExitDlg (AnIndx:Integer): Boolean;
@@ -133,7 +119,7 @@ function TDialogDial.ExitDlg (AnIndx:Integer): Boolean;
     (**WRITELN ('EXITDLG ', AnIndx); **)
     ExitDlg := TRUE;                                    (* Determines whether the Dialog exits afterwards. *)
   
-    CASE AnIndx OF
+    case AnIndx of
       B_PREV_MONTH:
       begin
         (**WRITELN('Button A = <', MyApplication.Desk2Menu^.o_Button_A^.GetText, '>'); **)

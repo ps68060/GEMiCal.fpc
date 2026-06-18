@@ -5,8 +5,9 @@ unit Constant;
 
 interface
 
-
   const
+    dAppName = 'GEMiCal';
+
     BEGIN_CAL_TK = 'BEGIN:VCALENDAR';
     END_CAL_TK   = 'END:VCALENDAR';
   
