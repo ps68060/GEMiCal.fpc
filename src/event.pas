@@ -13,8 +13,7 @@ interface
   uses
     Objects,
     Constant,
-    DateStrc,
-    DateUtils;
+    DateStrc;
 
 
 type
@@ -34,17 +33,13 @@ type
     startDate   : TDateStruct;
     endDate     : TDateStruct;
 
-    alarmAction      : String;
-    alarmTrigger     : String;
-    alarmDescription : String;
+    alarm       : TAlarm;
+    recurRule   : TRRule;
 
     constructor Create;
     destructor  Destroy; override;
 
     function GetEvent (VAR calFile : Text)
-            : Boolean;
-
-    function GetAlarm (var calFile : Text)
             : Boolean;
 
     procedure DebugEvent;
@@ -64,8 +59,11 @@ type
 implementation
 
   uses
+    DateUtils,
     Token,
-    Logger;
+    Logger,
+    IcsAlarm,
+    RRule;
 
 constructor TEvent.Create;
   begin
@@ -80,10 +78,6 @@ constructor TEvent.Create;
     dtend       := '';
     dtendTz     := '';
     location    := '';
-
-    alarmAction      := '';
-    alarmTrigger     := '';
-    alarmDescription := '';
 
     startDate := TDateStruct.create;
     endDate   := TDateStruct.create;
@@ -117,7 +111,6 @@ function TEvent.GetEvent (VAR calFile : Text)
   var
     currentLn    : String;
 
-    alarm        : Boolean;
     endEvent     : Boolean;
 
     offset       : String;
@@ -133,7 +126,6 @@ function TEvent.GetEvent (VAR calFile : Text)
     log.level := LLDEBUG;
 
     endEvent     := FALSE;
-    alarm        := FALSE;
 
     while (NOT eof (calFile) 
            AND NOT endEvent )
@@ -152,17 +144,17 @@ function TEvent.GetEvent (VAR calFile : Text)
 
       else
       begin
-        // Split at the first colon
+        // Split at the first colon into parts[] array
         parts := SplitString(currentLn, ':');
 
         if Length(parts) < 2
         then
         begin
+          log.error('Invalid iCal Event', currentLn);
           Exit;
-          log.error('Invalid iCal');
         end;
 
-        // Split  parts[0] at the semi-colon. i.e property-name;property-parameters
+        // Split parts[0] at the semi-colon. i.e property-name;property-parameters
         leftParts := SplitString(parts[0], ';');
         propName  := leftParts[0];
 
@@ -197,29 +189,19 @@ function TEvent.GetEvent (VAR calFile : Text)
             end;
 
           SUMMARY_TK:
-            if not alarm
-            then
-              summary := value;
+            summary := value;
 
           DESCR_TK:
-            if not alarm
-            then
-              description := value;
+            description := value;
 
           LOCATION_TK:
-            if not alarm
-            then
-              location := value;
+            location := value;
 
           BEGIN_ALARM_TK:
-            if not alarm then
-              alarm := GetAlarm(calFile);
-
-          END_ALARM_TK:
-            alarm := False;
+            alarm.ParseAlarm(calFile);
 
           RECUR_RULE_TK:
-            log.info('Recurring event not yet handled. ' + value);
+            rrule.ParseRRule(value, recurRule)
         end;  (* case *)
 
       end;  (* if *)
@@ -300,60 +282,12 @@ function TEvent.GetTimeZone2(TZIdString: String)
   begin
     // Split TZID at the Equals sign.
     parts := SplitString(TZIdString, '=');  // e.g. "TZID=Europe/London".
-  
+
     if (parts[0] = TZID_TK)
     then
       GetTimeZone := parts[1]
     else
       GetTimeZone := '';
-  end;
-
-
-function TEvent.GetAlarm (var calFile : Text)
-        : Boolean;
-  var
-    currentLn    : String;
-
-    endAlarm     : Boolean;
-
-  begin
-    endAlarm := FALSE;
-
-    while (NOT eof (calFile) 
-           AND NOT endAlarm )
-    do
-    begin
-
-      readln ( calFile, currentLn );
-
-      (* Look for End Alarm *)
-      if ( pos(END_ALARM_TK, currentLn) = 1 )
-      then
-      begin
-
-        endAlarm := TRUE;
-
-      end
-      else
-      begin
-
-        if (pos(TRIGGER_TK, currentLn) = 1 )
-        then
-          alarmTrigger := COPY (currentLn, 9, length(currentLn));
-
-        if (pos(ALARM_ACTION_TK, currentLn) = 1 )
-        then
-          alarmAction  := COPY (currentLn, 8, length(currentLn));
-
-        if (pos(ALARM_DESC_TK, currentLn) = 1 )
-        then
-          alarmDescription := COPY (currentLn, 13, length(currentLn));
-
-      end;  (* if *)
-
-    end;  (* while *)
-
-    GetAlarm := TRUE;
   end;
 
 
@@ -380,7 +314,9 @@ procedure TEvent.DebugEvent;
     write('Location     : ');
     WriteNN (location);
 
-    WriteNN (alarmTrigger);
+    WriteNN (alarm.alarmTrigger);
+    
+    WriteNN (recurRule.freq);
 
     write('Event ends   : ');
     endDate.WriteDateStrc;

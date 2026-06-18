@@ -106,7 +106,7 @@ constructor TDateStruct.CreateFromISO(iso8601 : String);
 
 procedure TDateStruct.WriteDateStrc;
   begin
-    writeln(' DateTime ', fpDateTime);
+    writeln(' DateTime=', fpDateTime);
   end;
 
 

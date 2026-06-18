@@ -15,17 +15,19 @@ type
     ByDay      : array of String;    // MO,TU,WE,TH,FR,SA,SU
     ByMonth    : array of Integer;   // 1..12
     ByMonthDay : array of Integer;   // 1..31 or -31..-1
-  end;
 
-  procedure ParseRRule(const s: String;
-                       var rule: TRRule);
+    procedure ParseRRule(const s: String;
+                         var rule: TRRule);
+
+  end;
 
 
 implementation
 
 uses
   SysUtils,
-  StrUtils;
+  StrUtils,
+  Logger;
 
 const
   FREQ_TK       = 'FREQ';
@@ -36,8 +38,12 @@ const
   BYMONTH_TK    = 'BYMONTH';
   BYMONTHDAY_TK = 'BYMONTHDAY';
 
-procedure ParseRRule(const s: String;
-                     var rule: TRRule);
+procedure TRRule.ParseRRule(const value: String;
+                            var rule: TRRule);
+ (* Purpose: Parse the single line Recur rule.
+  * e.g  RRULE:FREQ=DAILY;COUNT=10
+  *      RRULE:FREQ=MONTHLY;UNTIL=19971224T000000Z;BYDAY=1FR
+  *)
   var
     parts,
     kv         : TStringArray;
@@ -48,6 +54,7 @@ procedure ParseRRule(const s: String;
     list       : TStringArray;
 
   begin
+    log.info('Recurring event not yet handled. ' + value);
     // Defaults
     rule.Freq := '';
     rule.Interval := 1;
@@ -58,7 +65,7 @@ procedure ParseRRule(const s: String;
     SetLength(rule.ByMonthDay, 0);
   
     // Split at semicolons: FREQ=DAILY;INTERVAL=2;BYDAY=MO,WE,FR
-    parts := SplitString(s, ';');
+    parts := SplitString(value, ';');
   
     for i := 0 to High(parts) do
     begin
@@ -69,20 +76,19 @@ procedure ParseRRule(const s: String;
       val := kv[1];
   
       case key of
-  
-          FREQ_TK:
+        FREQ_TK:
           rule.Freq := val;
   
-          INTERVAL_TK:
+        INTERVAL_TK:
           rule.Interval := StrToIntDef(val, 1);
   
-          UNTIL_TK:
+        UNTIL_TK:
           rule.UntilDate := val;
   
-          COUNT_TK:
+        COUNT_TK:
           rule.Count := StrToIntDef(val, 0);
   
-          BYDAY_TK:
+        BYDAY_TK:
           begin
             list := SplitString(val, ',');
             SetLength(rule.ByDay, Length(list));
@@ -91,7 +97,7 @@ procedure ParseRRule(const s: String;
               rule.ByDay[j] := list[j];
           end;
   
-          BYMONTH_TK:
+        BYMONTH_TK:
           begin
             list := SplitString(val, ',');
             SetLength(rule.ByMonth, Length(list));
@@ -100,7 +106,7 @@ procedure ParseRRule(const s: String;
               rule.ByMonth[j] := StrToIntDef(list[j], 0);
           end;
   
-          BYMONTHDAY:
+        BYMONTHDAY:
           begin
             list := SplitString(val, ',');
             SetLength(rule.ByMonthDay, Length(list));
@@ -109,8 +115,8 @@ procedure ParseRRule(const s: String;
               rule.ByMonthDay[j] := StrToIntDef(list[j], 0);
           end;
   
-      end; // case
-    end;
+      end;  // case
+    end;  // for
   end;
 
 end.
