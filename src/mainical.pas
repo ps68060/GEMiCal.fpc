@@ -67,7 +67,11 @@ type
                      destructor done; virtual;
                      procedure INITInstance;   VIRTUAL;
                      procedure INITMainWindow; VIRTUAL;
-                   end;
+
+                     // Handle AES Events
+                     procedure HandleEvent(var Event: TAesEvent); virtual;
+
+  end;
 
   procedure LoadCal;
 
@@ -169,10 +173,11 @@ procedure TMyApplication.INITMainWindow;
 
       LoadCal;
 
-      // calDate holds the date for the displayed calendar month.
-      // Initially set to the 1st of the current month.
-      // Used to filter the events for the month.
-      // Updated when the user navigates to a different month or year.
+      (* calDate holds the date for the displayed calendar month.
+         Initially set to the 1st of the current month.
+         Used to filter the events for the month.
+         Updated when the user navigates to a different month or year.
+       *)
 
       GetDate (year, month, day, dayNumber);
       myApplication.winCal^.calDate := EncodeDateTime(year, month, 1, 00, 00, 00, 000);
@@ -194,18 +199,22 @@ procedure TMyApplication.INITMainWindow;
   end;
 
 
-(*procedure TMyApplication.HandleMouse(var Event: OSMouseEvent);
+procedure TMyApplication.HandleEvent(var Event: TAesEvent);
   begin
-    inherited HandleMouse(Event);
+    inherited HandleEvent(Event);
   
-    if Event.State = msButtonDown
-    then
+    { Mouse button event? }
+    if Event.ev_mwhich = evButton then
     begin
-      writeln('Mouse clicked at X=', Event.X, ' Y=', Event.Y);
-      writeln('Buttons=', Event.Buttons);
+      { Left button = 1 }
+      if Event.ev_mmobutton = 1 then
+      begin
+        writeln('Left click at X=', Event.ev_mmox,
+                             ' Y=', Event.ev_mmoy);
+      end;
     end;
   end;
-*)
+
 
 procedure TLoadMenu.Work;
   begin
