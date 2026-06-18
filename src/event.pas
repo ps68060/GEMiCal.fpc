@@ -103,6 +103,15 @@ function TEvent.GetEvent (VAR calFile : Text)
 
   (*
    * Purpose : Get one iCS event.
+   * property-name;property-paramter:property-value
+   * is divided into propName, paramStr, value
+   *
+   * sample of lines that are handled:
+   *      UID:uid1@example.com
+   *      DTSTART:19960918T143000Z
+   *      DTEND;TZID=America/New_York:19980312T093000
+   *      SUMMARY:Atari Conference
+   *      END:VEVENT
    *)
 
   var
@@ -111,8 +120,14 @@ function TEvent.GetEvent (VAR calFile : Text)
     alarm        : Boolean;
     endEvent     : Boolean;
 
-    tokens       : TToken;
     offset       : String;
+
+    parts,
+    leftParts    : TStringArray;
+
+    propName,
+    paramStr,
+    value        : String;
 
   begin
     log.level := LLDEBUG;
@@ -137,64 +152,75 @@ function TEvent.GetEvent (VAR calFile : Text)
 
       else
       begin
-        tokens := TToken.Create;
-        tokens.tokeniseIcal(currentLn);  // Split string at : and ; and store in tokens.part[0..n]
+        // Split at the first colon
+        parts := SplitString(currentLn, ':');
 
-        if (tokens.StartsWith(CREATED_TK))
-        then
-          created := tokens.part[2];
-
-        if (tokens.StartsWith(UID_TK))
-        then
-          uid := tokens.part[2];
-
-        if (tokens.StartsWith(DTSTART_TK))
+        if Length(parts) < 2
         then
         begin
-          (*       part[0] = "DTSTART"
-           *       part[1] = "TZID=Europe/London"
-           *       part[2] = "20200516T000000"
+          Exit;
+          log.error('Invalid iCal');
+        end;
+
+        // Split  parts[0] at the semi-colon. i.e property-name;property-parameters
+        leftParts := SplitString(parts[0], ';');
+        propName  := leftParts[0];
+
+        value     := parts[1];
+        if Length(leftParts) > 1
+        then
+          paramStr := leftParts[1]
+        else
+          paramStr := '';    // No property-parameters
+
+        case propName of
+          CREATED_TK:
+            created := value;
+
+          UID_TK:
+            uid := value;
+
+          (*       propname = "DTSTART"
+           *       paramStr = "TZID=Europe/London"
+           *       value    = "20200516T000000"
            *)
-          dtStart   := tokens.part[2];
-          dtStartTz := GetTimeZone(tokens.part[1]);
-        end;
+          DTSTART_TK:
+            begin
+              dtStart   := value;
+              dtStartTz := GetTimeZone(paramStr);
+            end;
 
-        if (tokens.StartsWith(DTEND_TK))
-        then
-        begin
-          dtEnd   := tokens.part[2];
-          dtEndTz := GetTimeZone(tokens.part[1]);
-        end;
+          DTEND_TK:
+            begin
+              dtEnd   := value;
+              dtEndTz := GetTimeZone(paramStr);
+            end;
 
-        if ( tokens.StartsWith(SUMMARY_TK))
-           and (NOT alarm)
-        then
-          summary := tokens.part[2];
+          SUMMARY_TK:
+            if not alarm
+            then
+              summary := value;
 
-        if ( tokens.StartsWith(DESCR_TK))
-           and (NOT alarm)
-        then
-          description := tokens.part[2];
+          DESCR_TK:
+            if not alarm
+            then
+              description := value;
 
-        if ( tokens.StartsWith(LOCATION_TK))
-           and (NOT alarm)
-        then
-          location := tokens.part[2];
+          LOCATION_TK:
+            if not alarm
+            then
+              location := value;
 
-        if (NOT alarm )
-            and (tokens.StartsWith(BEGIN_ALARM_TK))
-        then
-          alarm := GetAlarm(calFile);
+          BEGIN_ALARM_TK:
+            if not alarm then
+              alarm := GetAlarm(calFile);
 
-        if (tokens.StartsWith(END_ALARM_TK))
-        then
-          alarm := FALSE;
+          END_ALARM_TK:
+            alarm := False;
 
-        if (tokens.StartsWith(RECUR_RULE_TK))
-        then
-          log.info('Recurring event not yet handled.' + tokens.part[2]);
-        
-        tokens.Free;
+          RECUR_RULE_TK:
+            log.info('Recurring event not yet handled. ' + value);
+        end;  (* case *)
 
       end;  (* if *)
 
@@ -249,10 +275,10 @@ function TEvent.GetEvent (VAR calFile : Text)
 
 function TEvent.GetTimeZone(TZIdString: String)
         : String;
+  (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
   var
     subTokens  : TToken;
   begin
-    (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
     subtokens := TToken.Create;
     subtokens.TokeniseInf(TZIdString); // e.g. "TZID=Europe/London".  Split string at =
 
@@ -262,7 +288,24 @@ function TEvent.GetTimeZone(TZIdString: String)
     else
       GetTimeZone := '';
 
-    subTokens.Destroy;
+    subTokens.Free;
+  end;
+
+function TEvent.GetTimeZone2(TZIdString: String)
+        : String;
+  (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
+  var
+    parts    : TStringArray;
+
+  begin
+    // Split TZID at the Equals sign.
+    parts := SplitString(TZIdString, '=');  // e.g. "TZID=Europe/London".
+  
+    if (parts[0] = TZID_TK)
+    then
+      GetTimeZone := parts[1]
+    else
+      GetTimeZone := '';
   end;
 
 
