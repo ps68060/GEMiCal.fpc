@@ -3,9 +3,9 @@
 
 unit Cal;
 
-(* AUTHOR  : P SLEGG
-   DATE    : 17th May 2020 Version 1
-   PURPOSE : TCal object for ICS file.
+(* Aauthor  : P SLEGG
+   Date    : 17th May 2020 Version 1
+   Purpos : TCal object for ICS file.
 *)
 
 interface
