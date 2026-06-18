@@ -4,6 +4,8 @@ GEMiCal
 Simple GEM app to display a calendar from iCal (ics) files.
 Originally written in Pure-Pascal it is now being migrated to Free Pascal.
 
+![GemiCal](screenshots/GemiCal_01.jpg)
+
 It is not very functional at the moment, it is very much an MVP.
 
 **Contributions welcome**
