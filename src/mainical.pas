@@ -69,7 +69,7 @@ type
                      procedure INITMainWindow; VIRTUAL;
 
                      // Handle AES Events
-                     procedure HandleEvent(var Event: TAesEvent); virtual;
+//                     procedure HandleEvent(var Event: TAesEvent); virtual;
 
   end;
 
@@ -198,12 +198,12 @@ procedure TMyApplication.INITMainWindow;
     //myApplication.winCal^.calDate.free //todo ???;
   end;
 
-
+(*
 procedure TMyApplication.HandleEvent(var Event: TAesEvent);
   begin
     inherited HandleEvent(Event);
   
-    { Mouse button event? }
+    // Mouse button event?
     if Event.ev_mwhich = evButton then
     begin
       { Left button = 1 }
@@ -214,7 +214,7 @@ procedure TMyApplication.HandleEvent(var Event: TAesEvent);
       end;
     end;
   end;
-
+*)
 
 procedure TLoadMenu.Work;
   begin

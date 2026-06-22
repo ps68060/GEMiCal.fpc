@@ -36,8 +36,7 @@ implementation
 
   uses
     SysUtils,
-    Logger,
-    Token;
+    Logger;
 
 constructor TCal.Create;
   var

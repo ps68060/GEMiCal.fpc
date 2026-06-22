@@ -1,5 +1,6 @@
 {$I projopts.i}
 {$mode objfpc}
+{$modeswitch advancedrecords}
 
 unit IcsAlarm;
 
@@ -11,8 +12,10 @@ unit IcsAlarm;
 interface
   uses
     Objects,
+    SysUtils,
+    StrUtils,
     Constant,
-    DateStruct;
+    DateStrc;
 
 type
 
@@ -20,10 +23,16 @@ type
     alarmAction      : String;
     alarmTrigger     : String;
     alarmDescription : String;
+
+    procedure ParseAlarm(var calFile : Text);
+
   end;
+
   
 
 implementation
+  uses
+    Logger;
 
 
 procedure TAlarm.ParseAlarm(var calFile : Text);

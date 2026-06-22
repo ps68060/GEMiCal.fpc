@@ -14,9 +14,8 @@ const
   dVersion = 'Vn 0.0';                          (**  not used yet **)
 
 type
-  PDeskMenu    = ^TDeskMenu;   (* About *)
-
   (* Menu1 > About *)
+  PDeskMenu    = ^TDeskMenu;   (* About *)
   TDeskMenu  =  OBJECT(TKeyMenu)
                   d_Headline,
                   d_Infoline    : PStatic;   (* Text-element     *)
@@ -28,8 +27,6 @@ type
                 end;
 
   PAboutDial   = ^TAboutDial;
-
-
   TAboutDial =  OBJECT(TDialog)
                   function OK   : Boolean;        VIRTUAL;
                   function HELP : Boolean;        VIRTUAL;

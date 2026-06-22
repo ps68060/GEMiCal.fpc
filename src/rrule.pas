@@ -1,5 +1,6 @@
 {$I projopts.i}
 {$mode objfpc}
+{$modeswitch advancedrecords}
 
 unit rrule;
 
@@ -8,15 +9,15 @@ interface
 type
 
   TRRule = record
-    Freq       : String;             // DAILY, WEEKLY, MONTHLY, YEARLY
-    Interval   : Integer;            // default = 1
-    UntilDate  : String;             // YYYYMMDD or YYYYMMDDTHHMMSSZ
+    freq       : String;             // DAILY, WEEKLY, MONTHLY, YEARLY
+    interval   : Integer;            // default = 1
+    untilDate  : String;             // YYYYMMDD or YYYYMMDDTHHMMSSZ
     Count      : Integer;            // number of occurrences
-    ByDay      : array of String;    // MO,TU,WE,TH,FR,SA,SU
-    ByMonth    : array of Integer;   // 1..12
-    ByMonthDay : array of Integer;   // 1..31 or -31..-1
+    byDay      : array of String;    // MO,TU,WE,TH,FR,SA,SU
+    byMonth    : array of Integer;   // 1..12
+    byMonthDay : array of Integer;   // 1..31 or -31..-1
 
-    procedure ParseRRule(const s: String;
+    procedure ParseRRule(const value: String;
                          var rule: TRRule);
 
   end;
@@ -56,13 +57,14 @@ procedure TRRule.ParseRRule(const value: String;
   begin
     log.info('Recurring event not yet handled. ' + value);
     // Defaults
-    rule.Freq := '';
-    rule.Interval := 1;
-    rule.UntilDate := '';
-    rule.Count := 0;
-    SetLength(rule.ByDay, 0);
-    SetLength(rule.ByMonth, 0);
-    SetLength(rule.ByMonthDay, 0);
+    freq := '';
+    interval := 1;
+    untilDate := '';
+    count := 0;
+
+    SetLength(byDay, 0);
+    SetLength(byMonth, 0);
+    SetLength(byMonthDay, 0);
   
     // Split at semicolons: FREQ=DAILY;INTERVAL=2;BYDAY=MO,WE,FR
     parts := SplitString(value, ';');
@@ -77,42 +79,42 @@ procedure TRRule.ParseRRule(const value: String;
   
       case key of
         FREQ_TK:
-          rule.Freq := val;
+          freq := value;
   
         INTERVAL_TK:
-          rule.Interval := StrToIntDef(val, 1);
+          interval := StrToIntDef(value, 1);
   
         UNTIL_TK:
-          rule.UntilDate := val;
+          untilDate := value;
   
         COUNT_TK:
-          rule.Count := StrToIntDef(val, 0);
+          count := StrToIntDef(value, 0);
   
         BYDAY_TK:
           begin
-            list := SplitString(val, ',');
-            SetLength(rule.ByDay, Length(list));
+            list := SplitString(value, ',');
+            SetLength(byDay, Length(list));
 
             for j := 0 to High(list) do
-              rule.ByDay[j] := list[j];
+              byDay[j] := list[j];
           end;
   
         BYMONTH_TK:
           begin
-            list := SplitString(val, ',');
-            SetLength(rule.ByMonth, Length(list));
+            list := SplitString(value, ',');
+            SetLength(byMonth, Length(list));
 
             for j := 0 to High(list) do
-              rule.ByMonth[j] := StrToIntDef(list[j], 0);
+              byMonth[j] := StrToIntDef(list[j], 0);
           end;
   
-        BYMONTHDAY:
+        BYMONTHDAY_TK:
           begin
             list := SplitString(val, ',');
-            SetLength(rule.ByMonthDay, Length(list));
+            SetLength(byMonthDay, Length(list));
 
             for j := 0 to High(list) do
-              rule.ByMonthDay[j] := StrToIntDef(list[j], 0);
+              byMonthDay[j] := StrToIntDef(list[j], 0);
           end;
   
       end;  // case

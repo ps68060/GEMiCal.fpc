@@ -1,5 +1,4 @@
 {$I projopts.i}
-{$mode objfpc}
 
 unit DlgConv;
 
@@ -17,7 +16,7 @@ type
   PDialogMenu  = ^TDialogMenu;
 
   (* Menu2 > Dialogue Dialogue *)
-  TDialogMenu  =  object(TKeyMenu)
+  TDialogMenu  =  object (TKeyMenu)
                     o_Button_A,
                     o_Button_B,
                     o_Button_C,
@@ -29,10 +28,10 @@ type
 
 
   PDialogDial  = ^TDialogDial; 
-  TDialogDial  =  OBJECT(TDialog)
-                    function ExitDlg (anIndx: Integer): Boolean; virtual;
-                    function OK                       : Boolean; virtual;
-                    function GetIconTitle: String;               virtual;
+  TDialogDial  =  object (TDialog)
+                    function ExitDlg (anIndx: Integer) : Boolean; virtual;
+                    function OK                        : Boolean; virtual;
+                    function GetIconTitle: String;                virtual;
                   end;
 
 implementation
@@ -83,13 +82,14 @@ procedure TDialogMenu.Work;
 end;
 
 
-function TDialogDial.OK: Boolean;
-(* Purpose : If any OK button is pressed then this routine is called *)
+function TDialogDial.OK
+        : Boolean;
+  (* Purpose : If any OK button is pressed then this routine is called *)
 
-var
-  valid   : Boolean;
+  var
+    valid   : Boolean;
 
-  Latitude, Longitude  : String;
+    Latitude, Longitude  : String;
 
   begin
     valid := INHERITED OK;
@@ -111,7 +111,8 @@ var
  end;  
 
 
-function TDialogDial.ExitDlg (AnIndx:Integer): Boolean;
+function TDialogDial.ExitDlg (AnIndx:Integer)
+        : Boolean;
   
   (* Purpose : If any EXIT button is pressed this routine is called *)
   
@@ -138,7 +139,9 @@ function TDialogDial.ExitDlg (AnIndx:Integer): Boolean;
     end;
   end;  
 
-function TDialogDial.GetIconTitle : String;
+
+function TDialogDial.GetIconTitle
+        : String;
   begin
     GetIconTitle := 'Button';
   end;

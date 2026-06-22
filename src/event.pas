@@ -1,5 +1,6 @@
 {$I projopts.i}
 {$mode objfpc}
+{$modeswitch advancedrecords}
 
 unit Event;
 
@@ -13,8 +14,9 @@ interface
   uses
     Objects,
     Constant,
-    DateStrc;
-
+    DateStrc,
+    IcsAlarm,
+    RRule;
 
 type
   TEvent = class
@@ -59,11 +61,10 @@ type
 implementation
 
   uses
+    SysUtils,
+    StrUtils,
     DateUtils,
-    Token,
-    Logger,
-    IcsAlarm,
-    RRule;
+    Logger;
 
 constructor TEvent.Create;
   begin
@@ -201,7 +202,7 @@ function TEvent.GetEvent (VAR calFile : Text)
             alarm.ParseAlarm(calFile);
 
           RECUR_RULE_TK:
-            rrule.ParseRRule(value, recurRule)
+            recurrule.ParseRRule(value, recurRule)
         end;  (* case *)
 
       end;  (* if *)
@@ -256,24 +257,6 @@ function TEvent.GetEvent (VAR calFile : Text)
 
 
 function TEvent.GetTimeZone(TZIdString: String)
-        : String;
-  (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
-  var
-    subTokens  : TToken;
-  begin
-    subtokens := TToken.Create;
-    subtokens.TokeniseInf(TZIdString); // e.g. "TZID=Europe/London".  Split string at =
-
-    if (subTokens.StartsWith(TZID_TK))
-    then
-      GetTimeZone := subTokens.part[2]
-    else
-      GetTimeZone := '';
-
-    subTokens.Free;
-  end;
-
-function TEvent.GetTimeZone2(TZIdString: String)
         : String;
   (* Purpose : Return the time zone from the TZID string, e.g. "TZID=Europe/London" *)
   var
