@@ -36,9 +36,6 @@ interface
                   count : Integer)
           : String;
 
-  function GET_TOKEN (var Text : STRING) : STRING;
-
-
 implementation
 
 function UPPERCASE (s : STRING) : STRING;
@@ -180,29 +177,5 @@ begin
   SubStr := Copy(myStr, index, count);
 end;
 
-
-function Get_Token (var Text : string)
-        : string;
-(*
- * Purpose: Get the first token
- *          Return the token
- *          Text = the remainder of the string 
- *)
-var
-  Token    : string;
-  SpacePos : integer;
-
-begin
-  Text := LTrim(Text);
-  SpacePos := POS (' ', Text);
-
-  if (SpacePos = 0)
-  then
-    SpacePos := LENGTH(Text) + 1;
-
-  Get_Token := COPY (Text, 1, SpacePos-1);
-  Text := COPY (Text, SpacePos+1, LENGTH(Text) - SpacePos);  (* chop from first space to end *)
-
-end;
 
 end.

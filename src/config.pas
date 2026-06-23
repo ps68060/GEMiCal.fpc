@@ -25,11 +25,13 @@ type
 
 implementation
 
-uses
-  Logger,
-  Token;
+  uses
+    Logger,
+    SysUtils,
+    StrUtils;
 
   const
+    COMMENT_TK     = '#';
     NAME_TK        = 'name';
     LAT_TK         = 'lat';
     LNG_TK         = 'long';
@@ -54,7 +56,11 @@ destructor TConfig.destroy;
   end;
 
 
-function GetValue(keyValue : TToken; value : real; limit: real) : real;
+function GetValue(keyValue : String;
+                  value    : real;
+                  limit    : real)
+        : real;
+
   var
     code         : Integer;
     valReal      : Real;
@@ -63,15 +69,15 @@ function GetValue(keyValue : TToken; value : real; limit: real) : real;
     log.level := LLINFO;
 
     GetValue := value;
-    val(keyValue.part[1], valReal, code);
+    val (keyValue, valReal, code);
 
     if (code <> 0)
     then
-      log.error ('Real conversion error of ' + keyValue.part[0] + '=', keyValue.part[1]);
+      log.error ('Real conversion error of ' + keyValue);
 
     if (abs(valReal) > limit)
     then
-      log.warn(keyValue.part[0] + ' out of range, check gemical.cnf')
+      log.warn(keyValue + ' out of range, check gemical.cnf')
     else
       GetValue := valReal;
   end;
@@ -82,7 +88,8 @@ procedure TConfig.readConfig;
     cnfFile      : Text;
 
     currentLn    : String;
-    tokens       : TToken;
+
+    parts        : TStringArray;
 
   begin
     log.level := LLINFO;
@@ -95,36 +102,31 @@ procedure TConfig.readConfig;
     do
     begin
       readln (cnfFile, currentLn );
+      
+      // Split at the first equals sign into parts[] array
+      parts := SplitString(currentLn, '=');
 
-      tokens := TToken.Create;
-      tokens.tokeniseInf(currentLn);
+      name := parts[0];
 
-      (* Get the name *)
-      if ( tokens.StartsWith(NAME_TK) )
-      then
-        name := tokens.part[1];
+      case parts[0] of
+        COMMENT_TK:
+          break;
 
-      (* Get the latitude, if it is invalid, keep default *)
-      if ( tokens.StartsWith(LAT_TK) )
-      then
-        lat := GetValue(tokens, lat, 90.0);
+        NAME_TK:       (* Get the name *)
+          name := parts[1];
 
-      (* Get the longitude, if it is invalid, keep default *)
-      if ( tokens.StartsWith(LNG_TK) )
-      then
-        lng := GetValue(tokens, lng, 180.0);
+        LAT_TK:        (* Get the latitude, if it is invalid, keep default *)
+          lat := GetValue(parts[1], lat, 90.0);
 
-      (* Get the UTC offset, if it is invalid, keep default *)
-      if ( tokens.StartsWith(UTC_OFFSET_TK) )
-      then
-        UTCoffset := GetValue(tokens, UTCoffset, 12.0);
+        LNG_TK:        (* Get the longitude, if it is invalid, keep default *)
+          lng := GetValue(parts[1], lng, 180.0);
 
-      (* Get the local Timezone *)
-      if ( tokens.StartsWith(TIMEZONE_TK) )
-      then
-        Timezone := tokens.part[1];
+        UTC_OFFSET_TK: (* Get the UTC offset, if it is invalid, keep default *)
+          UTCoffset := GetValue(parts[1], UTCoffset, 12.0);
 
-      tokens.Free;
+        TIMEZONE_TK:   (* Get the local Timezone *)
+          Timezone := parts[1];
+      end;  (* case *)
     end;  (* while *)
 
     log.debug ('location = ' + name);
