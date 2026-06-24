@@ -64,9 +64,11 @@ type
                      iCal       : TCal;
                      winCal     : PWinCal;
 
-                     destructor done; virtual;
-                     procedure INITInstance;   VIRTUAL;
-                     procedure INITMainWindow; VIRTUAL;
+                     destructor done;  virtual;
+
+                     procedure INITInstance;                  virtual;
+                     procedure INITMainWindow;                virtual;
+                     procedure MUButton(data : TEventData);   virtual;
 
                      // Handle AES Events
 //                     procedure HandleEvent(var Event: TAesEvent); virtual;
@@ -94,22 +96,30 @@ implementation
 (* ------------------------------------------------------------------------------- *)
 
 var
-
   myFile,
-  myPath        : String;
+  myPath       : String;
 
-  directory     : String;
+  directory    : String;
+
 
 destructor TMyApplication.done;
   begin
-    
+    inherited Destroy;
+  end;
+
+
+function ToBiosKey(scan: Word)
+        : Word;
+  (* Purpose: Normalise a scan code into BIOS format *)
+  begin
+    ToBiosKey := scan shl 8;
   end;
 
 
 procedure TMyApplication.INITInstance;
-  const
-    K_Left  = $4B00;
-    K_Right = $4D00;
+const
+//    K_Left  = $4B00;
+//    K_Right = $4D00;
     K_Up    = $4800;
     K_Down  = $5000;
 
@@ -147,8 +157,10 @@ procedure TMyApplication.INITInstance;
     appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, K_Up,   M_MONTHPREV, M_DESK3));  // K_Up
     appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, K_Down, M_MONTHNEXT, M_DESK3));  // K_Down
 
-    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, Ctrl_H, M_YEARPREV,  M_DESK3));  // K_Left
-    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, Ctrl_J, M_YEARNEXT,  M_DESK3));  // K_Right
+    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, ToBiosKey(KbLeft),  M_YEARPREV,  M_DESK3));  // K_Left
+    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, ToBiosKey(KbRight), M_YEARNEXT,  M_DESK3));  // K_Right
+
+    Attr.EventMask := MU_MESAG or MU_KEYBD or MU_BUTTON;
 
     INHERITED INITInstance;
     SetQuit (M_END, M_DESK2);
@@ -160,7 +172,7 @@ procedure TMyApplication.INITMainWindow;
     year,
     month,
     day,
-    dayNumber : Word;
+    dayNumber  : Word;
 
   begin
     log.level := LLDEBUG;
@@ -198,23 +210,20 @@ procedure TMyApplication.INITMainWindow;
     //myApplication.winCal^.calDate.free //todo ???;
   end;
 
-(*
-procedure TMyApplication.HandleEvent(var Event: TAesEvent);
+
+procedure TMyApplication.MUButton(data: TEventData);
+  var
+    x, y,
+    b          : integer;
+
   begin
-    inherited HandleEvent(Event);
+    x := data.mX;
+    y := data.mY;
+    b := data.mB;   // 1=left, 2=right, 4=middle
   
-    // Mouse button event?
-    if Event.ev_mwhich = evButton then
-    begin
-      { Left button = 1 }
-      if Event.ev_mmobutton = 1 then
-      begin
-        writeln('Left click at X=', Event.ev_mmox,
-                             ' Y=', Event.ev_mmoy);
-      end;
-    end;
+    writeLn('Mouse clicked at ', x, ',', y, ' button=', b);
   end;
-*)
+
 
 procedure TLoadMenu.Work;
   begin
