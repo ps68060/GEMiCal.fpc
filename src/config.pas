@@ -44,7 +44,7 @@ constructor TConfig.create;
     lat       := 51.4779;
     lng       := 0.0;
     UTCoffset := 0.0;
-    Timezone  := 'UTC';
+    timezone  := 'UTC';
 
     readConfig;
   end;
@@ -125,14 +125,15 @@ procedure TConfig.readConfig;
           UTCoffset := GetValue(parts[1], UTCoffset, 12.0);
 
         TIMEZONE_TK:   (* Get the local Timezone *)
-          Timezone := parts[1];
+          timezone := parts[1];
       end;  (* case *)
     end;  (* while *)
 
     log.debug ('location = ' + name);
-    log.debug ('lat = ', lat);
-    log.debug ('lng = ', lng);
-    log.debug ('UTC = ', UTCoffset);
+    log.debug ('lat  = ', lat);
+    log.debug ('lng  = ', lng);
+    log.debug ('UTC      = ', UTCoffset);
+    log.debug ('Timezone = ' + timezone);
 
     close(cnfFile);
   end;
