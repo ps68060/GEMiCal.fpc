@@ -1,6 +1,6 @@
 {$I projopts.i}
 
-unit DlgConv;
+unit DlgConf;
 
 interface
 
@@ -38,8 +38,8 @@ implementation
 
 var
   buffer     : record
-                 Latitude
-                ,Longitude : String[7];
+                 Latitude,
+                 Longitude : String;
                end;
 
 
@@ -87,9 +87,10 @@ function TDialogDial.OK
   (* Purpose : If any OK button is pressed then this routine is called *)
 
   var
-    valid   : Boolean;
+    valid      : Boolean;
 
-    Latitude, Longitude  : String;
+    Latitude,
+    Longitude  : String;
 
   begin
     valid := INHERITED OK;
