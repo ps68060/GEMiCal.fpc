@@ -134,10 +134,14 @@ procedure TRRule.ParseRRule(const value: String);
   end;
 
 
-procedure GetRecurEnd;
+procedure GetRecurEnd(startDate: TDateTime);
   (*
    * Purpose: Determine when the recurring event will end and store as a TDateStruct.
    *)
+  var
+    endDays     : Integer;
+    endDateTime : TDateTime;
+
   begin
     if Length(untilDate) > 0
     then
@@ -145,8 +149,14 @@ procedure GetRecurEnd;
       recurUntilDate := TDateStruct.Create;
       recurUntilDate.CreateFromISO(untilDate);
     end
+
     else
-      CalcRecurEnd;
+    begin
+      endDays := CalcRecurEnd;
+      recurUntilDate := TDateStruct.Create;
+      endDateTime := startDate + endDays;
+      recurUntilDate.fpDateTime := endDateTime;
+    end;
   end;
 
 
