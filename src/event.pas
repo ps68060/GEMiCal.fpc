@@ -202,7 +202,7 @@ function TEvent.GetEvent (VAR calFile : Text)
             alarm.ParseAlarm(calFile);
 
           RECUR_RULE_TK:
-            recurrule.ParseRRule(value, recurRule)
+            recurrule.ParseRRule(value)
         end;  (* case *)
 
       end;  (* if *)
