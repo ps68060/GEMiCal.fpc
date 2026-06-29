@@ -3,9 +3,9 @@
 
 unit Cal;
 
-(* Aauthor  : P SLEGG
-   Date    : 17th May 2020 Version 1
-   Purpos : TCal object for ICS file.
+(* Author  : P SLEGG
+ * Date    : 17th May 2020 Version 1
+ * Purpose : TCal object for ICS file.
 *)
 
 interface
@@ -30,7 +30,8 @@ type
     procedure WriteIcsHeader(var calFile : Text);
     procedure WriteIcsFooter(var calFile : Text);
     procedure SaveIcs (directory : String);
-  end;
+    procedure UpdateIcs (directory : String, filename : String, TEvent : event);
+end;
 
 implementation
 
@@ -226,6 +227,61 @@ procedure TCal.SaveIcs (directory : String);
     close(calFile);
     
     WriteIcsFooter(calFile);
+  end;
+
+
+procedure TCal.UpdateIcs (directory : String, filename : String, TEvent : event);
+  (*
+   * Purpose : Update an existing ics file.
+   *           Read the existing file
+   *           Write the content to a new temporary file
+   *           until reaching the closing footer.
+   *  inputs : directory
+   *           filename of file to be read
+   *           event to be added to the ics file.
+   *)
+  var
+    inFile,
+    tempFile       : Text;
+
+    tempFileName,
+    line           : String;
+
+  begin
+    log.level := LLDEBUG;
+
+    (* Check if the file exists *)
+    if not FileExists(FileName)
+    then
+      Exit;
+
+    (* Open the input file for reading *)
+    assign (inFile, directory + filename);
+    reset (inFile);
+
+    tempFileName := directory + '/calTemp.ics';
+    assign (tempFile, tempFilename);
+    rewrite (tempFile);
+
+    while not EOF(inFile) do
+    begin
+      readln (inFile, line);
+
+      if line = END_CAL_TK
+      then
+      begin
+        event.SaveEvent(tempFilename);
+        WriteIcsFooter(tempFilename);
+      else
+        writeln (tempFilename, line);
+    end;
+
+    close (inFile);
+    close (tempFile);
+
+    delete(filename);
+    rename(tempFilename, filename);
+    log.debug ('Updated ics file ', directory + '/' + filename);
   end;
 
 end.
