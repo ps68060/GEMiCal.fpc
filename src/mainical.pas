@@ -7,6 +7,7 @@ interface
 
 uses
   owindows,
+  otypes,
 
   DlgAbout,
   DlgConv,
@@ -60,6 +61,7 @@ type
                   procedure Work; VIRTUAL;
                 end;
 
+  PMyApplication = ^TMyApplication;
   TMyApplication = OBJECT(TApplication)
                      iCal       : TCal;
                      winCal     : PWinCal;
@@ -68,10 +70,8 @@ type
 
                      procedure INITInstance;                  virtual;
                      procedure INITMainWindow;                virtual;
-                     procedure MUButton(data : TEventData);   virtual;
-
-                     // Handle AES Events
-//                     procedure HandleEvent(var Event: TAesEvent); virtual;
+//                     procedure MUButton(data : TEventData);   virtual;
+                     procedure MUKeybd(data : TEventData);      virtual;
 
   end;
 
@@ -90,7 +90,8 @@ implementation
     gem,
     Logger,
     DateStrc,
-    CellGrid;
+    CellGrid,
+    Nvram;
 
 
 (* ------------------------------------------------------------------------------- *)
@@ -101,25 +102,34 @@ var
 
   directory    : String;
 
+    appNavPrevMon  : PNavPrevMon;
+    appNavNextMon  : PNavNextMon;
 
-destructor TMyApplication.done;
+    appNavPrevYear : PNavPrevYear;
+    appNavNextYear : PNavNextYear;
+
+destructor TMyApplication.Done;
   begin
-    inherited Destroy;
+//    inherited Destroy;
   end;
 
 
 function ToBiosKey(scan: Word)
         : Word;
   (* Purpose: Normalise a scan code into BIOS format *)
+  var
+    x : Word;
   begin
-    ToBiosKey := scan shl 8;
+    x := scan shl 8;
+    writeln('key = ', x);
+    ToBiosKey := x;
   end;
 
 
 procedure TMyApplication.INITInstance;
 const
-//    K_Left  = $4B00;
-//    K_Right = $4D00;
+    K_Left  = $4B00;
+    K_Right = $4D00;
     K_Up    = $4800;
     K_Down  = $5000;
 
@@ -128,11 +138,6 @@ const
     appLoadMenu    : PLoadMenu;
     appDialogMenu  : PDialogMenu;
     appCalMenu     : PCalMenu;
-    appNavPrevMon  : PNavPrevMon;
-    appNavNextMon  : PNavNextMon;
-
-    appNavPrevYear : PNavPrevYear;
-    appNavNextYear : PNavNextYear;
 
   begin
     log.level := LLINFO;
@@ -157,12 +162,11 @@ const
     appNavPrevMon  := new (PNavPrevMon,  Init(@SELF, K_Ctrl, K_Up,   M_MONTHPREV, M_DESK3));  // K_Up
     appNavNextMon  := new (PNavNextMon,  Init(@SELF, K_Ctrl, K_Down, M_MONTHNEXT, M_DESK3));  // K_Down
 
-    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, ToBiosKey(KbLeft),  M_YEARPREV,  M_DESK3));  // K_Left
-    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, ToBiosKey(KbRight), M_YEARNEXT,  M_DESK3));  // K_Right
-
-    Attr.EventMask := MU_MESAG or MU_KEYBD or MU_BUTTON;
+    appNavPrevYear := new (PNavPrevYear, Init(@SELF, K_Ctrl, K_Left,  M_YEARPREV,  M_DESK3));  // K_Left
+    appNavNextYear := new (PNavNextYear, Init(@SELF, K_Ctrl, K_Right, M_YEARNEXT,  M_DESK3));  // K_Right
 
     INHERITED INITInstance;
+
     SetQuit (M_END, M_DESK2);
   end;
 
@@ -177,6 +181,8 @@ procedure TMyApplication.INITMainWindow;
   begin
     log.level := LLDEBUG;
     log.debug('INIT Main Window');
+    
+    ReadLang;
 
     if MyApplication.winCal = NIL
     then
@@ -210,7 +216,7 @@ procedure TMyApplication.INITMainWindow;
     //myApplication.winCal^.calDate.free //todo ???;
   end;
 
-
+(*
 procedure TMyApplication.MUButton(data: TEventData);
   var
     x, y,
@@ -222,6 +228,30 @@ procedure TMyApplication.MUButton(data: TEventData);
     b := data.mB;   // 1=left, 2=right, 4=middle
   
     writeLn('Mouse clicked at ', x, ',', y, ' button=', b);
+  end;
+*)
+
+
+procedure TMyApplication.MUKeybd(data : TEventData);
+  const
+    K_Up    = $4800;
+    K_Down  = $5000;
+    K_Left  = $4B00;
+    K_Right = $4D00;
+
+  var
+    key            : Word;
+
+  begin
+    key := data.key;
+    writeln('Key: ' + IntToHex(key, 4));
+    
+    case key of
+      K_Up    : appNavPrevMon^.Work;
+      K_Down  : appNavNextMon^.Work;
+      K_Left  : appNavPrevYear^.Work;
+      K_Right : appNavNextYear^.Work;
+    end;    
   end;
 
 

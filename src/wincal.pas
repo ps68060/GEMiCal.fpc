@@ -533,9 +533,9 @@ function TWinCal.WriteDates
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
 
     firstOffset := GetFirstOffset(calDate);
-    writeln('DayOfWeek    =', DayOfWeek(calDate) );
-    writeln('DayOfTheWeek =', DayOfTheWeek(calDate), ' ', DateToISO8601(calDate) );
-    writeln('firstOffset  =', firstOffset);
+//    writeln('DayOfWeek    =', DayOfWeek(calDate) );
+//    writeln('DayOfTheWeek =', DayOfTheWeek(calDate), ' ', DateToISO8601(calDate) );
+//    writeln('firstOffset  =', firstOffset);
 
  CalcCellGrid(firstOffset, 1, row, col);
  log.level := LLDEBUG;

@@ -30,7 +30,9 @@ type
     procedure WriteIcsHeader(var calFile : Text);
     procedure WriteIcsFooter(var calFile : Text);
     procedure SaveIcs (directory : String);
-    procedure UpdateIcs (directory : String, filename : String, TEvent : event);
+    procedure UpdateIcs (directory : String;
+                         filename  : String;
+                         event     : TEvent);
 end;
 
 implementation
@@ -230,7 +232,9 @@ procedure TCal.SaveIcs (directory : String);
   end;
 
 
-procedure TCal.UpdateIcs (directory : String, filename : String, TEvent : event);
+procedure TCal.UpdateIcs (directory : String;
+                          filename  : String;
+                          event     : TEvent);
   (*
    * Purpose : Update an existing ics file.
    *           Read the existing file
@@ -270,17 +274,18 @@ procedure TCal.UpdateIcs (directory : String, filename : String, TEvent : event)
       if line = END_CAL_TK
       then
       begin
-        event.SaveEvent(tempFilename);
-        WriteIcsFooter(tempFilename);
+        event.SaveEvent(tempFile);
+        WriteIcsFooter(tempFile);
+      end
       else
-        writeln (tempFilename, line);
+        writeln (tempFile, line);
     end;
 
     close (inFile);
     close (tempFile);
 
-    delete(filename);
-    rename(tempFilename, filename);
+    DeleteFile(filename);
+    RenameFile(tempFilename, filename);
     log.debug ('Updated ics file ', directory + '/' + filename);
   end;
 

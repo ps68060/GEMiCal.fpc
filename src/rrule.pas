@@ -20,10 +20,13 @@ type
     byMonth    : array of Integer;   // 1..12
     byMonthDay : array of Integer;   // 1..31 or -31..-1
     
-    recurUntilDate : DateStrc;
+    recurUntilDate : TDateStruct;
 
-    procedure ParseRRule(const value: String;
-                         var rule: TRRule);
+    procedure ParseRRule(const value: String);
+
+    procedure GetRecurEnd(startDate: TDateTime);
+
+    function  CalcRecurEnd : Integer;
 
   end;
 
@@ -134,7 +137,7 @@ procedure TRRule.ParseRRule(const value: String);
   end;
 
 
-procedure GetRecurEnd(startDate: TDateTime);
+procedure TRRule.GetRecurEnd(startDate: TDateTime);
   (*
    * Purpose: Determine when the recurring event will end and store as a TDateStruct.
    *)
@@ -160,7 +163,7 @@ procedure GetRecurEnd(startDate: TDateTime);
   end;
 
 
-function CalcRecurEnd : Integer;
+function TRRule.CalcRecurEnd : Integer;
   (*
    * Purpose: Calculate the number of days until the recurrence ends based on COUNT.
    *          Supports DAILY, WEEKLY, MONTHLY, and YEARLY frequencies.

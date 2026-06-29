@@ -23,7 +23,7 @@ type
   end;
 
 
-  // FPC’s Atari RTL provides this
+  // FPCs Atari RTL provides this
   // Uses C declaration
   // xbi to map to XBIOS trap dispatcher trap #14
   function NVMaccess(mode   : Integer;
@@ -41,7 +41,7 @@ const
             = ('US-English', 'German',     'French',    'UK-English',
                'Spanish',    'Italian',    'Swedish',
                'Swiss-French', 'Swiss-German',
-               'Danish',     'Dutch',      'Norwegian', 'Czech'
+               'Danish',     'Dutch',      'Norwegian', 'Czech',
                'Slovak',     'Hungarian',  'Polish',    'Russian',
                'Finnish',    'Portuguese', 'Turkish');
 
