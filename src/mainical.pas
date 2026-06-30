@@ -2,6 +2,7 @@
 {$mode objfpc}
 
 unit MainIcal;
+{$I gemical.i}
 
 interface
 
@@ -13,11 +14,7 @@ uses
   DlgConv,
   Cal,
   WinCal,
-  Tos, aes, vdi,
-  DateUtils,
-  SysUtils;
-
-{$I gemical.i}
+  Tos, aes, vdi;
 
 const
   dAppName = 'GEMiCal';
@@ -89,9 +86,11 @@ implementation
     Dos,
     gem,
     Logger,
-    DateStrc,
     CellGrid,
-    Nvram;
+    DateStrc,
+    Resource,
+    DateUtils,
+    SysUtils;
 
 
 (* ------------------------------------------------------------------------------- *)
@@ -142,13 +141,15 @@ const
   begin
     log.level := LLINFO;
 
-    (* Get current path *)
-    GetDir (0, directory);
+    LoadResourceFiles;
 
-    LoadResource ('GEMICAL.RSC','');
+//    (* Get current path *)
+//    GetDir (0, directory);
 
-    (* Load and set-up the menu *)
-    LoadMenu (TREE000);
+//    LoadResource ('GEMICAL.RSC','');
+
+//    (* Load and set-up the menu *)
+//    LoadMenu (TREE000);
 
     appDeskMenu := new (PDeskMenu,  Init(@SELF, K_Ctrl, Ctrl_I, M_INFO,     M_DESK1));       (* Info *)
 
