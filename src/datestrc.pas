@@ -3,10 +3,10 @@
 
 unit DateStrc;
 
-(* AUTHOR  : P SLEGG
-   DATE    : 17th May 2020 Version 1
-   PURPOSE : TDateStruct object for the parsed an converted ICS Event.
-*)
+(* Author  : P SLEGG
+ * Date    : 17th May 2020 Version 1
+ * Purpose : TDateStruct object for the parsed an converted ICS Event.
+ *)
 
 interface
   uses
