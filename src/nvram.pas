@@ -6,6 +6,7 @@ unit nvram;
 interface
 
 uses
+  Xbios,
   Objects;
 
 type
@@ -22,17 +23,7 @@ type
     scsi      : Byte;
   end;
 
-
-  // FPCs Atari RTL provides this
-  // Uses C declaration
-  // xbi to map to XBIOS trap dispatcher trap #14
-  function NVMaccess(mode   : Integer;
-                     start  : Integer;
-                     count  : Integer;
-                     buffer : Pointer)
-          : Integer;   cdecl;   external 'xbi';
-
-  procedure ReadLang;
+ procedure ReadLang;
 
 implementation
 
@@ -50,7 +41,7 @@ procedure ReadLang;
   var
     nv : TNVRam;
   begin
-    NVMaccess(0, 0, SizeOf(nv), @nv);  // mode 0 = read
+    NVMaccess(0, 0, SizeOf(nv), @nv);  // mode (0 = read), start, count, buffer
     writeLn('Language code = ', nv.language);
     writeLn('Language name = ', LANGUAGES[nv.language]);
   end;
