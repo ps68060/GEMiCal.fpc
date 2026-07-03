@@ -14,7 +14,7 @@ interface
 
   type
     TCalCell  = class
-      cellEvents : array [0..9] of TCellEvent;
+      cellEvents : array [0..CALCELL_EVENTS_MAX] of TCellEvent;
       eventNum   : Integer;
       counter    : Integer;
 

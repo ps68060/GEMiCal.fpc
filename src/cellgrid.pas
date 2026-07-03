@@ -11,6 +11,7 @@ interface
   uses
     Objects,
 
+    Constant,
     Cal,
     CalCell,
     DateStrc,
@@ -18,12 +19,9 @@ interface
     Event,
     SysUtils;
 
-  const
-    GRIDDAYS  = 31;
-
   type
     TCellGrid = class
-      calCell    : array [1..GRIDDAYS] of TCalCell;
+      calCell    : array [1..GRID_DAYS] of TCalCell;
 
       constructor Create;
       destructor  Destroy; override;
@@ -52,7 +50,7 @@ constructor TCellGrid.Create;
     i : Integer;
 
   begin
-    for i := 1 to GRIDDAYS
+    for i := 1 to GRID_DAYS
     do
     begin
       calCell[i] := TCalCell.Create;
@@ -65,7 +63,7 @@ destructor TCellGrid.Destroy;
     i : Integer;
 
   begin
-    for i := 1 to GRIDDAYS
+    for i := 1 to GRID_DAYS
     do
     begin
       calCell[i].Free;

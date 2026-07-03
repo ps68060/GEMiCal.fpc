@@ -23,18 +23,19 @@ const
   dAppName = 'GEMiCal';
   TITLE_FONT_SIZE = 20;
   BODY_FONT_SIZE  = 10;
+  EVENT_FONT_SIZE = 7;
 
 type
 
-  PWinCal     = ^TWinCal;
-  TWinCal     = OBJECT(TWindow)
-                private
-                    titleHeight,
-                    headerHeight, 
-                    cellWidth,
-                    cellHeight : integer;
+  PWinCal    = ^TWinCal;
+  TWinCal    = OBJECT(TWindow)
+                 private
+                   titleHeight,
+                   headerHeight, 
+                   cellWidth,
+                   cellHeight : integer;
 
-                public
+                 public
                    calDate : TDateTime;
                    conf    : TConfig;
 
@@ -66,7 +67,15 @@ type
                                             var rowColVar : array of SmallInt);
 
                    procedure DrawGrid(rows : Integer);
-                 END;
+
+//                   procedure FilterCal;
+                   procedure DrawBox(x, y,
+                                     w, h   : SmallInt);
+
+                   function DrawText(x, y : SmallInt;
+                                     const text : String)
+                          : TAESObject);
+  end;
 
 var
   cellGr          : TCellGrid;
@@ -151,7 +160,7 @@ procedure TWinCal.SetupSize;
       headerHeight := hCell * 2;
   
       cellHeight   := hCell * 6; (*(H - headerHeight) div 6;*)
-      cellWidth    := (W - X*2) div 7;  //todo - improve calcs
+      cellWidth    := (W - X*2) div DAYS_IN_WEEK;  //todo - improve calcs
     end;
   
     Calc(WC_BORDER, Work, Curr)
@@ -411,7 +420,7 @@ procedure TWinCal.DrawGridHeading;
     DrawGrid (1);
   
     (* Write Day labels *)
-    for c := 1 to 7 do
+    for c := 1 to DAYS_IN_WEEK do
     begin
       CalcWinXY(0, c-1, pxy[0], pxy[1]);
       v_gtext(vdiHandle,
@@ -440,7 +449,7 @@ procedure TWinCal.DrawGrid(rows  : Integer);
   
     (* Draw heading line *)
     pxy[0] := Curr.X;  //todo - fudged to the right
-    pxy[2] := Curr.X + (7 * cellWidth);  (* constant X for horizontal line *)
+    pxy[2] := Curr.X + (DAYS_IN_WEEK * cellWidth);  (* constant X for horizontal line *)
   
     (* Draw horizontal lines for weeks by changing y co-ords *)
     //writeln ('Draw horizontal grid ', work.Y, ':', curr.Y);
@@ -459,7 +468,7 @@ procedure TWinCal.DrawGrid(rows  : Integer);
     end;
 
     (* Draw vertical lines for days by changing x co-ords *)
-    for c := 1 to 8 do  (* 8 vertical lines for 7 columns *)
+    for c := 1 to DAYS_IN_WEEK + 1 do  (* DAYS_IN_WEEK + 1 vertical lines for DAYS_IN_WEEK columns *)
     begin
       (* Use column to calc X co-ord in [0] *)
       CalcWinXY (0,    c-1, pxy[0], pxy[1]);
@@ -476,7 +485,7 @@ procedure TWinCal.DrawGrid(rows  : Integer);
 function GetFirstOffset(aDate : TDateTime)
         : Integer;
   begin
-    GetFirstOffset := (DayOfWeek(aDate) + 6) mod 7;
+    GetFirstOffset := (DayOfWeek(aDate) + 6) mod DAYS_IN_WEEK;
   end;
 
 
@@ -556,7 +565,7 @@ function TWinCal.WriteDates
         v_gtext(vdiHandle,
                 scrollX + pxy[0] + Attr.boxWidth div 2,
                 scrollY + pxy[1] + Attr.boxHeight,  (* Use char height and not the char cell height *)
-                IntToStr(i) + ' ' + day2[(DayOf(calDate) + i) mod 7]);
+                IntToStr(i) + ' ' + day2[(DayOf(calDate) + i) mod DAYS_IN_WEEK]);
         vst_effects(vdiHandle, TF_NORMAL);
       end
       else
@@ -598,6 +607,8 @@ procedure TWinCal.DisplayEvents;
   
     day,
     i           : Integer;
+
+    eventAesObj    : array[1..GRID_DAYS, 0..CALCELL_EVENTS_MAX] of TAESObject;  // 10 events per day max
   
   begin
     log.level := LLDEBUG;
@@ -609,9 +620,9 @@ procedure TWinCal.DisplayEvents;
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wCell, hCell);
     offset    := hCell + hcell div 2;
   
-    vst_point(vdiHandle, 7, wchar, hchar, wCell, hCell);
+    vst_point(vdiHandle, EVENT_FONT_SIZE, wchar, hchar, wCell, hCell);
   
-    for day := 1 to 31 do
+    for day := 1 to GRID_DAYS do
     begin
       CalcCellGrid (GetFirstOffset(calDate), day, row, col);
       CalcWinXY(row, col, pixX, pixY);
@@ -636,6 +647,11 @@ procedure TWinCal.DisplayEvents;
                   scrollX + pixX + Attr.boxWidth div 2,
                   scrollY + pixY + offset + Attr.boxHeight div 2,    //  (i + 1) * lineSpace,
                   timePlace );
+
+//          eventAesObj[day, i] := DrawText(scrollX + pixX + Attr.boxWidth div 2,
+//                                          scrollY + pixY + offset,
+//                                          summ);
+
         end;  // for
       end;  // if
     end;  // for
@@ -643,4 +659,80 @@ procedure TWinCal.DisplayEvents;
     vst_point(vdiHandle, BODY_FONT_SIZE, wchar, hchar, wcell, hcell);
   end;
 
+(**
+procedure TWinCal.FilterCal;
+  ( *
+   * Purpose: Get the events for the date.
+   *
+  begin
+    log.level := LLDEBUG;
+    log.debug('FilterCal: start');
+    log.debug('FilterCal: date= ', DateToISO8601(calDate, false) );
+  
+    if (cellGr <> NIL)
+    then
+    cellGr.Free;
+  
+    cellGr := TCellGrid.Create;
+    cellGr.FilterEvents(myApplication.iCal,
+                        calDate);
+    log.debug('FilterCal: done');
+  
+  end;
+*)
+
+procedure TWinCal.DrawBox(x, y,
+                          w, h   : SmallInt);
+  (* Purpose : Draw an AES box at x, y with width w and height h with outline.
+   *)   
+  var
+    box      : TAESOBJECT;
+  
+  begin
+    box.ob_next := NIL;
+    box.ob_head := NIL;
+    box.ob_tail := NIL;
+
+    box.ob_type  := G_BOX;
+    box.ob_flags := NONE;
+    box.ob_state := NORMAL;
+    box.ob_flags := OUTLINED;
+
+    box.ob_x      := x;    // left
+    box.ob_y      := y;    // top
+    box.ob_width  := w;
+    box.ob_height := h;
+
+    objc_draw(@box, 0, 1,
+               box.ob_x,     box.ob_y,
+               box.ob_width, box.ob_height);
+  end;
+
+
+function TWinCal.DrawText(x, y : SmallInt;
+                          const text : String)
+        : TAESObject);
+  (* Purpose : Draw an AES text at x, y.
+   * Returned AES objs are used later to detect clicks.txtobj
+   * store as LineObj[0..n] of TAESObject
+   * Detect the mouse click with   if objc_find(@LineObj[i], 0, 1, mx, my) = 0 then
+   *)
+  begin
+    txtObj.ob_next := NIL;
+    txtObj.ob_head := NIL;
+    txtObj.ob_tail := NIL;
+
+    txtObj.ob_type  := G_TEXT;
+    txtObj.ob_flags := SELECTABLE;
+    txtObj.ob_state := NORMAL;
+
+    txtObj.ob_x      := x;    // left
+    txtObj.ob_y      := y;    // top
+    txtobj.ob_height := BODY_FONT_SIZE;
+    txtObj.ob_spec   := text;
+
+    objc_draw(@txtObj, 0, 1,
+               txtObj.ob_x,   txtObj.ob_y,
+               Attr.boxWidth, Attr.boxHeight);
+  end;
 end.

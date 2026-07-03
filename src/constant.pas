@@ -32,6 +32,9 @@ interface
     ALARM_DESC_TK   = 'DESCRIPTION:';
     ALARM_ACTION_TK = 'ACTION:';
 
+    DAYS_IN_WEEK        = 7;
+    GRID_DAYS           = 31;
+    CALCELL_EVENTS_MAX  = 9;
 implementation
 
 end.
